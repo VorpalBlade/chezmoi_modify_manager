@@ -62,6 +62,18 @@ For detailed usage instructions see `chezmoi_ini_manager.py --help`
    the modify script.
 2. Add this repository as a submodule at `.utils/chezmoi_modify_manager`. If
    you use another path, the `chezmoi_ini_add` script will not work as is for you.
+   This can be done as follows:
+ 
+   ```console
+   $ chezmoi cd
+   $ git submodule add https://github.com/VorpalBlade/chezmoi_modify_manager.git .utils/chezmoi_modify_manager
+   $ git commit [...]
+   ```
+
+   Note that as long as you use `chezmoi init` and `chezmoi update` everything
+   else will be taken care of automatically. If you use `git` commands directly
+   you will need to ensure that you use `--recurse-submodules=on-demand` as needed.
+
 3. (Optional) For your convenience considering adding `chezmoi_ini_add` to your
    `$PATH` by either a symlink into something that is in your `$PATH` or by
    adding the bin directory of this repository to your path. If you use zsh with
