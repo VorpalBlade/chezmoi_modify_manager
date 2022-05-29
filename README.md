@@ -80,6 +80,11 @@ For detailed usage instructions see `chezmoi_ini_manager.py --help`
    a plugin manager that allows loading plugins from arbitrary paths (e.g.
    zsh4humans), this repository is set up as a zsh plugin for ease of use.
 
+## Updating
+
+To update to a newer version of chezmoi-modify-manager, update the revision of
+the submodule that is pointed to, add it and commit your repository.
+
 ## Requirements
 
 * Python 3.10 or newer for `chezmoi_ini_manager.py`.
