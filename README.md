@@ -96,6 +96,14 @@ $ git commit [...]
 $ git push [...]
 ```
 
+## Usage
+
+Details of supported actions can be seen with `chezmoi_ini_manager.py --help`.
+See `chezmoi_ini --help` for details on how to use that script.
+
+Some examples on various ignore flags and transforms can be found in
+[EXAMPLES.md](EXAMPLES.md).
+
 ## Requirements
 
 * Python 3.10 or newer for `chezmoi_ini_manager.py`.
