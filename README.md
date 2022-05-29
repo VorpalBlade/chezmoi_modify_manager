@@ -114,3 +114,10 @@ Optional:
 
 * python-keyring is required for the `keyring` transform to pull passwords from
   kwallet/gnome-keyring/etc.
+
+## Limitations
+
+* When a key exists in the `.src.ini` file but not in the target state it will
+  be added to the end of the relevant section. This is not an issue as the
+  program will usually just resort the file next time it writes out its
+  settings.
