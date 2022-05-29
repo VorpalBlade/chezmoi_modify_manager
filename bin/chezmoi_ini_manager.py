@@ -3,13 +3,6 @@
 Chezmoi modify_ script helper to handle ini files (mostly from KDE)
 
 Needs Python 3.10 or later.
-
-Known issues:
-* Dolphin puts a key-value pair before the first section. This is only
-  semi-supported. It must exist in the target file already to work.
-* Keys and sections that don't exist in the target state are tacked on to the
-  end and formatted funny. This will still work correctly. Next time KDE saves
-  the file and overwrites it, the formatting will end up fixed though.
 """
 
 import enum
