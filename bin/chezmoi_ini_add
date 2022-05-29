@@ -46,6 +46,19 @@ add_with_script() {
     create_script $script_file
 }
 
+if [[ $# -gt 0 && ( $1 == -h || $1 == --help) ]]; then
+    printf "Usage: $0 <file in managed directory> ...\n"
+    printf "\n"
+    printf "Use this instead of chezmoi add for the ini files in question.\n"
+    printf "\n"
+    printf "The script can also convert files that are currently managed as\n"
+    printf "plain settings files to be managed by chezmoi_ini_manager.\n"
+    printf "\n"
+    printf "Finally it can update the .src.ini if a settings file is already\n"
+    printf "managed by chezmoi_ini_manager.\n"
+    exit 1
+fi
+
 while [[ $# -gt 0 ]]; do
     dest_file="$1"
     if [[ ! -f $dest_file ]]; then
