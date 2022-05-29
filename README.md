@@ -68,6 +68,7 @@ For detailed usage instructions see `chezmoi_ini_manager.py --help`
    $ chezmoi cd
    $ git submodule add https://github.com/VorpalBlade/chezmoi_modify_manager.git .utils/chezmoi_modify_manager
    $ git commit [...]
+   $ git push [...]
    ```
 
    Note that as long as you use `chezmoi init` and `chezmoi update` everything
@@ -83,7 +84,17 @@ For detailed usage instructions see `chezmoi_ini_manager.py --help`
 ## Updating
 
 To update to a newer version of chezmoi-modify-manager, update the revision of
-the submodule that is pointed to, add it and commit your repository.
+the submodule that is pointed to, add it and commit your repository:
+
+```console
+$ chezmoi cd
+$ cd .utils/chezmoi_modify_manager
+$ git pull origin main
+$ cd ../..
+$ git add .utils/chezmoi_modify_manager
+$ git commit [...]
+$ git push [...]
+```
 
 ## Requirements
 
