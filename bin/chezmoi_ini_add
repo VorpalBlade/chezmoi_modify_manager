@@ -1,0 +1,74 @@
+#!/usr/bin/env zsh
+
+# Script to add a config file for processing with chezmoi_ini_manager.py
+# Assumes chezmoi_ini_manager is installed as
+# <chezmoi-source-dir>/.utils/chezmoi_modify_manager/bin/chezmoi_ini_manager.py
+# If not, adjust path in exec call in create_script()
+
+create_script() {
+    local script_file=$1
+    # We do NOT want to overwrite the script, if it exists the user will likely
+    # have added custom flags to chezmoi_ini_manager to ignore/transform (that is the
+    # whole point after all).
+    if [[ ! -f $script_file ]]; then
+        cat > $script_file << 'END'
+#!/bin/bash
+
+src_path="{{ .chezmoi.sourceDir }}"
+script="{{ .chezmoi.sourceFile }}"
+
+src_file="${script/.tmpl/.src.ini}"
+src_file="${src_file/modify_}"
+
+# Add your options to chezmoi_ini_manager.py here
+options=(
+)
+
+exec "${src_path}/.utils/chezmoi_modify_manager/bin/chezmoi_ini_manager.py" \
+    -s "${src_path}/${src_file}" \
+    "${options[@]}"
+END
+    echo "New script at $script_file"
+fi
+}
+
+# Add with script wrapper.
+# $1 Path in ~
+add_with_script() {
+    local dest_file=$1
+    echo "Setting up new script..."
+    chezmoi add "$dest_file"
+    local src_path="$(chezmoi source-path $dest_file)"
+    local src_dir=${src_path%/*}
+    local data_file=${src_path}.src.ini
+    local script_file=$src_dir/modify_${src_path##*/}.tmpl
+    mv $src_path $data_file
+    create_script $script_file
+}
+
+while [[ $# -gt 0 ]]; do
+    dest_file="$1"
+    if [[ ! -f $dest_file ]]; then
+        echo "Must use existing file!"
+        exit 1
+    fi
+
+    # Check if we are re-adding a file or adding a new file:
+    if [[ -f "$(chezmoi source-path $dest_file 2>/dev/null)" ]]; then
+        src_path="$(chezmoi source-path $dest_file)"
+        # Figure out state of this file. Is it a modify script?
+        if [[ $src_path =~ modify_ ]]; then
+            echo "Updating existing .src.ini file..."
+            cp "$dest_file" "${${src_path/modify_/}%.tmpl}.src.ini"
+        else
+            echo "Converting existing..."
+            # This case is the same as adding a new file.
+            add_with_script $dest_file
+        fi
+    else
+        echo "Setting up new script..."
+        add_with_script $dest_file
+    fi
+
+    shift 1
+done
