@@ -45,15 +45,23 @@ will tell it to ignore the key `Show Inline Previews` in the section
 **Note!** If a key appears before the first section, use `<NO_SECTION>` as the
 section.
 
-### Supported actions
+### Supported features
 
-For detailed usage instructions see `chezmoi_ini_manager.py --help`
+For detailed usage instructions on the filtering see `chezmoi_ini_manager.py --help`
 
 * Ignore entire section.
 * Ignore specific key in specific section.
 * Ignore key in section based on regular expressions.
 * Apply a transformation to the value of a specified key. These are implemented
   as python functions. A list of transforms is available via `--transform-list`.
+
+The add script also has some nice features (see `chezmoi_ini_add --help`):
+
+* Smart re-add mode (re-add files as managed `.src.ini` if they are already
+  managed, otherwise add with plain chezmoi).
+* Conversion mode (convert from plain chezmoi to managed to `.src.ini`).
+* User specified hook. Can be used to filter out passwords when adding or
+  re-adding configuration files. See [EXAMPLES.md](EXAMPLES.md#add-hook) for details.
 
 ## Installation
 
