@@ -34,6 +34,8 @@ if [[ $help ]]; then
     exit 0
 fi
 
+# Path for hook
+HOOK_PATH="$(chezmoi source-path)/.chezmoi_modify_manager.add_hook"
 
 create_script() {
     local script_file=$1
@@ -58,7 +60,7 @@ exec "${src_path}/.utils/chezmoi_modify_manager/bin/chezmoi_ini_manager.py" \
     -s "${src_path}/${src_file}" \
     "${options[@]}"
 END
-        echo "New script at $script_file"
+        echo "     New script at $script_file"
     fi
 }
 
@@ -71,7 +73,15 @@ add_with_script() {
     local src_dir=${src_path%/*}
     local data_file=${src_path}.src.ini
     local script_file=$src_dir/modify_${src_path##*/}.tmpl
-    mv $src_path $data_file
+    # If the hook exists, execute it instead of just moving the file
+    if [[ -f $HOOK_PATH ]]; then
+        echo "     Executing hook script..."
+        $HOOK_PATH ini $dest_file $data_file < $src_path > $data_file
+        rm $src_path
+    else
+        echo "     No hook script found, performing direct update."
+        mv $src_path $data_file
+    fi
     create_script $script_file
 }
 
@@ -89,7 +99,14 @@ while [[ $# -gt 0 ]]; do
         # Figure out state of this file. Is it a modify script?
         if [[ $src_path =~ modify_ ]]; then
             echo "  -> Updating existing .src.ini file for $dest_file..."
-            cp "$dest_file" "${${src_path/modify_/}%.tmpl}.src.ini"
+            data_file="${${src_path/modify_/}%.tmpl}.src.ini"
+            if [[ -f $HOOK_PATH ]]; then
+                echo "     Executing hook script..."
+                $HOOK_PATH ini $dest_file $data_file < $dest_file > $data_file
+            else
+                echo "     No hook script found, performing direct update."
+                cp $dest_file $data_file
+            fi
         else
             if [[ ! $smart ]]; then
                 echo "  -> Converting existing file $dest_file to managed..."
