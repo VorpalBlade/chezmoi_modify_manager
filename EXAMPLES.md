@@ -9,6 +9,7 @@ Here are some useful examples of flags for various settings files I have come ac
 -is MainWindow
 -is KPropertiesDialog
 -ik General ViewPropsTimestamp
+-ik "Open-with settings" History
 ```
 
 ### kdeglobals
@@ -18,11 +19,29 @@ Here are some useful examples of flags for various settings files I have come ac
 ```
 
 ### kglobalshortcutsrc
-Here a regular expression is more useful. This not state as such but a key
-that seems to vary between different computers with different UUID values.
+There are two issues in this configuration.
+
+First, ActivityManager switch-to-activity entries. There are multiple entries,
+making it a perfect fit for a regular expression. Note that this is not state
+per se. It does however seem to vary between computers, having different UUID
+values.
+
+Second, certain media shortcut keys like flipping between two representations.
+A specialised transform has been added to handle this case. When this is needed you
+will see diffs like the following:
+
+```diff
+-playmedia=none,,Play media playback
++playmedia=none,none,Play media playback
+```
+
+In summary, the following seems to work well:
 
 ```bash
 -ikr ActivityManager 'switch-to-activity-.*'
+-tk kde_media_shortcut "mediacontrol" "mediavolumedown" "{}"
+-tk kde_media_shortcut "mediacontrol" "mediavolumeup" "{}"
+-tk kde_media_shortcut "mediacontrol" "playmedia" "{}"
 ```
 
 ### konversationrc
