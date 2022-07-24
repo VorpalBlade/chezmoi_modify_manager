@@ -46,7 +46,7 @@ KeyLineState = tuple[str, str]
 
 # A transform takes two lines and merges them
 # Args: section, key, source data, target data
-Transform = Callable[[str, str, Optional[KeyLineState], KeyLineState], str]
+Transform = Callable[[str, str, Optional[KeyLineState], Optional[KeyLineState]], str]
 
 
 @dataclass
@@ -175,7 +175,12 @@ def process_target(
                     )
                     for k in sorted(unseen_keys):
                         if not is_key_ignored(cur_section, k, mutations):
-                            yield source_kvs[cur_section][k][0]
+                            if (cur_section, k) in mutations.transforms:
+                                yield mutations.transforms[(cur_section, k)](
+                                    cur_section, k, source_kvs[cur_section][k], None
+                                )
+                            else:
+                                yield source_kvs[cur_section][k][0]
                 seen_sections.add(section)
                 seen_keys = set()
                 cur_section = section
@@ -192,8 +197,11 @@ def process_target(
                 if is_key_ignored(section, key, mutations):
                     yield line
                 elif (section, key) in mutations.transforms:
+                    src_data = None
+                    if section in source_kvs and key in source_kvs[section]:
+                        src_data = source_kvs[section][key]
                     yield mutations.transforms[(section, key)](
-                        section, key, source_kvs[section][key], (line, value)
+                        section, key, src_data, (line, value)
                     )
                 elif section in source_kvs and key in source_kvs[section]:
                     yield source_kvs[section][key][0]
@@ -207,14 +215,19 @@ def process_target(
         yield source_sections[section]
         for key, (line, _) in sorted(source_kvs[section].items()):
             if not is_key_ignored(section, key, mutations):
-                yield line
+                if (section, key) in mutations.transforms:
+                    yield mutations.transforms[(section, key)](
+                        section, key, source_kvs[section][key], None
+                    )
+                else:
+                    yield line
 
 
 def transform_unsorted_lists(
     section: str,
     key: str,
     source: Optional[KeyLineState],
-    target: KeyLineState,
+    target: Optional[KeyLineState],
     *,
     separator: str,
 ) -> str:
@@ -225,6 +238,11 @@ def transform_unsorted_lists(
     Args: {"separator": separating character}
     Example args: {"separator": ","}
     """
+    # Deal with case of line in just target or source
+    if target is None:
+        return source[0]
+    if source is None:
+        return target[0]
     ss = set(source[1].split(separator))
     ts = set(target[1].split(separator))
     if ss != ts:
@@ -237,7 +255,7 @@ def transform_kde_media_shortcut(
     section: str,
     key: str,
     source: Optional[KeyLineState],
-    target: KeyLineState,
+    target: Optional[KeyLineState],
 ) -> str:
     """
     Specialised transform to handle KDE changing certain media shortcuts back and forth between formats like:
@@ -249,6 +267,11 @@ def transform_kde_media_shortcut(
     Args: {}
     Example args: {}
     """
+    # Deal with case of line in just target or source
+    if target is None:
+        return source[0]
+    if source is None:
+        return target[0]
     src_split = source[1].split(",")
     tgt_split = target[1].split(",")
     if (
@@ -266,7 +289,7 @@ def transform_value_keyring(
     section: str,
     key: str,
     source: Optional[KeyLineState],
-    target: KeyLineState,
+    target: Optional[KeyLineState],
     *,
     service: str,
     username: str,
@@ -297,6 +320,9 @@ def transform_value_keyring(
         return f"{key}={password}\n"
     except keyring.errors.KeyringError as e:
         print(f"ERROR: Keyring error: {e}", file=stderr)
+        # Try to pull the value from the target instead
+        if target is not None:
+            return target[0]
         return f"{key}=<KEYRING ERROR>\n"
 
 
