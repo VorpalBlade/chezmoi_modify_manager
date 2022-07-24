@@ -196,15 +196,16 @@ def process_target(
                 # Back to handling things that exist in the target
                 if is_key_ignored(section, key, mutations):
                     yield line
-                elif (section, key) in mutations.transforms:
-                    src_data = None
-                    if section in source_kvs and key in source_kvs[section]:
-                        src_data = source_kvs[section][key]
-                    yield mutations.transforms[(section, key)](
-                        section, key, src_data, (line, value)
-                    )
                 elif section in source_kvs and key in source_kvs[section]:
-                    yield source_kvs[section][key][0]
+                    if (section, key) in mutations.transforms:
+                        src_data = None
+                        if section in source_kvs and key in source_kvs[section]:
+                            src_data = source_kvs[section][key]
+                        yield mutations.transforms[(section, key)](
+                            section, key, src_data, (line, value)
+                        )
+                    else:
+                        yield source_kvs[section][key][0]
     # Handle extra sections in source state
     for section in sorted(set(source_sections.keys()).difference(seen_sections)):
         # Before the first section. Special case handled above in case LineType.SectionHeader
