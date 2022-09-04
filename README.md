@@ -91,7 +91,7 @@ The add script also has some nice features (see `chezmoi_ini_add --help`):
 
 4. **You** are in control of updates, there is no auto update functionality. Consider
    subscribing to be notified of new releases on the github repository. This can be
-   done via `Watch` -> `Custom in the top right corner. Or just remember to check the
+   done via `Watch` -> `Custom` in the top right corner. Or just remember to check the
    sub-repo occasionally. Then see the next section for how to perform an update.
 
 ## Updating
