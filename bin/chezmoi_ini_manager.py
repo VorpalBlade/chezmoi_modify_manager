@@ -161,6 +161,21 @@ def process_target(
     seen_sections = set()
     seen_keys = set()
     cur_section = OUTSIDE_SECTION
+    pending_section_header = None
+
+    def emit_pending_section():
+        """
+        Emit the pending section header (if any)
+
+        This deals with the case of a section missing from the source + an ignore key
+        on an entry in that section. Without this, we would emit the entry without
+        the section header.
+        """
+        nonlocal pending_section_header
+        if pending_section_header is not None:
+            yield pending_section_header
+            pending_section_header = None
+
     for data in load_ini(file):
         match data:
             case (LineType.Comment, line):
@@ -185,26 +200,34 @@ def process_target(
                 seen_keys = set()
                 cur_section = section
                 # Back to handling things that exist in the target
+                pending_section_header = None
                 if is_section_ignored(section, mutations):
                     yield line
                 elif section in source_sections:
                     yield source_sections[section]
+                else:
+                    # We need to save the section header in case we do end up having
+                    # to emit it due to an ignored key in the section.
+                    pending_section_header = line
             case (LineType.KeyValue, line, section, key, value):
-                # Keep track of seen keys so we can later on deal with things
+                # Keep track of seen keys, so we can later on deal with things
                 # missing in target but found in source.
                 seen_keys.add(key)
                 # Back to handling things that exist in the target
                 if is_key_ignored(section, key, mutations):
+                    yield from emit_pending_section()
                     yield line
                 elif section in source_kvs and key in source_kvs[section]:
                     if (section, key) in mutations.transforms:
                         src_data = None
                         if section in source_kvs and key in source_kvs[section]:
                             src_data = source_kvs[section][key]
+                        yield from emit_pending_section()
                         yield mutations.transforms[(section, key)](
                             section, key, src_data, (line, value)
                         )
                     else:
+                        yield from emit_pending_section()
                         yield source_kvs[section][key][0]
     # Handle extra sections in source state
     for section in sorted(set(source_sections.keys()).difference(seen_sections)):
