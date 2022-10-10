@@ -12,6 +12,7 @@ options:
          - fix
          - perf
          - refactor
+         - tests
   commit_groups:
     title_maps:
       docs: Documentation
@@ -19,6 +20,7 @@ options:
       fix: Bug Fixes
       perf: Performance Improvements
       refactor: Code Refactoring
+      tests: Unit & integration tests
   header:
     pattern: "^(\\w*)\\:\\s(.*)$"
     pattern_maps:
