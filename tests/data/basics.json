@@ -1,0 +1,7 @@
+{
+  "args": [
+    "-is", "section-sys-ignored",
+    "-is", "section-src-ignored",
+    "-ikr", ".*", ".*_ignored$"
+  ]
+}

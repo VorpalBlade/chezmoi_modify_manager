@@ -127,6 +127,7 @@ Optional:
 
 * python-keyring is required for the `keyring` transform to pull passwords from
   kwallet/gnome-keyring/etc.
+* pytest to run unit tests (only needed if you develop and submit patches).
 
 ## Limitations
 
