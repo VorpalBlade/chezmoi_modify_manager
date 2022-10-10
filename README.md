@@ -114,6 +114,23 @@ $ git push [...]
 Details of supported actions can be seen with `chezmoi_ini_manager.py --help`.
 See `chezmoi_ini --help` for details on how to use that script.
 
+There is a helper script `bin/chezmoi_ini_add` for helping you add new
+files correctly. Call `chezmoi_ini_add --help` fore more info. Some example
+usages:
+
+```bash
+# Add configs to be handled by chezmoi-ini-manager (or convert configs
+# managed by chezmoi to be managed by chezmoi-ini-manager).
+chezmoi_ini_add ~/.config/kdeglobals ~/.config/kwinrc
+
+# Re-add config after changes in the live system.
+chezmoi_ini_add ~/.config/kdeglobals
+
+# Don't remember if chezmoi-ini-manager handles the file or if it is raw chezmoi?
+# Use smart mode (-s) to update the file!
+chezmoi_ini_add -s ~/.config/PrusaSlicer/PrusaSlicer.ini
+```
+
 Some examples on various ignore flags and transforms can be found in
 [EXAMPLES.md](EXAMPLES.md).
 
