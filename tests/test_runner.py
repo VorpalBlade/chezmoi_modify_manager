@@ -31,4 +31,7 @@ def test_example(name: str):
     )
     with base_name.with_suffix(".expected.ini").open(mode="rb") as expected_file:
         expected_data = expected_file.read()
+        # Split on newlines to get easier to read diff from pytest
         assert expected_data.split(b"\n") == result.stdout.split(b"\n")
+        # The non-split data should also be byte-identical.
+        assert expected_data == result.stdout
