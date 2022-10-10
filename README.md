@@ -115,7 +115,7 @@ Details of supported actions can be seen with `chezmoi_ini_manager.py --help`.
 See `chezmoi_ini --help` for details on how to use that script.
 
 There is a helper script `bin/chezmoi_ini_add` for helping you add new
-files correctly. Call `chezmoi_ini_add --help` fore more info. Some example
+files correctly. Call `chezmoi_ini_add --help` for more info. Some example
 usages:
 
 ```bash
