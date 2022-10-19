@@ -26,9 +26,9 @@ making it a perfect fit for a regular expression. Note that this is not state
 per se. It does however seem to vary between computers, having different UUID
 values.
 
-Second, certain media shortcut keys like flipping between two representations.
-A specialised transform has been added to handle this case. When this is needed you
-will see diffs like the following:
+Second, certain shortcut keys like flipping between two representations. A
+specialised transform has been added to handle this case. When this is needed
+you will see diffs like the following:
 
 ```diff
 -playmedia=none,,Play media playback
@@ -39,9 +39,7 @@ In summary, the following seems to work well:
 
 ```bash
 -ikr ActivityManager 'switch-to-activity-.*'
--tk kde_media_shortcut "mediacontrol" "mediavolumedown" "{}"
--tk kde_media_shortcut "mediacontrol" "mediavolumeup" "{}"
--tk kde_media_shortcut "mediacontrol" "playmedia" "{}"
+-tkr kde_shortcut ".*" ".*" "{}"
 ```
 
 ### konversationrc

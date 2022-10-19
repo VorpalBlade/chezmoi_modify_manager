@@ -301,14 +301,14 @@ def transform_unsorted_lists(
         return target[0]
 
 
-def transform_kde_media_shortcut(
+def transform_kde_shortcut(
     section: str,
     key: str,
     source: Optional[KeyLineState],
     target: Optional[KeyLineState],
 ) -> str:
     """
-    Specialised transform to handle KDE changing certain media shortcuts back and forth between formats like:
+    Specialised transform to handle KDE changing certain global shortcuts back and forth between formats like:
     ```
     playmedia=none,,Play media playback
     playmedia=none,none,Play media playback
@@ -325,7 +325,8 @@ def transform_kde_media_shortcut(
     src_split = source[1].split(",")
     tgt_split = target[1].split(",")
     if (
-        src_split[0] == tgt_split[0]
+        len(src_split) == len(tgt_split) == 3
+        and src_split[0] == tgt_split[0]
         and src_split[2] == tgt_split[2]
         and src_split[1] in ("", "none")
         and tgt_split[1] in ("", "none")
@@ -377,7 +378,7 @@ def transform_value_keyring(
 
 
 transform_registry = {
-    "kde_media_shortcut": transform_kde_media_shortcut,
+    "kde_shortcut": transform_kde_shortcut,
     "keyring": transform_value_keyring,
     "unsorted_list": transform_unsorted_lists,
 }
