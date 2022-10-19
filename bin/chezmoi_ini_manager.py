@@ -57,6 +57,7 @@ class Mutations:
     ignore_keys: set[tuple[str, str]]
     ignore_regexes: list[tuple[re.Pattern, re.Pattern]]
     transforms: dict[tuple[str, str], Transform]
+    transform_regexes: list[tuple[re.Pattern, re.Pattern, Transform]]
 
 
 class ParseException(Exception):
@@ -151,6 +152,25 @@ def is_key_ignored(section: str, key: str, mutations: Mutations) -> bool:
     return False
 
 
+def transformed_re(section: str, key: str, mutations: Mutations):
+    """Check if section + key is an ignored regex"""
+    for re_section, re_key, transform in mutations.transform_regexes:
+        if re_section.match(section) and re_key.match(key):
+            return transform
+    return None
+
+
+def is_key_transformed(
+    section: str, key: str, mutations: Mutations
+) -> Transform | None:
+    """Check if key is ignored. Does not handle transformations"""
+    if transform := mutations.transforms.get((section, key), None):
+        return transform
+    if transform := transformed_re(section, key, mutations):
+        return transform
+    return None
+
+
 def process_target(
     file: TextIO | Iterable[str],
     source_sections: SourceSections,
@@ -196,8 +216,10 @@ def process_target(
                     )
                     for k in sorted(unseen_keys):
                         if not is_key_ignored(cur_section, k, mutations):
-                            if (cur_section, k) in mutations.transforms:
-                                yield mutations.transforms[(cur_section, k)](
+                            if transform := is_key_transformed(
+                                cur_section, k, mutations
+                            ):
+                                yield transform(
                                     cur_section, k, source_kvs[cur_section][k], None
                                 )
                             else:
@@ -224,14 +246,12 @@ def process_target(
                     yield from emit_pending_lines()
                     yield line
                 elif section in source_kvs and key in source_kvs[section]:
-                    if (section, key) in mutations.transforms:
+                    if transform := is_key_transformed(cur_section, key, mutations):
                         src_data = None
                         if section in source_kvs and key in source_kvs[section]:
                             src_data = source_kvs[section][key]
                         yield from emit_pending_lines()
-                        yield mutations.transforms[(section, key)](
-                            section, key, src_data, (line, value)
-                        )
+                        yield transform(section, key, src_data, (line, value))
                     else:
                         yield from emit_pending_lines()
                         yield source_kvs[section][key][0]
@@ -417,6 +437,14 @@ def main():
         help="apply transformation to a key, format is transform, section, key, transform args (json dict).",
     )
     parser.add_argument(
+        "-tkr",
+        "--transform-key-re",
+        action="append",
+        nargs=4,
+        default=[],
+        help="apply transformation to a key, format is transform, section regex, key regex, transform args (json dict).",
+    )
+    parser.add_argument(
         "--transform-list",
         action=TransformHelp,
         nargs=0,
@@ -448,11 +476,26 @@ def main():
             transform_registry[transform], **transform_args
         )
 
+    transform_regexes = []
+    for transform, section, key, targs in args.transform_key_re:
+        if transform not in transform_registry:
+            print(f"Unknown transform {transform}", file=stderr)
+            sys.exit(1)
+        transform_args: dict[str, Any] = json.loads(targs)
+        transform_regexes.append(
+            (
+                re.compile(section),
+                re.compile(key),
+                partial(transform_registry[transform], **transform_args),
+            )
+        )
+
     mutations = Mutations(
         ignore_sections=set(args.ignore_section),
         ignore_keys=set(tuple(e) for e in args.ignore_key),
         ignore_regexes=[(re.compile(a), re.compile(b)) for a, b in args.ignore_key_re],
         transforms=transforms,
+        transform_regexes=transform_regexes,
     )
     # print(mutations)
 
