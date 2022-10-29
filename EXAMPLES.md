@@ -106,6 +106,19 @@ PrusaSlicer and the fork SuperSlicer also use INI style files:
 -ik "<NO_SECTION>" window_mainframe
 ```
 
+## KeePassXC
+
+## keepassxc.ini
+
+KeePassXC stores private and public keys for KeeShare in the config.
+You may not want to commit this to the repository.
+
+```bash
+-ik KeeShare Active
+-ik KeeShare Foreign
+-ik KeeShare Own
+```
+
 # Examples - hook scripts
 
 ## Add hook
