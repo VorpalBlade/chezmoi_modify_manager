@@ -74,6 +74,12 @@ Similar to kglobalshortcutsrc there are computer specific UUIDs.
 -ikr Desktops 'Id_.*'
 ```
 
+### plasmanotifyrc
+
+```bash
+-is DoNotDisturb
+```
+
 ## PrusaSlicer / SuperSlicer
 
 PrusaSlicer and the fork SuperSlicer also use INI style files:
