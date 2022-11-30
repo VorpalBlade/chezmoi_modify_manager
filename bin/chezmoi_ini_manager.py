@@ -206,6 +206,37 @@ def process_target(
                 yield line
             pending_lines = []
 
+    def emit_kv(section: str, line: str | None, key: str, value: str | None):
+        """
+        Emit a key-value line, handling transforms. Ignores are NOT handled here.
+        """
+        if transform := is_key_transformed(section, key, mutations):
+            src_data = None
+            if section in source_kvs and key in source_kvs[section]:
+                src_data = source_kvs[section][key]
+            if line is None:
+                yield transform(section, key, src_data, None)
+            else:
+                yield transform(section, key, src_data, (line, value))
+        else:
+            yield source_kvs[section][key][0]
+
+    def emit_source_only_lines(section: str):
+        """
+        Emit lines that only exist in the source.
+
+        Call just before switching to the next section.
+        """
+        nonlocal seen_keys
+        if section in source_sections.keys() and not is_section_ignored(
+            section, mutations
+        ):
+            unseen_keys = set(source_kvs[section].keys()).difference(seen_keys)
+            for k in sorted(unseen_keys):
+                if not is_key_ignored(section, k, mutations):
+                    yield from emit_kv(section, None, k, None)
+        seen_keys = set()
+
     for data in load_ini(file):
         match data:
             case (LineType.Comment, line):
@@ -215,24 +246,8 @@ def process_target(
                     yield line
             case (LineType.SectionHeader, line, section):
                 # Track state to deal with keys existing in source but not target
-                if cur_section in source_sections.keys() and not is_section_ignored(
-                    cur_section, mutations
-                ):
-                    unseen_keys = set(source_kvs[cur_section].keys()).difference(
-                        seen_keys
-                    )
-                    for k in sorted(unseen_keys):
-                        if not is_key_ignored(cur_section, k, mutations):
-                            if transform := is_key_transformed(
-                                cur_section, k, mutations
-                            ):
-                                yield transform(
-                                    cur_section, k, source_kvs[cur_section][k], None
-                                )
-                            else:
-                                yield source_kvs[cur_section][k][0]
+                yield from emit_source_only_lines(cur_section)
                 seen_sections.add(section)
-                seen_keys = set()
                 cur_section = section
                 # Back to handling things that exist in the target
                 pending_lines = []
@@ -253,19 +268,16 @@ def process_target(
                     yield from emit_pending_lines()
                     yield line
                 elif section in source_kvs and key in source_kvs[section]:
-                    if transform := is_key_transformed(cur_section, key, mutations):
-                        src_data = None
-                        if section in source_kvs and key in source_kvs[section]:
-                            src_data = source_kvs[section][key]
-                        yield from emit_pending_lines()
-                        yield transform(section, key, src_data, (line, value))
-                    else:
-                        yield from emit_pending_lines()
-                        yield source_kvs[section][key][0]
-    # Handle extra sections in source state
+                    yield from emit_pending_lines()
+                    yield from emit_kv(section, line, key, value)
+
+    # End of system file, emit source only keys for the last section.
+    yield from emit_source_only_lines(cur_section)
+
+    # Emit sections that are only in the source file
     for section in sorted(set(source_sections.keys()).difference(seen_sections)):
-        # Before the first section. Special case handled above in case LineType.SectionHeader
         if section is OUTSIDE_SECTION:
+            # Before the first section. Special case handled above in case LineType.SectionHeader
             continue
         if is_section_ignored(section, mutations):
             continue
