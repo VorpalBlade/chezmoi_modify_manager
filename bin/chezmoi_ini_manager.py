@@ -36,13 +36,16 @@ class LineType(enum.Enum):
 
 # Return type of load_ini. Written to be used together with match.
 LineState = (
+    # (Comment, full line)
     tuple[Literal[LineType.Comment], str]
+    # (SectionHeader, full line, section name)
     | tuple[Literal[LineType.SectionHeader], str, str]
-    | tuple[Literal[LineType.KeyValue], str, str, str, str]
+    # (KeyValue, full line, section name, key, value)
+    | tuple[Literal[LineType.KeyValue], str, str, str, str | None]
 )
 
 # Raw line, value
-KeyLineState = tuple[str, str]
+KeyLineState = tuple[str, str | None]
 
 # A transform takes two lines and merges them
 # Args: section, key, source data, target data
@@ -87,8 +90,12 @@ def load_ini(file: TextIO | Iterable[str]) -> Generator[LineState, None, None]:
                 section = match.group("name")
                 yield LineType.SectionHeader, line, section
             else:
-                key, value = line.split("=", maxsplit=1)
-                yield LineType.KeyValue, line, section, key.strip(), value.strip()
+                if "=" in line:
+                    key, value = line.split("=", maxsplit=1)
+                    yield LineType.KeyValue, line, section, key.strip(), value.strip()
+                else:
+                    # KDE has some lines without values. This is terrible.
+                    yield LineType.KeyValue, line, section, line.strip(), None
     except Exception as e:
         raise ParseException(f"Error while processing line {line}") from e
 
@@ -96,7 +103,7 @@ def load_ini(file: TextIO | Iterable[str]) -> Generator[LineState, None, None]:
 # Section -> Raw Line
 SourceSections = dict[str, str]
 # Section -> Key -> (Raw line, value)
-SourceKvs = dict[str, dict[str, tuple[str, str]]]
+SourceKvs = dict[str, dict[str, tuple[str, str | None]]]
 
 
 def load_into_dict(file: TextIO | Iterable[str]) -> tuple[SourceSections, SourceKvs]:
