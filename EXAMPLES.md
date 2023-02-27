@@ -14,6 +14,8 @@ Here are some useful examples of flags for various settings files I have come ac
 
 ### kdeglobals
 ```bash
+-ik "General" "ColorSchemeHash"
+-ik "KFileDialog Settings" "Show hidden files"
 -ik "KFileDialog Settings" "Show Inline Previews"
 -is "DirSelect Dialog"
 ```
@@ -114,7 +116,7 @@ PrusaSlicer and the fork SuperSlicer also use INI style files:
 
 ## KeePassXC
 
-## keepassxc.ini
+### keepassxc.ini
 
 KeePassXC stores private and public keys for KeeShare in the config.
 You may not want to commit this to the repository.
@@ -123,6 +125,18 @@ You may not want to commit this to the repository.
 -ik KeeShare Active
 -ik KeeShare Foreign
 -ik KeeShare Own
+```
+
+## GTK-3.0/GTK-4.0
+
+### settings.ini
+
+The file `~/.config/gtk-<version>/settings.ini` has a DPI value in it that
+changes between computers. Thus, each of those setting files need the
+following:
+
+```bash
+-ik "Settings" "gtk-xft-dpi"
 ```
 
 # Examples - hook scripts
