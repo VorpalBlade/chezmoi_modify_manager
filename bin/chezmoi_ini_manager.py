@@ -170,7 +170,7 @@ def transformed_re(section: str, key: str, mutations: Mutations):
 def is_key_transformed(
     section: str, key: str, mutations: Mutations
 ) -> Transform | None:
-    """Check if key is ignored. Does not handle transformations"""
+    """Check if key is transformed. Does not handle ignores"""
     if transform := mutations.transforms.get((section, key), None):
         return transform
     if transform := transformed_re(section, key, mutations):
