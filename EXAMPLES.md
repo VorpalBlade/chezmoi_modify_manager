@@ -82,6 +82,15 @@ Similar to kglobalshortcutsrc there are computer specific UUIDs.
 -is DoNotDisturb
 ```
 
+### Trolltech.conf
+
+This is a Qt config, rather than a KDE config (strictly speaking) but since KDE
+uses Qt, it is sitll relevant.
+
+```bash
+-ik Qt filedialog
+```
+
 ## PrusaSlicer / SuperSlicer
 
 PrusaSlicer and the fork SuperSlicer also use INI style files:
@@ -93,15 +102,16 @@ PrusaSlicer and the fork SuperSlicer also use INI style files:
 -ik "<NO_SECTION>" freecad_path
 -ik "<NO_SECTION>" last_output_path
 -ik "<NO_SECTION>" last_output_path_removable
+-ik "<NO_SECTION>" version
 -ik "<NO_SECTION>" version_online
 -ik "<NO_SECTION>" version_online_seen
 -ik "<NO_SECTION>" version_system_info_sent
 -ik "<NO_SECTION>" window_mainframe
--ikr "<NO_SECTION>" 'desktop_integration_.*'
 -ik presets filament
 -ik presets print
 -ik presets sla_material
 -ik presets sla_print
+-ikr "<NO_SECTION>" 'desktop_integration_.*'
 -ikr presets 'filament_.*'
 -is recent
 -is recent_projects
@@ -110,8 +120,9 @@ PrusaSlicer and the fork SuperSlicer also use INI style files:
 ### PrusaSlicerGcodeViewer.ini / SuperSlicerGcodeViewer.ini
 
 ```bash
--is recent_projects
+-ik "<NO_SECTION>" version
 -ik "<NO_SECTION>" window_mainframe
+-is recent_projects
 ```
 
 ## KeePassXC
