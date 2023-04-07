@@ -1,5 +1,8 @@
 # Modify script helper addon for chezmoi
 
+NOTE! An experimental rewrite in rust is currently in progress. See the
+[v2 branch](https://github.com/VorpalBlade/chezmoi_modify_manager/tree/v2).
+
 Addon for [chezmoi](https://www.chezmoi.io/) for deals with settings files that
 contain a mix of settings and state. So far handling INI-style files are
 supported.
