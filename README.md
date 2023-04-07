@@ -65,7 +65,7 @@ The command can also be used to add files (see `chezmoi_ini_add --help` for deta
   managed, otherwise add with plain chezmoi).
 * Conversion mode (convert from plain chezmoi to managed to `.src.ini`).
 * User specified hook. Can be used to filter out passwords when adding or
-  re-adding configuration files. See [EXAMPLES.md](EXAMPLES.md#add-hook) for details.
+  re-adding configuration files. See [EXAMPLES.md](doc/EXAMPLES.md#add-hook) for details.
 
 Finally, the command has a built in updater (similar to `chezmoi upgrade`).
 
@@ -118,7 +118,7 @@ chezmoi_modify_manager --smart-add ~/.config/PrusaSlicer/PrusaSlicer.ini
 ```
 
 Some examples on various ignore flags and transforms can be found in
-[EXAMPLES.md](EXAMPLES.md).
+[EXAMPLES.md](doc/EXAMPLES.md).
 
 ## Requirements
 
