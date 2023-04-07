@@ -1,0 +1,31 @@
+[package]
+authors = ["Arvid Norlander"]
+categories = ["config"]
+description = "Chezmoi addon to patch ini files with mixed settings and state (experimental rust branch)"
+edition = "2021"
+keywords = ["ini", "config", "configuration", "chezmoi"]
+license = "GPL-3.0-only"
+name = "chezmoi_modify_manager"
+repository = "https://github.com/VorpalBlade/chezmoi_modify_manager"
+version = "0.0.1"
+
+[features]
+default = ["updater"]
+# Built in updater, distro packages probably wants to disable this
+updater = []
+
+[dependencies]
+anyhow = { version = "1.0.70", features = ["backtrace"] }
+bpaf = { version = "0.7.9", features = ["autocomplete", "derive"] }
+duct = "0.13.6"
+ini-merge = { version = "0.1.0", default-features = false, features = [
+    "keyring",
+], path = "../ini-merge" }
+itertools = "0.10.5"
+strum = { version = "0.24.1", features = ["derive"] }
+thiserror = "1.0.40"
+winnow = "0.4.1"
+
+[dev-dependencies]
+indoc = "2.0.1"
+pretty_assertions = "1.3.0"
