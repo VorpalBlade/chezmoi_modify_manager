@@ -20,7 +20,7 @@ bpaf = { version = "0.7.9", features = ["autocomplete", "derive"] }
 duct = "0.13.6"
 ini-merge = { version = "0.1.0", default-features = false, features = [
     "keyring",
-], path = "../ini-merge" }
+] }
 itertools = "0.10.5"
 strum = { version = "0.24.1", features = ["derive"] }
 thiserror = "1.0.40"
