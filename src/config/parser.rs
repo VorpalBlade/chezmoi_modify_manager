@@ -67,12 +67,13 @@ fn comment<'a>(i: &'a str) -> IResult<&'a str, Directive, ErrTy<'a>> {
 fn source<'a>(i: &'a str) -> IResult<&str, Directive, ErrTy<'a>> {
     (
         "source",
+        space1,
         alt((
             "auto".map(|_| Directive::SourceAuto),
-            (space1, quoted_string).map(|(_, path)| Directive::Source(path)),
+            quoted_string.map(|path| Directive::Source(path)),
         )),
     )
-        .map(|(_, result)| result)
+        .map(|(_, _, result)| result)
         .parse_next(i)
 }
 
@@ -226,7 +227,7 @@ mod tests {
 
     const FULL_EXAMPLE: &str = indoc! {r#"
     #!/path
-    source "some/path"
+    source auto
 
     ignore section "c"
     ignore "a" "b"
@@ -250,7 +251,7 @@ mod tests {
         assert_eq!(
             out,
             vec![
-                Directive::Source("some/path".into()),
+                Directive::SourceAuto,
                 Directive::Ignore(Matcher::Section("c".into())),
                 Directive::Ignore(Matcher::Literal("a".into(), "b".into())),
                 Directive::Transform(
