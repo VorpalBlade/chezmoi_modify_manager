@@ -1,8 +1,14 @@
 //! Data & config driven tests.
 
-use std::{fs::File, io::Read, path::PathBuf};
+use std::{
+    fs::File,
+    io::{BufReader, Read},
+    path::PathBuf,
+};
 
-use assert_cmd::Command;
+use pretty_assertions::assert_eq;
+
+use chezmoi_modify_manager::{inner_main, ChmmArgs};
 
 /// Find all the test cases
 fn find_test_cases() -> anyhow::Result<Vec<PathBuf>> {
@@ -30,14 +36,21 @@ fn test_data() {
         // let src = test_case.with_extension("src.ini");
         let sys = test_case.with_extension("sys.ini");
         let expected = test_case.with_extension("expected.ini");
-        let mut cmd = Command::cargo_bin("chezmoi_modify_manager").unwrap();
-        let assert = cmd.arg(&test_case).pipe_stdin(sys).unwrap().assert();
 
-        let mut expected_data = String::new();
+        let mut expected_data: Vec<u8> = vec![];
         File::open(&expected)
             .unwrap()
-            .read_to_string(&mut expected_data).unwrap();
+            .read_to_end(&mut expected_data)
+            .unwrap();
 
-        assert.success().stdout(expected_data);
+        let mut stdout: Vec<u8> = vec![];
+
+        inner_main(
+            ChmmArgs::Process(test_case),
+            &mut BufReader::new(File::open(&sys).unwrap()),
+            &mut stdout,
+        )
+        .unwrap();
+        assert_eq!(String::from_utf8(stdout), String::from_utf8(expected_data));
     }
 }

@@ -2,6 +2,7 @@
 use std::path::PathBuf;
 
 use crate::add::Style;
+use anyhow::anyhow;
 use bpaf::short;
 use bpaf::Bpaf;
 use bpaf::Parser;
@@ -48,7 +49,7 @@ fn style() -> impl Parser<Style> {
 /// Arg parser
 #[derive(Debug, Bpaf)]
 #[bpaf(options, version)]
-pub(super) enum Args {
+pub enum ChmmArgs {
     /// Process a single file (containing settings).
     Process(#[bpaf(positional("FILE"), complete_shell(ShellComp::File{mask: None}))] PathBuf),
     Add {
@@ -78,8 +79,18 @@ pub(super) enum Args {
 }
 
 /// Apply arg parser to standard arguments
-pub(super) fn parse_args() -> Args {
-    args().run()
+pub fn parse_args() -> ChmmArgs {
+    chmm_args().run()
+}
+
+pub fn parse_string_args(args: &[&str]) -> anyhow::Result<ChmmArgs> {
+    match chmm_args().run_inner(bpaf::Args::from(args)) {
+        Ok(t) => Ok(t),
+        Err(err) => match err {
+            bpaf::ParseFailure::Stdout(s) => Err(anyhow!("bpaf: stdout: {s}")),
+            bpaf::ParseFailure::Stderr(s) => Err(anyhow!("bpaf: stderr: {s}")),
+        },
+    }
 }
 
 #[cfg(test)]
@@ -88,6 +99,6 @@ mod tests {
 
     #[test]
     fn check_options() {
-        args().check_invariants(false)
+        chmm_args().check_invariants(false)
     }
 }
