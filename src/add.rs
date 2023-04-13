@@ -14,7 +14,7 @@ use strum::{Display, EnumIter, EnumMessage, EnumString, IntoStaticStr};
 #[derive(
     Debug, Eq, PartialEq, EnumString, Clone, Copy, EnumIter, EnumMessage, Display, IntoStaticStr,
 )]
-pub(crate) enum Style {
+pub enum Style {
     /// Normal non-templated file, assumes this program is in PATH
     #[strum(serialize = "normal")]
     Normal,
