@@ -45,5 +45,7 @@ jobs:
           bin: chezmoi_modify_manager
           # (optional) Target triple, default is host triple.
           target: ${{ matrix.target }}
+          # Include version number.
+          archive: $bin-$tag-$target
           # (required) GitHub token for uploading assets to GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}
