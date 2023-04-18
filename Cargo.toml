@@ -7,7 +7,7 @@ keywords = ["ini", "config", "configuration", "chezmoi"]
 license = "GPL-3.0-only"
 name = "chezmoi_modify_manager"
 repository = "https://github.com/VorpalBlade/chezmoi_modify_manager"
-version = "0.0.2"
+version = "0.0.3"
 
 [features]
 default = ["updater"]
