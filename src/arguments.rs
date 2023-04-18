@@ -83,16 +83,6 @@ pub fn parse_args() -> ChmmArgs {
     chmm_args().run()
 }
 
-pub fn parse_string_args(args: &[&str]) -> anyhow::Result<ChmmArgs> {
-    match chmm_args().run_inner(bpaf::Args::from(args)) {
-        Ok(t) => Ok(t),
-        Err(err) => match err {
-            bpaf::ParseFailure::Stdout(s) => Err(anyhow!("bpaf: stdout: {s}")),
-            bpaf::ParseFailure::Stderr(s) => Err(anyhow!("bpaf: stderr: {s}")),
-        },
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
