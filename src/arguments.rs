@@ -2,7 +2,6 @@
 use std::path::PathBuf;
 
 use crate::add::Style;
-use anyhow::anyhow;
 use bpaf::short;
 use bpaf::Bpaf;
 use bpaf::Parser;
