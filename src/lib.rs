@@ -8,7 +8,6 @@ use std::{
 
 pub use add::Style;
 pub use arguments::parse_args;
-pub use arguments::parse_string_args;
 pub use arguments::ChmmArgs;
 
 mod add;
