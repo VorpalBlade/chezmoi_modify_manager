@@ -34,20 +34,17 @@ impl Config {
     pub(crate) fn source_path(&self, script_path: &Path) -> anyhow::Result<Cow<'_, Path>> {
         match self.source {
             Source::Path(ref p) => Ok(Cow::Borrowed(p)),
-            Source::Auto => Ok(Cow::Owned(
-                script_path
-                    .with_file_name(
-                        script_path
-                            .file_name()
-                            .ok_or_else(|| anyhow!("Failed to extract filename from {script_path:?}"))?
-                            .to_string_lossy()
-                            .strip_prefix("modify_")
-                            .ok_or_else(|| {
-                                anyhow!("Failed to strip modify_ from filename {script_path:?}")
-                            })?,
-                    )
-                    .with_extension("src.ini"),
-            )),
+            Source::Auto => {
+                let script_name = script_path
+                    .file_name()
+                    .ok_or_else(|| anyhow!("Failed to extract filename from {script_path:?}"))?
+                    .to_string_lossy();
+                Ok(Cow::Owned(
+                    script_path
+                        .with_file_name(script_name.strip_prefix("modify_").unwrap_or(&script_name))
+                        .with_extension("src.ini"),
+                ))
+            }
         }
     }
 }
