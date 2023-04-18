@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use winnow::branch::alt;
+use winnow::bytes::one_of;
 use winnow::bytes::take_till0;
 use winnow::bytes::take_till1;
 use winnow::character::escaped_transform;
@@ -50,7 +51,7 @@ pub(super) fn parse_config<'a>(i: &'a str) -> IResult<&str, Vec<Directive>, ErrT
         transform.context("transform"),
         "".map(|_| Directive::WS).context("whitespace"), // Blank lines
     );
-    (separated0(alt(alternatives), "\n"), opt("\n"))
+    (separated0(alt(alternatives), one_of("\r\n")), opt("\r\n"))
         .map(|(val, _)| val)
         .parse_next(i)
 }
@@ -278,6 +279,23 @@ mod tests {
                     "kde-shortcut".into(),
                     HashMap::new()
                 ),
+            ]
+        )
+    }
+
+
+    #[test]
+    fn test_parse_newlines() {
+        let out = parse_config.parse("source auto\r\nignore section \"bar\"").unwrap();
+
+        // Get rid of whitespace, we don't care about those
+        let out: Vec<_> = out.into_iter().filter(|v| *v != Directive::WS).collect();
+
+        assert_eq!(
+            out,
+            vec![
+                Directive::SourceAuto,
+                Directive::Ignore(Matcher::Section("bar".into())),
             ]
         )
     }
