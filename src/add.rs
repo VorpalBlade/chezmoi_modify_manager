@@ -47,7 +47,8 @@ source auto
 "#;
 
 const IN_PATH: &str = "/usr/bin/env chezmoi_modify_manager";
-const LOCAL: &str = "{{ .chezmoi.sourceDir }}/.utils/chezmoi_modify_manager-{{ .chezmoi.os }}-{{ .chezmoi.arch }}";
+const LOCAL: &str =
+    "{{ .chezmoi.sourceDir }}/.utils/chezmoi_modify_manager-{{ .chezmoi.os }}-{{ .chezmoi.arch }}";
 
 /// Format the template
 fn template(path: &str) -> String {
