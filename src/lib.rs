@@ -18,11 +18,15 @@ mod update;
 use ini_merge::merge_ini;
 
 /// Main function, amenable to integration tests.
-pub fn inner_main(
+pub fn inner_main<R: Read, W: Write, FR, FW>(
     opts: ChmmArgs,
-    stdin: &mut impl Read,
-    stdout: &mut impl Write,
-) -> anyhow::Result<()> {
+    stdin: FR,
+    stdout: FW,
+) -> anyhow::Result<()>
+where
+    FR: FnOnce() -> R,
+    FW: FnOnce() -> W,
+{
     match opts {
         arguments::ChmmArgs::Process(file_name) => {
             let mut f = File::open(&file_name)?;
@@ -30,8 +34,10 @@ pub fn inner_main(
             f.read_to_string(&mut buf)?;
             let c = config::parse(&buf)?;
 
+            let mut stdin = stdin();
+            let mut stdout = stdout();
             let mut src_file = File::open(c.source_path(&file_name))?;
-            let merged = merge_ini(stdin, &mut src_file, &c.mutations)?;
+            let merged = merge_ini(&mut stdin, &mut src_file, &c.mutations)?;
             for line in merged {
                 writeln!(stdout, "{line}")?;
             }

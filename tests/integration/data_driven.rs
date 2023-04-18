@@ -47,8 +47,8 @@ fn test_data() {
 
         inner_main(
             ChmmArgs::Process(test_case),
-            &mut BufReader::new(File::open(&sys).unwrap()),
-            &mut stdout,
+            || BufReader::new(File::open(&sys).unwrap()),
+            || &mut stdout,
         )
         .unwrap();
         assert_eq!(String::from_utf8(stdout), String::from_utf8(expected_data));
