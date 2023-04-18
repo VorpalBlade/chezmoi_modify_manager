@@ -35,7 +35,7 @@ const TEMPLATE: &str = r#"#!(PATH)
 
 # Use this version if this modify script contains chezmoi templates, as
 # we cannot auto detect the location of the script in that case.
-source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | trimPrefix "modify_" }}.src.ini"
+source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini"
 # Otherwise you can use automatic source (based on the location of the modify script)
 source auto
 

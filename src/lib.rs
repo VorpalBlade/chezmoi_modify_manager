@@ -7,6 +7,7 @@ use std::{
 };
 
 pub use add::Style;
+use anyhow::Context;
 pub use arguments::parse_args;
 pub use arguments::ChmmArgs;
 
@@ -29,14 +30,21 @@ where
 {
     match opts {
         arguments::ChmmArgs::Process(file_name) => {
-            let mut f = File::open(&file_name)?;
+            let mut f = File::open(&file_name)
+                .with_context(|| format!("Failed to open script at: {file_name:?}"))?;
             let mut buf = String::new();
-            f.read_to_string(&mut buf)?;
-            let c = config::parse(&buf)?;
+            f.read_to_string(&mut buf)
+                .with_context(|| format!("Failed to read script from {file_name:?}"))?;
+            let c = config::parse(&buf)
+                .with_context(|| format!("Failed to parse script from {file_name:?}"))?;
 
             let mut stdin = stdin();
             let mut stdout = stdout();
-            let mut src_file = File::open(c.source_path(&file_name))?;
+            let src_path = c
+                .source_path(&file_name)
+                .context("Failed to get source path")?;
+            let mut src_file = File::open(&src_path)
+                .with_context(|| format!("Failed to open source file at: {src_path:?}"))?;
             let merged = merge_ini(&mut stdin, &mut src_file, &c.mutations)?;
             for line in merged {
                 writeln!(stdout, "{line}")?;
