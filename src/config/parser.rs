@@ -283,10 +283,9 @@ mod tests {
         )
     }
 
-
     #[test]
     fn test_parse_newlines() {
-        let out = parse_config.parse("source auto\r\nignore section \"bar\"").unwrap();
+        let out = parse_config.parse("source auto\rsource \"foo\"\r\nignore section \"bar\"\nignore section \"quux\"\r\n").unwrap();
 
         // Get rid of whitespace, we don't care about those
         let out: Vec<_> = out.into_iter().filter(|v| *v != Directive::WS).collect();
@@ -295,7 +294,9 @@ mod tests {
             out,
             vec![
                 Directive::SourceAuto,
+                Directive::Source("foo".into()),
                 Directive::Ignore(Matcher::Section("bar".into())),
+                Directive::Ignore(Matcher::Section("quux".into()))
             ]
         )
     }
