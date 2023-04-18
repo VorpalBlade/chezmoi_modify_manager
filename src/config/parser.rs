@@ -43,7 +43,7 @@ pub(super) enum Matcher {
 }
 
 /// Top level parser for the config file
-pub(super) fn parse_config<'a>(i: &'a str) -> IResult<&str, Vec<Directive>, ErrTy<'a>> {
+pub(super) fn parse_config(i: &str) -> IResult<&str, Vec<Directive>, ErrTy<'_>> {
     let alternatives = (
         comment.context("comment"),
         source.context("source"),
@@ -57,7 +57,7 @@ pub(super) fn parse_config<'a>(i: &'a str) -> IResult<&str, Vec<Directive>, ErrT
 }
 
 /// A comment
-fn comment<'a>(i: &'a str) -> IResult<&'a str, Directive, ErrTy<'a>> {
+fn comment(i: &str) -> IResult<&str, Directive, ErrTy<'_>> {
     ('#', take_till0("\n\r"))
         .void()
         .map(|_| Directive::WS)
@@ -65,13 +65,13 @@ fn comment<'a>(i: &'a str) -> IResult<&'a str, Directive, ErrTy<'a>> {
 }
 
 /// A source statement
-fn source<'a>(i: &'a str) -> IResult<&str, Directive, ErrTy<'a>> {
+fn source(i: &str) -> IResult<&str, Directive, ErrTy<'_>> {
     (
         "source",
         space1,
         alt((
             "auto".map(|_| Directive::SourceAuto),
-            quoted_string.map(|path| Directive::Source(path)),
+            quoted_string.map(Directive::Source),
         )),
     )
         .map(|(_, _, result)| result)
@@ -79,14 +79,14 @@ fn source<'a>(i: &'a str) -> IResult<&str, Directive, ErrTy<'a>> {
 }
 
 /// An ignore statement
-fn ignore<'a>(i: &'a str) -> IResult<&str, Directive, ErrTy<'a>> {
+fn ignore(i: &str) -> IResult<&str, Directive, ErrTy<'_>> {
     ("ignore", space1, matcher)
         .map(|(_, _, pattern)| Directive::Ignore(pattern))
         .parse_next(i)
 }
 
 /// A transform statement
-fn transform<'a>(i: &'a str) -> IResult<&str, Directive, ErrTy<'a>> {
+fn transform(i: &str) -> IResult<&str, Directive, ErrTy<'_>> {
     (
         "transform",
         space1,
@@ -102,45 +102,45 @@ fn transform<'a>(i: &'a str) -> IResult<&str, Directive, ErrTy<'a>> {
 }
 
 /// One argument to a transformer on the form `arg="value"`
-fn transform_arg<'a>(i: &'a str) -> IResult<&str, (String, String), ErrTy<'a>> {
+fn transform_arg(i: &str) -> IResult<&str, (String, String), ErrTy<'_>> {
     (take_till1([' ', '=']), '=', quoted_string)
         .map(|(key, _, value)| (key.to_owned(), value))
         .parse_next(i)
 }
 
 /// Matcher for a section
-fn match_section<'a>(i: &'a str) -> IResult<&str, Matcher, ErrTy<'a>> {
+fn match_section(i: &str) -> IResult<&str, Matcher, ErrTy<'_>> {
     ("section", space1, quoted_string)
         .map(|(_, _, section)| Matcher::Section(section))
         .parse_next(i)
 }
 
 /// Matcher for a regex
-fn match_regex<'a>(i: &'a str) -> IResult<&str, Matcher, ErrTy<'a>> {
+fn match_regex(i: &str) -> IResult<&str, Matcher, ErrTy<'_>> {
     ("regex", space1, quoted_string, space1, quoted_string)
         .map(|(_, _, section, _, key)| Matcher::Regex(section, key))
         .parse_next(i)
 }
 
 /// Literal matcher
-fn match_literal<'a>(i: &'a str) -> IResult<&str, Matcher, ErrTy<'a>> {
+fn match_literal(i: &str) -> IResult<&str, Matcher, ErrTy<'_>> {
     (quoted_string, space1, quoted_string)
         .map(|(section, _, key)| Matcher::Literal(section, key))
         .parse_next(i)
 }
 
 /// All valid matchers
-fn matcher<'a>(i: &'a str) -> IResult<&str, Matcher, ErrTy<'a>> {
+fn matcher(i: &str) -> IResult<&str, Matcher, ErrTy<'_>> {
     alt((match_section, match_regex, match_literal)).parse_next(i)
 }
 
 /// The valid matchers for a transformer
-fn matcher_transform<'a>(i: &'a str) -> IResult<&str, Matcher, ErrTy<'a>> {
+fn matcher_transform(i: &str) -> IResult<&str, Matcher, ErrTy<'_>> {
     alt((match_regex, match_literal)).parse_next(i)
 }
 
 /// Quoted string value
-fn quoted_string<'a>(i: &'a str) -> IResult<&str, String, ErrTy<'a>> {
+fn quoted_string(i: &str) -> IResult<&str, String, ErrTy<'_>> {
     delimited(
         '"',
         escaped_transform(
