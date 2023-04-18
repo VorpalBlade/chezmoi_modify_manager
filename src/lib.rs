@@ -13,6 +13,7 @@ pub use arguments::ChmmArgs;
 mod add;
 mod arguments;
 mod config;
+mod update;
 
 use ini_merge::merge_ini;
 
@@ -49,8 +50,7 @@ pub fn inner_main(
         }
         #[cfg(feature = "updater")]
         arguments::ChmmArgs::Update { _a } => {
-            println!("TODO: Self update");
-            todo!()
+            update::update()?;
         }
     }
     Ok(())
