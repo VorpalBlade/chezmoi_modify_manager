@@ -62,9 +62,16 @@ where
                 add::add(add::Mode::Smart, style, &file)?;
             }
         }
-        #[cfg(feature = "updater")]
         arguments::ChmmArgs::Update { _a } => {
-            update::update()?;
+            #[cfg(feature = "updater")]
+            {
+                update::update()?;
+            }
+            #[cfg(not(feature = "updater"))]
+            {
+                println!("Support for the updater was not included in this build.");
+                println!("Please refer to the way you installed this software to determine how to update it.");
+            }
         }
     }
     Ok(())
