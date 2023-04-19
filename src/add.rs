@@ -33,11 +33,9 @@ pub(crate) enum Mode {
 /// Template for newly created scripts
 const TEMPLATE: &str = r#"#!(PATH)
 
-# Use this version if this modify script contains chezmoi templates, as
-# we cannot auto detect the location of the script in that case.
+# This is needed to figure out where the source file is.
+# See https://github.com/twpayne/chezmoi/issues/2934
 source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini"
-# Otherwise you can use automatic source (based on the location of the modify script)
-source auto
 
 # Add your ignores and transforms here
 #ignore section "my-section"
@@ -59,6 +57,7 @@ fn template(path: &str) -> String {
 fn chezmoi_source_path(path: &Path) -> anyhow::Result<Option<PathBuf>> {
     let output = cmd!("chezmoi", "source-path", path)
         .stdout_capture()
+        .stderr_null()
         .unchecked()
         .run()?;
     if !output.status.success() {
@@ -86,7 +85,10 @@ fn hook_path() -> anyhow::Result<Option<PathBuf>> {
 
 /// Perform actual adding with a script
 fn add_with_script(path: &Path, style: Style) -> anyhow::Result<()> {
-    let out = cmd!("chezmoi", "add", path).unchecked().run()?;
+    let out = cmd!("chezmoi", "add", path)
+        .stdout_null()
+        .unchecked()
+        .run()?;
     if !out.status.success() {
         return Err(anyhow!("chezmoi add failed with error code {}", out.status));
     }
@@ -120,7 +122,7 @@ fn add_or_hook(
     input_is_temporary: bool,
 ) -> Result<(), anyhow::Error> {
     if let Some(hook_path) = hook_path()? {
-        println!("     Executing hook script...");
+        println!("    Executing hook script...");
         let out = cmd!(hook_path, "ini", input_path, &target_path)
             .stdin_path(src_path)
             .stdout_path(target_path)
@@ -145,7 +147,7 @@ fn maybe_create_script(script_path: PathBuf, style: Style) -> anyhow::Result<()>
     if script_path.exists() {
         return Ok(());
     }
-    let mut file = File::create(script_path)?;
+    let mut file = File::create(&script_path)?;
     file.write_all(
         template(match style {
             Style::Normal => IN_PATH,
@@ -153,6 +155,7 @@ fn maybe_create_script(script_path: PathBuf, style: Style) -> anyhow::Result<()>
         })
         .as_bytes(),
     )?;
+    println!("    New script at {script_path:?}");
 
     Ok(())
 }
@@ -165,7 +168,7 @@ pub(crate) fn add(mode: Mode, style: Style, path: &Path) -> anyhow::Result<()> {
     let src_path = chezmoi_source_path(path)?;
     match src_path {
         Some(existing_file) => {
-            println!("Existing (to chezmoi) file: {existing_file:?}");
+            println!("  Existing (to chezmoi) file: {existing_file:?}");
             // Existing file
             let src_filename = existing_file
                 .file_name()
@@ -173,7 +176,7 @@ pub(crate) fn add(mode: Mode, style: Style, path: &Path) -> anyhow::Result<()> {
                 .to_string_lossy();
             let is_mod_script = src_filename.starts_with("modify_");
             if is_mod_script {
-                println!("  -> Updating existing .src.ini file for {existing_file:?}...");
+                println!("    Updating existing .src.ini file for {existing_file:?}...");
                 let data_file = src_filename
                     .strip_prefix("modify_")
                     .and_then(|s| s.strip_suffix(".tmpl").or(Some(s)))
@@ -182,14 +185,14 @@ pub(crate) fn add(mode: Mode, style: Style, path: &Path) -> anyhow::Result<()> {
                     + ".src.ini";
                 add_or_hook(path, data_file.as_ref(), path, false)?;
             } else {
-                println!("  -> Existing, but not a modify script...");
+                println!("    Existing, but not a modify script...");
                 // Existing, but not modify script.
                 add_file_basic(mode, path, style)?;
             }
         }
         None => {
             // New file
-            println!("New (to chezmoi) file {path:?}");
+            println!("  New (to chezmoi) file {path:?}");
             add_file_basic(mode, path, style)?;
         }
     }
@@ -200,12 +203,15 @@ pub(crate) fn add(mode: Mode, style: Style, path: &Path) -> anyhow::Result<()> {
 fn add_file_basic(mode: Mode, path: &Path, style: Style) -> Result<(), anyhow::Error> {
     match mode {
         Mode::Normal => {
-            println!("  -> Setting up new modify_ script...");
+            println!("    Setting up new modify_ script...");
             add_with_script(path, style)?
         }
         Mode::Smart => {
-            println!("  -> In smart mode... Adding as plain chezmoi...");
-            let out = cmd!("chezmoi", "add", path).unchecked().run()?;
+            println!("    In smart mode... Adding as plain chezmoi...");
+            let out = cmd!("chezmoi", "add", path)
+                .stdout_null()
+                .unchecked()
+                .run()?;
             if !out.status.success() {
                 return Err(anyhow!("Failed to add file {:?} with chezmoi", path));
             }
