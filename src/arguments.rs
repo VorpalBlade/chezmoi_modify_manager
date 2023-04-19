@@ -69,10 +69,9 @@ pub enum ChmmArgs {
         #[bpaf(positional("FILE"), complete_shell(ShellComp::File{mask: None}))]
         files: Vec<PathBuf>,
     },
-    #[cfg(feature = "updater")]
     Update {
         /// Perform self update
-        #[bpaf(long("upgrade"))]
+        #[bpaf(short('u'), long("upgrade"))]
         _a: (),
     },
 }
