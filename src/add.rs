@@ -15,12 +15,12 @@ use strum::{Display, EnumIter, EnumMessage, EnumString, IntoStaticStr};
     Debug, Eq, PartialEq, EnumString, Clone, Copy, EnumIter, EnumMessage, Display, IntoStaticStr,
 )]
 pub enum Style {
-    /// Normal non-templated file, assumes this program is in PATH
-    #[strum(serialize = "normal")]
-    Normal,
-    /// Templated file, for when this program is in .utils of chezmoi source state
-    #[strum(serialize = "template")]
-    Template,
+    /// Program is in PATH
+    #[strum(serialize = "path")]
+    InPath,
+    /// Program is in .utils of chezmoi source state
+    #[strum(serialize = "src")]
+    InSrc,
 }
 
 /// The mode for adding
@@ -45,7 +45,7 @@ source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | r
 "#;
 
 const IN_PATH: &str = "/usr/bin/env chezmoi_modify_manager";
-const LOCAL: &str =
+const IN_SRC: &str =
     "{{ .chezmoi.sourceDir }}/.utils/chezmoi_modify_manager-{{ .chezmoi.os }}-{{ .chezmoi.arch }}";
 
 /// Format the template
@@ -150,8 +150,8 @@ fn maybe_create_script(script_path: PathBuf, style: Style) -> anyhow::Result<()>
     let mut file = File::create(&script_path)?;
     file.write_all(
         template(match style {
-            Style::Normal => IN_PATH,
-            Style::Template => LOCAL,
+            Style::InPath => IN_PATH,
+            Style::InSrc => IN_SRC,
         })
         .as_bytes(),
     )?;

@@ -11,7 +11,7 @@ use strum::EnumMessage;
 use strum::IntoEnumIterator;
 
 fn style() -> impl Parser<Style> {
-    const DEFAULT: Style = Style::Normal;
+    const DEFAULT: Style = Style::InPath;
     let iter = Style::iter().map(|x| -> String {
         if x == DEFAULT {
             format!("{} (default)", x)
