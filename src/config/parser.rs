@@ -51,9 +51,14 @@ pub(super) fn parse_config(i: &str) -> IResult<&str, Vec<Directive>, ErrTy<'_>> 
         transform.context("transform"),
         "".map(|_| Directive::WS).context("whitespace"), // Blank lines
     );
-    (separated0(alt(alternatives), one_of("\r\n")), opt("\r\n"))
+    (separated0(alt(alternatives), newline), opt(newline))
         .map(|(val, _)| val)
         .parse_next(i)
+}
+
+/// A newline (LF, CR or CRLF)
+fn newline(i: &str) -> IResult<&str, (), ErrTy<'_>> {
+    one_of(("\n", "\r", "\r\n")).void().parse_next(i)
 }
 
 /// A comment
@@ -92,7 +97,7 @@ fn transform(i: &str) -> IResult<&str, Directive, ErrTy<'_>> {
         space1,
         matcher_transform,
         space1,
-        take_till1(" \n"),
+        take_till1(" \r\n"),
         opt(preceded(space1, separated0(transform_arg, space1))),
     )
         .map(|(_, _, pattern, _, transform, args)| {
