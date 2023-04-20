@@ -294,7 +294,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chezmoi_modify_manager"
-version = "2.0.0-alpha1"
+version = "2.0.0-alpha2"
 dependencies = [
  "anyhow",
  "bpaf",
@@ -886,9 +886,9 @@ checksum = "9f2cb48b81b1dc9f39676bf99f5499babfec7cd8fe14307f7b3d747208fb5690"
 
 [[package]]
 name = "ini-merge"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "27d65457a5193ce070dc838790951c9e087bdbc825ee79f2a9cce178f6d686c4"
+checksum = "e3cfdccfb3ec48713d9e24c254897ab9bfd234254cafe7547d82a2c6ce40bed0"
 dependencies = [
  "ini-roundtrip",
  "itertools",
@@ -901,9 +901,9 @@ dependencies = [
 
 [[package]]
 name = "ini-roundtrip"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e24fac64e7be7e0bd45d9a6174bf9894b7c687e4718e988691ec82ee8a692ce7"
+checksum = "f3774ec469800744dc999da80b42ddb37300dc80490a6368817896011824cee7"
 dependencies = [
  "cfg-if",
 ]
