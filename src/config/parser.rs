@@ -1,3 +1,4 @@
+//! Defines the winnow parser for the config file format.
 use std::collections::HashMap;
 
 use winnow::branch::alt;
@@ -14,6 +15,7 @@ use winnow::sequence::preceded;
 use winnow::IResult;
 use winnow::Parser;
 
+/// Type of parser errors
 pub(crate) type ErrTy<'a> = VerboseError<&'a str>;
 
 /// A directive in the config file

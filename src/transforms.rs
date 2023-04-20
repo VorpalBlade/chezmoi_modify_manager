@@ -1,12 +1,16 @@
+//! Defines supported transforms.
+
 use std::collections::HashMap;
 
 use ini_merge::mutations::transforms as ini_transforms;
 use itertools::Itertools;
 use strum::{EnumIter, EnumMessage, EnumString, IntoStaticStr};
 
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, EnumIter, EnumString, IntoStaticStr, EnumMessage,
-)]
+/// Supported transforms
+///
+/// This serves as a central point for documentation, parsing, generating
+/// lists etc.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, EnumString, IntoStaticStr, EnumMessage)]
 pub(crate) enum Transform {
     /// Compare the value as an unsorted list.
     /// Useful because Konversation likes to reorder lists.
@@ -15,7 +19,8 @@ pub(crate) enum Transform {
     /// * separator="," (Separating character between list elements)
     #[strum(serialize = "unsorted-list")]
     UnsortedLists,
-    /// Specialised transform to handle KDE changing certain global shortcuts back and forth between formats like:
+    /// Specialised transform to handle KDE changing certain global
+    /// shortcuts back and forth between formats like:
     ///
     /// playmedia=none,,Play media playback
     /// playmedia=none,none,Play media playback
@@ -37,6 +42,7 @@ pub(crate) enum Transform {
 }
 
 impl Transform {
+    /// Print help for transforms
     pub(crate) fn help() {
         use strum::IntoEnumIterator;
         let docs = Self::iter().map(|elem| {

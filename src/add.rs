@@ -44,7 +44,9 @@ source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | r
 #transform "section" "key" transform_name read="the docs" for="more detail on transforms"
 "#;
 
+/// Shebang line to use when command is in PATH
 const IN_PATH: &str = "/usr/bin/env chezmoi_modify_manager";
+/// Shebang line to use when command is in dotfile repo.
 const IN_SRC: &str =
     "{{ .chezmoi.sourceDir }}/.utils/chezmoi_modify_manager-{{ .chezmoi.os }}-{{ .chezmoi.arch }}";
 

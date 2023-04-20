@@ -17,6 +17,7 @@ mod config;
 mod transforms;
 mod update;
 
+use indoc::printdoc;
 use ini_merge::merge_ini;
 
 /// Main function, amenable to integration tests.
@@ -80,6 +81,66 @@ where
     Ok(())
 }
 
+/// Print help for the overall syntax of the configuration language.
 fn help_syntax() {
-    println!("TODO!");
+    printdoc! {r#"
+    Configuration files
+    ===================
+
+    chezmoi_modify_manager uses basic configuration files to control how to
+    merge INI files. The easiest way to get started is to use -a to add a
+    file and generate a skeleton configuration file.
+
+    Syntax
+    ======
+
+    The file consists of directives, one per line. Comments are supported
+    by prefixing a line with #. Comments are only supported at the start
+    of lines.
+
+    Directives
+    ==========
+
+    source
+    ------
+    This directive is required. It specifies where to find the source file
+    (i.e. the file in the dotfile repo). It should have the following format:
+
+    {}
+
+    ignore
+    ------
+    Ignore a certain line, always taking it from the target file (i.e. file
+    in your home directory), instead of the source state. The following
+    variants are supported:
+
+    ignore section "my-section"
+    ignore "my-section" "my-key"
+    ignore regex "section.*regex" "key regex.*"
+
+    The first form ignores a whole section (exact literal match).
+    The second form ignores a specific key (exact literal match).
+    The third form uses a regex to ignore a specific key.
+
+    Prefer the exact literal match variants where possible, they will be
+    marginally faster.
+
+    transform
+    ---------
+    Some specific situations need more complicated merging that a simple
+    ignore. For those situations you can use transforms. Supported variants
+    are:
+
+    transform "section" "key" transform-name arg1="value" arg2="value" ...
+    transform regex "section-regex.*" "key-regex.*" transform-name arg1="value" ...
+
+    For example, to treat mykey in mysection as an unsorted comma separated
+    list, you could use:
+
+    transform "mysection" "mykey" unsorted-list separator=","
+
+    The full list of supported transforms, and how to use them can be listed
+    using --help-transforms.
+    "#,
+    r#"source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini""#};
 }
