@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::path::Path;
 use std::path::PathBuf;
+use std::str::FromStr;
 
 use anyhow::anyhow;
 use ini_merge::mutations::transforms;
@@ -10,6 +11,8 @@ use ini_merge::mutations::Action;
 use ini_merge::mutations::Mutations;
 use ini_merge::mutations::MutationsBuilder;
 use winnow::Parser;
+
+use crate::transforms::Transform;
 
 use self::parser::Directive;
 use self::parser::Matcher;
@@ -66,20 +69,9 @@ fn make_transformer(
     transform: &str,
     args: &HashMap<String, String>,
 ) -> Result<Box<dyn transforms::Transformer>, ConfigError> {
-    use transforms::Transformer;
-
-    match transform {
-        "unsorted-list" => Ok(Box::new(
-            transforms::TransformUnsortedLists::from_user_input(args)?,
-        )),
-        "kde-shortcut" => Ok(Box::new(transforms::TransformKdeShortcut::from_user_input(
-            args,
-        )?)),
-        "keyring" => Ok(Box::new(transforms::TransformKeyring::from_user_input(
-            args,
-        )?)),
-        _ => Err(ConfigError::InvalidTransform(transform.into())),
-    }
+    Ok(Transform::from_str(transform)
+        .map_err(|_| ConfigError::InvalidTransform(transform.into()))?
+        .construct(args)?)
 }
 
 /// Parse directives for operation
