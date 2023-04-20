@@ -14,6 +14,7 @@ pub use arguments::ChmmArgs;
 mod add;
 mod arguments;
 mod config;
+mod transforms;
 mod update;
 
 use ini_merge::merge_ini;
@@ -29,7 +30,7 @@ where
     FW: FnOnce() -> W,
 {
     match opts {
-        arguments::ChmmArgs::Process(file_name) => {
+        ChmmArgs::Process(file_name) => {
             let mut f = File::open(&file_name)
                 .with_context(|| format!("Failed to open script at: {file_name:?}"))?;
             let mut buf = String::new();
@@ -50,19 +51,19 @@ where
                 writeln!(stdout, "{line}")?;
             }
         }
-        arguments::ChmmArgs::Add { _a, files, style } => {
+        ChmmArgs::Add { _a, files, style } => {
             for file in files {
                 println!("Adding {file:?}");
                 add::add(add::Mode::Normal, style, &file)?;
             }
         }
-        arguments::ChmmArgs::Smart { _a, files, style } => {
+        ChmmArgs::Smart { _a, files, style } => {
             for file in files {
                 println!("Adding {file:?}");
                 add::add(add::Mode::Smart, style, &file)?;
             }
         }
-        arguments::ChmmArgs::Update { _a } => {
+        ChmmArgs::Update { _a } => {
             #[cfg(feature = "updater")]
             {
                 update::update()?;
@@ -73,6 +74,12 @@ where
                 println!("Please refer to the way you installed this software to determine how to update it.");
             }
         }
+        ChmmArgs::HelpSyntax { _a } => help_syntax(),
+        ChmmArgs::HelpTransforms { _a } => transforms::Transform::help(),
     }
     Ok(())
+}
+
+fn help_syntax() {
+    println!("TODO!");
 }

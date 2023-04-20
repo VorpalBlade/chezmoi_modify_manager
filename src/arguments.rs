@@ -69,6 +69,16 @@ pub enum ChmmArgs {
         #[bpaf(positional("FILE"), complete_shell(ShellComp::File{mask: None}))]
         files: Vec<PathBuf>,
     },
+    HelpSyntax {
+        /// Print help about about the config file syntax
+        #[bpaf(long("help-syntax"))]
+        _a: (),
+    },
+    HelpTransforms {
+        /// Print help about supported transforms
+        #[bpaf(long("help-transforms"))]
+        _a: (),
+    },
     Update {
         /// Perform self update
         #[bpaf(short('u'), long("upgrade"))]
