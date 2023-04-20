@@ -19,9 +19,15 @@ use self::parser::Matcher;
 
 mod parser;
 
+/// Where to find the source file
 #[derive(Debug)]
 pub(crate) enum Source {
+    /// Specific path for the source file.
     Path(PathBuf),
+    /// Auto locate the source file.
+    /// 
+    /// This is currently broken with chezmoi, but needed for integration
+    /// tests however.
     Auto,
 }
 
@@ -52,25 +58,13 @@ impl Config {
     }
 }
 
-#[derive(Debug, thiserror::Error)]
-pub(crate) enum ConfigError {
-    #[error("Invalid transform specified: {0}")]
-    InvalidTransform(String),
-    #[error("Failed to create transform due to {source}")]
-    TransformerError {
-        #[source]
-        #[from]
-        source: transforms::TransformerError,
-    },
-}
-
 /// Create a transformer based on name
 fn make_transformer(
     transform: &str,
     args: &HashMap<String, String>,
-) -> Result<Box<dyn transforms::Transformer>, ConfigError> {
+) -> anyhow::Result<Box<dyn transforms::Transformer>> {
     Ok(Transform::from_str(transform)
-        .map_err(|_| ConfigError::InvalidTransform(transform.into()))?
+        .map_err(|err| anyhow!("Invalid transform specified: {}: {}", transform, err))?
         .construct(args)?)
 }
 

@@ -10,6 +10,7 @@ use itertools::Itertools;
 use strum::EnumMessage;
 use strum::IntoEnumIterator;
 
+/// Parser for `--style`
 fn style() -> impl Parser<Style> {
     const DEFAULT: Style = Style::InPath;
     let iter = Style::iter().map(|x| -> String {

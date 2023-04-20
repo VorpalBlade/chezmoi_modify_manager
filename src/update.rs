@@ -2,6 +2,8 @@
 #![cfg(feature = "updater")]
 
 use self_update::cargo_crate_version;
+
+/// Perform update check from github.
 pub(super) fn update() -> anyhow::Result<()> {
     let status = self_update::backends::github::Update::configure()
         .repo_owner("VorpalBlade")
