@@ -25,7 +25,7 @@ pub(crate) enum Source {
     /// Specific path for the source file.
     Path(PathBuf),
     /// Auto locate the source file.
-    /// 
+    ///
     /// This is currently broken with chezmoi, but needed for integration
     /// tests however.
     Auto,
