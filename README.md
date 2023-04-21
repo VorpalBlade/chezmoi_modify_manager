@@ -89,6 +89,15 @@ Finally, the command has a built in updater (similar to `chezmoi upgrade`).
    github repository. This can be done via `Watch` -> `Custom` in the top
    right corner. Or just remember to check with `--upgrade` occasionally.
 
+### Tab completion
+
+Optionally you can install tab completion. The tab completion can be generated
+using the hidden command line flag `--bpaf-complete-style-SHEL_NAME`, (e.g.
+`--bpaf-complete-style-zsh`, `--bpaf-complete-style-bash`, ...). As this is
+handled internally by the command line parsing library we use, please see
+[their documentation](https://docs.rs/bpaf/0.7.10/bpaf/index.html#dynamic-shell-completion)
+for detailed instructions.
+
 ## Updating
 
 Depending on the installation method:
