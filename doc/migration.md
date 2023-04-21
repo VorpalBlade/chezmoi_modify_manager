@@ -1,21 +1,49 @@
-# Converting from chezmoi_modify_manager 1.x
+# Migrating from chezmoi_modify_manager 1.x
 
 Both the old and the new version have the same feature set. However the
 rust implementation is about 50x faster (release builds, 25x in debug builds).
 
-However the syntax is not compatible.
+However, there is some work involved in migrating:
+* Different [installation](#installation) method.
+* The [syntax](#automatic-conversion-of-modify-scripts) has changed in the
+  modify scripts.
+* Some changes to [transforms](#transforms) (in particular the
+  [keyring](#keyring) transform has changed).
 
-## Automatic conversion
+In addition, the following differences are good to know about:
+* The separate shell script to help with adding files is gone, the functionality
+  is now built into the main program (see `--help` output).
+* For binary installs from GitHub, you can now use a built in self updater
+  (`--upgrade`).
+* The regex syntax is different. Previously Python re module was used, now the
+  [regex crate](https://docs.rs/regex/latest/regex/) for Rust is used. For most
+  simple regular expressions there will be no relevant difference. However, some
+  features (such as back references and look arounds) are not supported.
+* Platform support with precompiled binaries is somewhat limited (compared to
+  everything that Python supports). This is due to what I can build & test and
+  what GitHub CI supports. Pull requests that enable testing and building for
+  more platforms are welcome however (if the *tests cannot be executed* on
+  GitHub CI, I will not accept it however).
+
+## Installation
+
+The methods of installation is different. No longer do you need (or should)
+add this repo as a submodule in your dotfiles repo. Remove that and instead
+see the [installation section](../README.md#installation) in the README.
+
+## Modify scripts: Automatic conversion
 
 There is a [script](../utils/conversion.sh) that can help if you have standard
-shaped files (i.e. as created by the old `chezmoi_ini_add`), it will not handle
-100% of the conversion for transforms however. The argument lists formats have
-changed, as have some of the argument names.
+shaped files (i.e. as created by the old `chezmoi_ini_add`).
+
+It will not handle 100% of the conversion for transforms however. The argument
+list format has changed, as have some of the argument names. See
+[below](#transforms) for more details.
 
 Also, special consideration needs to be taken for the [keyring](#keyring)
 transform.
 
-## Manual conversion
+## Modify scripts: Manual conversion
 
 The first line should now be used to invoke chezmoi_modify_manager. It should
 be one of:

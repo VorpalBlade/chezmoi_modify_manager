@@ -3,7 +3,7 @@
 [ [lib.rs] ] [ [crates.io] ] [ [AUR] ]
 
 NOTE! This is version 2, which is a rewrite in Rust. See the
-[conversion guide](doc/conversion.md) if you are upgrading from the previous
+[migration guide](doc/migration.md) if you are upgrading from the previous
 Python version. Good news: This version is ~50x faster.
 
 Addon for [chezmoi](https://www.chezmoi.io/) for deals with settings files that
