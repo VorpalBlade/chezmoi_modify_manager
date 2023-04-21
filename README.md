@@ -1,4 +1,6 @@
-# Modify script helper addon for chezmoi (experimental branch)
+# Modify script helper addon for chezmoi (release candidate branch)
+
+[ [lib.rs] ] [ [crates.io] ] [ [AUR] ]
 
 NOTE! This is version 2, which is a rewrite in Rust. See the
 [conversion guide](doc/conversion.md) if you are upgrading from the previous
@@ -150,3 +152,7 @@ Requirements to build (if there is no native binary for your platform):
   Always look at `chezmoi diff` first! I do have some ideas on how to mitigate
   this in the future. See also [this chezmoi bug](https://github.com/twpayne/chezmoi/issues/2244)
   for a more detailed discussion on this.
+
+[AUR]: https://aur.archlinux.org/packages/chezmoi_modify_manager
+[crates.io]: https://crates.io/crates/chezmoi_modify_manager
+[lib.rs]: https://lib.rs/crates/chezmoi_modify_manager
