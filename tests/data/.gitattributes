@@ -1,0 +1,2 @@
+# We don't want EOL conversions in the example test files.
+*.ini -text
