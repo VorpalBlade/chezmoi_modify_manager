@@ -5,9 +5,9 @@ permissions:
 
 on:
   push:
-    branches: [ "v2" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "v2" ]
+    branches: [ "main" ]
 
 env:
   CARGO_TERM_COLOR: always
