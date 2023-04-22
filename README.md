@@ -1,10 +1,12 @@
-# Modify script helper addon for chezmoi (release candidate branch)
+# Modify script helper addon for chezmoi
 
 [ [lib.rs] ] [ [crates.io] ] [ [AUR] ]
 
-NOTE! This is version 2, which is a rewrite in Rust. See the
+**NOTE**! This is version 2, which is a rewrite in Rust. See the
 [migration guide](doc/migration.md) if you are upgrading from the previous
 Python version. Good news: This version is ~50x faster.
+
+---
 
 Addon for [chezmoi](https://www.chezmoi.io/) for deals with settings files that
 contain a mix of settings and state. So far handling INI-style files are
