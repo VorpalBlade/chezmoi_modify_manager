@@ -28,9 +28,13 @@ jobs:
           toolchain: stable
           components: clippy
           override: true
-
+      
+      - name: Get cargo-binstall
+        run: |
+          curl -L https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz | tar -zxf - && mv cargo-binstall $HOME/.cargo/bin/
+      
       - name: Install required cargo
-        run: cargo install clippy-sarif sarif-fmt
+        run: cargo binstall --no-confirm --no-symlinks clippy-sarif sarif-fmt
 
       - name: Run rust-clippy
         run:
