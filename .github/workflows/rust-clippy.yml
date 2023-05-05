@@ -19,20 +19,15 @@ jobs:
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af #@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          components: clippy
-          override: true
-      
+      - name: Setup Rust
+        run: rustup update stable && rustup default stable && rustup component add clippy
+
       - name: Get cargo-binstall
         run: |
           curl -L https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz | tar -zxf - && mv cargo-binstall $HOME/.cargo/bin/
-      
+
       - name: Install required cargo
         run: cargo binstall --no-confirm --no-symlinks clippy-sarif sarif-fmt
 
