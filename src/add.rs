@@ -176,6 +176,9 @@ pub(crate) fn add(mode: Mode, style: Style, path: &Path) -> anyhow::Result<()> {
                 .file_name()
                 .ok_or(anyhow!("No file name?"))?
                 .to_string_lossy();
+            let src_dir = existing_file
+                .parent()
+                .ok_or(anyhow!("Couldn't extract directory"))?;
             let is_mod_script = src_filename.starts_with("modify_");
             if is_mod_script {
                 println!("    Updating existing .src.ini file for {existing_file:?}...");
@@ -185,7 +188,9 @@ pub(crate) fn add(mode: Mode, style: Style, path: &Path) -> anyhow::Result<()> {
                     .ok_or(anyhow!("This should never happen"))?
                     .to_owned()
                     + ".src.ini";
-                add_or_hook(path, data_file.as_ref(), path, false)?;
+                let mut targeted_file: PathBuf = src_dir.into();
+                targeted_file.push(data_file);
+                add_or_hook(path, targeted_file.as_ref(), path, false)?;
             } else {
                 println!("    Existing, but not a modify script...");
                 // Existing, but not modify script.
