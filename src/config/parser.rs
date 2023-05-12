@@ -1,12 +1,12 @@
 //! Defines the winnow parser for the config file format.
 use std::collections::HashMap;
 
+use winnow::ascii::escaped_transform;
+use winnow::ascii::space1;
 use winnow::branch::alt;
 use winnow::bytes::one_of;
 use winnow::bytes::take_till0;
 use winnow::bytes::take_till1;
-use winnow::ascii::escaped_transform;
-use winnow::ascii::space1;
 use winnow::combinator::opt;
 use winnow::error::VerboseError;
 use winnow::multi::separated0;
