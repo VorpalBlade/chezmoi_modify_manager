@@ -19,15 +19,8 @@ jobs:
           # (Required) GitHub token for creating GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  upload-crates-io:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: cargo publish --token ${CRATES_TOKEN}
-        env:
-          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
-
   upload-assets:
+    needs: create-release
     strategy:
       matrix:
         include:
@@ -57,3 +50,37 @@ jobs:
           archive: $bin-$tag-$target
           # (required) GitHub token for uploading assets to GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  upload-crates-io:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: cargo publish --token ${CRATES_TOKEN}
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+
+  upload-aur:
+    needs:
+      - create-release
+      - upload-crates-io
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generate updated PKGBUILD
+        run:
+          git clone https://aur.archlinux.org/chezmoi_modify_manager.git aur
+          cd aur
+          sed -i '/^_pkgver/s/=.*$/='"${RELEASE_TAG#v}"'/' PKGBUILD
+          sed -i '/^pkgrel/s/=.*$/=1/' PKGBUILD
+        env:
+          RELEASE_TAG: ${{ github.ref }}
+      - name: Publish AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
+        with:
+          pkgname: chezmoi_modify_manager
+          pkgbuild: aur/PKGBUILD
+          updpkgsums: true
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: New upstream release (automatic update from GitHub Actions)
