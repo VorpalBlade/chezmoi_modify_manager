@@ -61,7 +61,6 @@ jobs:
 
   upload-aur:
     needs:
-      - create-release
       - upload-crates-io
     runs-on: ubuntu-latest
     steps:
