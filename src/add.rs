@@ -95,16 +95,12 @@ fn add_with_script(path: &Path, style: Style) -> anyhow::Result<()> {
         return Err(anyhow!("chezmoi add failed with error code {}", out.status));
     }
     let src_path = chezmoi_source_path(path)?.ok_or(anyhow!("chezmoi couldn't find added file"))?;
-    let data_path = src_path.with_extension("src.ini");
-    let script_suffix = ".tmpl";
-    let script_path = src_path.with_file_name(format!(
-        "modify_{}{}",
-        src_path
-            .file_name()
-            .ok_or(anyhow!("File has no filename"))?
-            .to_string_lossy(),
-        script_suffix
-    ));
+    let src_name = src_path
+        .file_name()
+        .ok_or(anyhow!("File has no filename"))?
+        .to_string_lossy();
+    let data_path = src_path.with_file_name(format!("{}.src.ini", src_name));
+    let script_path = src_path.with_file_name(format!("modify_{}.tmpl", src_name));
     // Run user provided hook script (if one exists)
     add_or_hook(path, &data_path, &src_path, true)?;
 
