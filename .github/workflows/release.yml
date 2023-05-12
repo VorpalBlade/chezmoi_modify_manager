@@ -65,14 +65,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Generate updated PKGBUILD
-        run:
-          git clone https://aur.archlinux.org/chezmoi_modify_manager.git aur
-          cd aur
-          sed -i '/^_pkgver/s/=.*$/='"${RELEASE_TAG#v}"'/' PKGBUILD
-          sed -i '/^pkgrel/s/=.*$/=1/' PKGBUILD
+      - name: Get AUR repo
+        run: git clone https://aur.archlinux.org/chezmoi_modify_manager.git aur
+      - name: Update PKGBUILD version
+        run: sed -i '/^_pkgver/s/=.*$/='"${RELEASE_TAG#v}"'/' aur/PKGBUILD
         env:
           RELEASE_TAG: ${{ github.ref }}
+      - name: Reset PKGBUILD pkgrel
+        run: sed -i '/^pkgrel/s/=.*$/=1/' aur/PKGBUILD
       - name: Publish AUR package
         uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
         with:
