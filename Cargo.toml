@@ -10,19 +10,22 @@ repository = "https://github.com/VorpalBlade/chezmoi_modify_manager"
 version = "2.0.5"
 
 [features]
-default = ["updater", "updater-tls-rusttls"]
-# Built in updater, distro packages probably wants to disable this
-updater = ["self_update"]
-# Use native TLS
-updater-tls-native = ["updater", "reqwest", "reqwest/default-tls"]
-# Use vendored native TLS
+default = ["updater-tls-rusttls"]
+# Built in updater, distro packages probably wants to disable this.
+
+# Native TLS: OpenSSL or platform specific
+# Note that vendored variant does not apply to Windows or OS X that don't use OpenSSL.
+
+# With native TLS (linking to system OpenSSL)
+updater-tls-native = ["self_update", "reqwest", "reqwest/default-tls"]
+# With vendored native TLS (vendored OpenSSL)
 updater-tls-native-vendored = [
-    "updater",
+    "self_update",
     "reqwest",
     "reqwest/native-tls-vendored",
 ]
-# Use rusttls instead of native TLS
-updater-tls-rusttls = ["updater", "self_update/rustls"]
+# Rusttls: TLS entirely in rust.
+updater-tls-rusttls = ["self_update", "self_update/rustls"]
 
 [target.'cfg(windows)'.dependencies]
 self_update = { version = "0.36.0", optional = true, default-features = false, features = [

@@ -15,7 +15,7 @@ env:
 
 jobs:
   test:
-    name: Test - ${{ matrix.target }} with rust ${{ matrix.rust }}
+    name: Test - ${{ matrix.target }} with rust ${{ matrix.rust }} (default configuration)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -43,8 +43,49 @@ jobs:
       - name: Cross compile and test
         run: cross test --target ${{ matrix.target }} --verbose
 
+  odd-ssls:
+    name: Test - "${{ matrix.features }}" on Linux with stable rust
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        features:
+          - --no-default-features
+          - --no-default-features --features=updater-tls-native
+          - --no-default-features --features=updater-tls-native-vendored
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Rust
+        run: rustup update stable && rustup default stable
+      - name: Compile and test
+        run: cargo test ${{ matrix.features }} --verbose
+
+  exotic-linux:
+    name: Test - ${{ matrix.target }} with rust ${{ matrix.rust }} (vendored OpenSSL)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          # Test targets that won't build with rusttls
+          - i586-unknown-linux-gnu
+          - mips64-unknown-linux-gnuabi64
+          - powerpc-unknown-linux-gnu
+          - powerpc64-unknown-linux-gnu
+          - riscv64gc-unknown-linux-gnu
+        rust:
+          - stable
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Rust
+        run: rustup update ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
+      - name: Install cross
+        uses: taiki-e/install-action@cross
+      - name: Cross compile and test
+        run: cross test --no-default-features --features=updater-tls-native-vendored --target ${{ matrix.target }} --verbose
+
   exotic-platforms:
-    name: Test - ${{ matrix.target }} on ${{ matrix.os }} (stable rust)
+    name: Test - ${{ matrix.target }} on ${{ matrix.os }} with stable rust
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
