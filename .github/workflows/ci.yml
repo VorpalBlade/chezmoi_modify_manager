@@ -53,14 +53,14 @@ jobs:
           - --no-default-features
           - --no-default-features --features=updater-tls-native
           - --no-default-features --features=updater-tls-native-vendored
-          - --no-default-features --features=updater-rusttls
+          - --no-default-features --features=updater-tls-rusttls
         rust:
           - 1.69.0
           - stable
     steps:
       - uses: actions/checkout@v3
       - name: Install Rust
-        run: rustup update stable && rustup default stable
+        run: rustup update ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
       - name: Compile and test
         run: cargo test ${{ matrix.features }} --verbose
 
