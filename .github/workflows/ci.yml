@@ -43,8 +43,8 @@ jobs:
       - name: Cross compile and test
         run: cross test --target ${{ matrix.target }} --verbose
 
-  odd-ssls:
-    name: Test - "${{ matrix.features }}" on Linux with stable rust
+  configurations:
+    name: Test - "${{ matrix.features }}" on Linux with Rust ${{ matrix.rust }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -53,6 +53,10 @@ jobs:
           - --no-default-features
           - --no-default-features --features=updater-tls-native
           - --no-default-features --features=updater-tls-native-vendored
+          - --no-default-features --features=updater-rusttls
+        rust:
+          - 1.69.0
+          - stable
     steps:
       - uses: actions/checkout@v3
       - name: Install Rust

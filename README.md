@@ -140,7 +140,7 @@ The binary is self contained, only needing:
 * Other OSes: TBD
 
 Requirements to build (if there is no native binary for your platform):
-* Rust 1.68 or newer
+* Rust 1.69 or newer
 
 ## Limitations
 
