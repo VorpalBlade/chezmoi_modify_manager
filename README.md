@@ -24,12 +24,11 @@ INI files when managing the configuration files with chezmoi.
 For each settings file you want to manage with `chezmoi_modify_manager` there
 will be two files in your chezmoi source directory:
 
-* A modify script. One of:
-  * `modify_<config file>`, eg. `modify_private_kdeglobals` (for installs
-    into `PATH`, recommended)
-  * `modify_<config file>.tmpl`, eg. `modify_private_kdeglobals.tmpl` (for
-    installs into the chezmoi source directory)
-* `<config file>.src.ini`, eg. `private_kdeglobals.src.ini`
+* `modify_<config file>.tmpl`, eg. `modify_private_kdeglobals.tmpl` \
+  This is the modify script/configuration file that calls `chezmoi_modify_manager`.
+  It contains the directives describing what to ignore.
+* `<config file>.src.ini`, eg. `private_kdeglobals.src.ini`\
+  This is the source state of the INI file.
 
 The `modify_` script is responsible for generating the new state of the file
 given the current state in your home directory. The `modify_` script is set
