@@ -39,7 +39,7 @@ fn style() -> impl Parser<Style> {
 
     short('t')
         .long("style")
-        .help(help_msg)
+        .help(help_msg.as_str())
         .argument::<String>("STYLE")
         .complete(complete_fn)
         .parse(|x| x.parse())
