@@ -8,15 +8,11 @@ use winnow::combinator::delimited;
 use winnow::combinator::opt;
 use winnow::combinator::preceded;
 use winnow::combinator::separated0;
-use winnow::error::VerboseError;
-use winnow::token::one_of;
+use winnow::error::StrContext;
+use winnow::prelude::*;
 use winnow::token::take_till0;
 use winnow::token::take_till1;
-use winnow::IResult;
 use winnow::Parser;
-
-/// Type of parser errors
-pub(crate) type ErrTy<'a> = VerboseError<&'a str>;
 
 /// A directive in the config file
 #[derive(Debug, PartialEq, Eq)]
@@ -45,13 +41,14 @@ pub(super) enum Matcher {
 }
 
 /// Top level parser for the config file
-pub(super) fn parse_config(i: &str) -> IResult<&str, Vec<Directive>, ErrTy<'_>> {
+pub(super) fn parse_config(i: &mut &str) -> PResult<Vec<Directive>> {
     let alternatives = (
-        comment.context("comment"),
-        source.context("source"),
-        ignore.context("ignore"),
-        transform.context("transform"),
-        "".map(|_| Directive::WS).context("whitespace"), // Blank lines
+        comment.context(StrContext::Label("comment")),
+        source.context(StrContext::Label("source")),
+        ignore.context(StrContext::Label("ignore")),
+        transform.context(StrContext::Label("transform")),
+        "".map(|_| Directive::WS)
+            .context(StrContext::Label("whitespace")), // Blank lines
     );
     (separated0(alt(alternatives), newline), opt(newline))
         .map(|(val, _)| val)
@@ -59,20 +56,20 @@ pub(super) fn parse_config(i: &str) -> IResult<&str, Vec<Directive>, ErrTy<'_>> 
 }
 
 /// A newline (LF, CR or CRLF)
-fn newline(i: &str) -> IResult<&str, (), ErrTy<'_>> {
-    one_of(("\n", "\r", "\r\n")).void().parse_next(i)
+fn newline(i: &mut &str) -> PResult<()> {
+    alt(("\r\n", "\n", "\r")).void().parse_next(i)
 }
 
 /// A comment
-fn comment(i: &str) -> IResult<&str, Directive, ErrTy<'_>> {
-    ('#', take_till0("\n\r"))
+fn comment(i: &mut &str) -> PResult<Directive> {
+    ('#', take_till0(['\n', '\r']))
         .void()
         .map(|_| Directive::WS)
         .parse_next(i)
 }
 
 /// A source statement
-fn source(i: &str) -> IResult<&str, Directive, ErrTy<'_>> {
+fn source(i: &mut &str) -> PResult<Directive> {
     (
         "source",
         space1,
@@ -86,20 +83,20 @@ fn source(i: &str) -> IResult<&str, Directive, ErrTy<'_>> {
 }
 
 /// An ignore statement
-fn ignore(i: &str) -> IResult<&str, Directive, ErrTy<'_>> {
+fn ignore(i: &mut &str) -> PResult<Directive> {
     ("ignore", space1, matcher)
         .map(|(_, _, pattern)| Directive::Ignore(pattern))
         .parse_next(i)
 }
 
 /// A transform statement
-fn transform(i: &str) -> IResult<&str, Directive, ErrTy<'_>> {
+fn transform(i: &mut &str) -> PResult<Directive> {
     (
         "transform",
         space1,
         matcher_transform,
         space1,
-        take_till1(" \r\n"),
+        take_till1([' ', '\r', '\n']),
         opt(preceded(space1, separated0(transform_arg, space1))),
     )
         .map(|(_, _, pattern, _, transform, args)| {
@@ -109,49 +106,49 @@ fn transform(i: &str) -> IResult<&str, Directive, ErrTy<'_>> {
 }
 
 /// One argument to a transformer on the form `arg="value"`
-fn transform_arg(i: &str) -> IResult<&str, (String, String), ErrTy<'_>> {
+fn transform_arg(i: &mut &str) -> PResult<(String, String)> {
     (take_till1([' ', '=']), '=', quoted_string)
         .map(|(key, _, value)| (key.to_owned(), value))
         .parse_next(i)
 }
 
 /// Matcher for a section
-fn match_section(i: &str) -> IResult<&str, Matcher, ErrTy<'_>> {
+fn match_section(i: &mut &str) -> PResult<Matcher> {
     ("section", space1, quoted_string)
         .map(|(_, _, section)| Matcher::Section(section))
         .parse_next(i)
 }
 
 /// Matcher for a regex
-fn match_regex(i: &str) -> IResult<&str, Matcher, ErrTy<'_>> {
+fn match_regex(i: &mut &str) -> PResult<Matcher> {
     ("regex", space1, quoted_string, space1, quoted_string)
         .map(|(_, _, section, _, key)| Matcher::Regex(section, key))
         .parse_next(i)
 }
 
 /// Literal matcher
-fn match_literal(i: &str) -> IResult<&str, Matcher, ErrTy<'_>> {
+fn match_literal(i: &mut &str) -> PResult<Matcher> {
     (quoted_string, space1, quoted_string)
         .map(|(section, _, key)| Matcher::Literal(section, key))
         .parse_next(i)
 }
 
 /// All valid matchers
-fn matcher(i: &str) -> IResult<&str, Matcher, ErrTy<'_>> {
+fn matcher(i: &mut &str) -> PResult<Matcher> {
     alt((match_section, match_regex, match_literal)).parse_next(i)
 }
 
 /// The valid matchers for a transformer
-fn matcher_transform(i: &str) -> IResult<&str, Matcher, ErrTy<'_>> {
+fn matcher_transform(i: &mut &str) -> PResult<Matcher> {
     alt((match_regex, match_literal)).parse_next(i)
 }
 
 /// Quoted string value
-fn quoted_string(i: &str) -> IResult<&str, String, ErrTy<'_>> {
+fn quoted_string(i: &mut &str) -> PResult<String> {
     delimited(
         '"',
         escaped_transform(
-            take_till1("\"\\"),
+            take_till1(['"', '\\']),
             '\\',
             alt(("\\".value("\\"), "\"".value("\""), "n".value("\n"))),
         ),
@@ -168,32 +165,34 @@ mod tests {
 
     #[test]
     fn check_quoted_string() {
-        let (rem, out) = quoted_string("\"test \\\" \\\\input\"").unwrap();
+        let (rem, out) = quoted_string.parse_peek("\"test \\\" \\\\input\"").unwrap();
         assert_eq!(rem, "");
         assert_eq!(out, "test \" \\input");
 
-        let res = quoted_string("\"invalid");
+        let res = quoted_string.parse_peek("\"invalid");
         assert!(matches!(res, Err(_)));
     }
 
     #[test]
     fn check_matcher() {
-        let (rem, out) = matcher("section \"my-section\"").unwrap();
+        let (rem, out) = matcher.parse_peek("section \"my-section\"").unwrap();
         assert_eq!(rem, "");
         assert!(matches!(out, Matcher::Section(s) if s == "my-section"));
 
-        let (rem, out) = matcher("\"my-section\" \"my-key\"").unwrap();
+        let (rem, out) = matcher.parse_peek("\"my-section\" \"my-key\"").unwrap();
         assert_eq!(rem, "");
         assert!(matches!(out, Matcher::Literal(s, k) if s == "my-section" && k == "my-key"));
 
-        let (rem, out) = matcher("regex \"my-section.*\" \"my-key.*\"").unwrap();
+        let (rem, out) = matcher
+            .parse_peek("regex \"my-section.*\" \"my-key.*\"")
+            .unwrap();
         assert_eq!(rem, "");
         assert!(matches!(out, Matcher::Regex(s, k) if s == "my-section.*" && k == "my-key.*"));
     }
 
     #[test]
     fn check_transform_arg() {
-        let (rem, out) = transform_arg("aaa=\"bbb\"").unwrap();
+        let (rem, out) = transform_arg.parse_peek("aaa=\"bbb\"").unwrap();
         assert_eq!(rem, "");
         assert_eq!(out.0, "aaa");
         assert_eq!(out.1, "bbb");
@@ -202,9 +201,9 @@ mod tests {
     #[test]
     fn check_transform() {
         // Test winnow parser
-        let (rem, out) =
-            transform("transform regex \"s.*\" \"k.*\" transform-name arg1=\"a\" arg2=\"b\"")
-                .unwrap();
+        let (rem, out) = transform
+            .parse_peek("transform regex \"s.*\" \"k.*\" transform-name arg1=\"a\" arg2=\"b\"")
+            .unwrap();
 
         assert_eq!(rem, "");
         assert_eq!(
@@ -220,7 +219,9 @@ mod tests {
     #[test]
     fn check_transform_no_args() {
         // Test winnow parser
-        let (rem, out) = transform("transform regex \"s.*\" \"k.*\" transform-name").unwrap();
+        let (rem, out) = transform
+            .parse_peek("transform regex \"s.*\" \"k.*\" transform-name")
+            .unwrap();
 
         assert_eq!(rem, "");
         assert_eq!(
