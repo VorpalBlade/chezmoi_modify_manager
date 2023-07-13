@@ -72,7 +72,7 @@ fn make_transformer(
 pub(crate) fn parse(src: &str) -> Result<Config, anyhow::Error> {
     let result = parser::parse_config
         .parse(src)
-        .map_err(|e| e.into_owned())?;
+        .map_err(|e| anyhow::format_err!("{e}"))?;
 
     let mut source = None;
     let mut builder = MutationsBuilder::new();
