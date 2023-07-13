@@ -3,15 +3,15 @@ use std::collections::HashMap;
 
 use winnow::ascii::escaped_transform;
 use winnow::ascii::space1;
-use winnow::branch::alt;
-use winnow::bytes::one_of;
-use winnow::bytes::take_till0;
-use winnow::bytes::take_till1;
+use winnow::combinator::alt;
+use winnow::combinator::delimited;
 use winnow::combinator::opt;
+use winnow::combinator::preceded;
+use winnow::combinator::separated0;
 use winnow::error::VerboseError;
-use winnow::multi::separated0;
-use winnow::sequence::delimited;
-use winnow::sequence::preceded;
+use winnow::token::one_of;
+use winnow::token::take_till0;
+use winnow::token::take_till1;
 use winnow::IResult;
 use winnow::Parser;
 
