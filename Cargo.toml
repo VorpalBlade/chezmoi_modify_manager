@@ -44,7 +44,7 @@ self_update = { version = "0.37.0", optional = true, default-features = false, f
 anyhow = { version = "1.0.71", features = ["backtrace"] }
 bpaf = { version = "0.9", features = ["autocomplete", "derive"] }
 duct = "0.13.6"
-indoc = "2.0.2"
+indoc = "2.0.3"
 ini-merge = { version = "0.1.2", default-features = false, features = [
     "keyring",
 ] }
