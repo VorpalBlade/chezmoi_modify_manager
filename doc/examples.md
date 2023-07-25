@@ -40,7 +40,7 @@ you will see diffs like the following:
 In summary, the following seems to work well:
 
 ```bash
-ignore regex "ActivityManager" "'switch-to-activity-.*'"
+ignore regex "ActivityManager" "switch-to-activity-.*"
 transform regex ".*" ".*" kde_shortcut
 ```
 
@@ -69,10 +69,12 @@ added to the chezmoi directory. Using an [add hook](#add-hook) can help with
 this.
 
 ### kwinrc
-Similar to kglobalshortcutsrc there are computer specific UUIDs.
+Similar to kglobalshortcutsrc there are computer specific UUIDs. In addition,
+the tiling configurations seem to be overwritten by KDE Plasma between computers.
 
 ```bash
-ignore regex "Desktops" "'Id_.*'"
+ignore regex "Desktops" "Id_.*"
+ignore regex "Tiling\\]\\[.*" ".*"
 ```
 
 ### plasmanotifyrc
