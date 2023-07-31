@@ -1,5 +1,5 @@
 //! Perform update check and auto update.
-#![cfg(feature = "updater")]
+#![cfg(feature = "self_update")]
 
 use self_update::cargo_crate_version;
 
