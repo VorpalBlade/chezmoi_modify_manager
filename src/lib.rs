@@ -125,6 +125,38 @@ fn help_syntax() {
     Prefer the exact literal match variants where possible, they will be
     marginally faster.
 
+    An additional effect is that lines that are missing in the source state
+    will not be deleted if they are ignored.
+
+    set
+    ---
+    Set an entry to a specific value. This is primarily useful together with
+    chezmoi templates, allowing you to override a specific value for only some
+    of your computers. The following variants are supported:
+
+    set "section" "key" "value"
+    set "section" "key" "value" separator="="
+
+    By default separator is " = ", which might not match what the program that
+    the ini files belongs to uses.
+    
+    Notes:
+    * Only exact literal matches are supported.
+    * It works better if the line exists in the source & target state, otherwise
+      it is likely the line will get formatted weirdly (which will often be
+      changed by the program the INI file belongs to).
+
+    remove
+    ------
+    Unconditionally remove everything matching the directive. This is primarily
+    useful together with chezmoi templates, allowing you to remove a specific
+    key or section for only some of your computers. The following variants are
+    supported:
+
+    remove section "my-section"
+    remove "my-section" "my-key"
+    remove regex "section.*regex" "key regex.*"
+
     transform
     ---------
     Some specific situations need more complicated merging that a simple
