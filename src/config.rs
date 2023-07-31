@@ -10,6 +10,7 @@ use ini_merge::mutations::transforms;
 use ini_merge::mutations::Action;
 use ini_merge::mutations::Mutations;
 use ini_merge::mutations::MutationsBuilder;
+use ini_merge::mutations::SectionAction;
 use winnow::Parser;
 
 use crate::transforms::Transform;
@@ -94,27 +95,36 @@ pub(crate) fn parse(src: &str) -> Result<Config, anyhow::Error> {
                 source = Some(Source::Auto);
             }
             Directive::Ignore(Matcher::Section(section)) => {
-                builder = builder.add_ignore_section(section);
+                builder = builder.add_section_action(section, SectionAction::Ignore);
             }
-            Directive::Ignore(Matcher::Literal(section, key)) => {
-                builder = builder.add_literal_action(section, key, Action::Ignore);
-            }
-            Directive::Ignore(Matcher::Regex(section, key)) => {
-                builder = builder.add_regex_action(section, key, Action::Ignore);
+            Directive::Ignore(matcher) => {
+                builder = add_action(builder, matcher, Action::Ignore);
             }
             Directive::Transform(matcher, transform, args) => {
                 let t = make_transformer(&transform, &args)?;
-                match matcher {
-                    Matcher::Section(_) => {
-                        return Err(anyhow!("Section match is not valid for transforms"));
-                    }
-                    Matcher::Literal(section, key) => {
-                        builder = builder.add_literal_action(section, key, Action::Transform(t));
-                    }
-                    Matcher::Regex(section, key) => {
-                        builder = builder.add_regex_action(section, key, Action::Transform(t));
-                    }
-                }
+                builder = add_action(builder, matcher, Action::Transform(t));
+            }
+            Directive::Set {
+                section,
+                key,
+                value,
+                separator,
+            } => {
+                // Set is a transform under the hood, but needs special support
+                // to enable adding lines that don't exist. This is handled inside
+                // the mutations builder.
+                builder = builder.add_setter(
+                    section,
+                    key,
+                    value,
+                    separator.unwrap_or_else(|| " = ".to_string()),
+                );
+            }
+            Directive::Remove(Matcher::Section(section)) => {
+                builder = builder.add_section_action(section, SectionAction::Delete);
+            }
+            Directive::Remove(matcher) => {
+                builder = add_action(builder, matcher, Action::Delete);
             }
         }
     }
@@ -123,4 +133,12 @@ pub(crate) fn parse(src: &str) -> Result<Config, anyhow::Error> {
         source: source.ok_or(anyhow!("No source directive found"))?,
         mutations: builder.build()?,
     })
+}
+
+fn add_action(builder: MutationsBuilder, matcher: Matcher, action: Action) -> MutationsBuilder {
+    match matcher {
+        Matcher::Section(_) => panic!("Section match not valid in add_action()"),
+        Matcher::Literal(section, key) => builder.add_literal_action(section, key, action),
+        Matcher::Regex(section, key) => builder.add_regex_action(section, key, action),
+    }
 }

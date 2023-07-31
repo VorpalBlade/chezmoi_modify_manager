@@ -27,6 +27,15 @@ pub(super) enum Directive {
     Ignore(Matcher),
     /// A transform directive
     Transform(Matcher, String, HashMap<String, String>),
+    /// Set an section, key to a specific value
+    Set {
+        section: String,
+        key: String,
+        value: String,
+        separator: Option<String>,
+    },
+    /// Remove everything matching a specific matcher
+    Remove(Matcher),
 }
 
 /// The different ways things can be matched.
@@ -47,6 +56,8 @@ pub(super) fn parse_config(i: &mut &str) -> PResult<Vec<Directive>> {
         source.context(StrContext::Label("source")),
         ignore.context(StrContext::Label("ignore")),
         transform.context(StrContext::Label("transform")),
+        set.context(StrContext::Label("set")),
+        remove.context(StrContext::Label("remove")),
         "".map(|_| Directive::WS)
             .context(StrContext::Label("whitespace")), // Blank lines
     );
@@ -86,6 +97,34 @@ fn source(i: &mut &str) -> PResult<Directive> {
 fn ignore(i: &mut &str) -> PResult<Directive> {
     ("ignore", space1, matcher)
         .map(|(_, _, pattern)| Directive::Ignore(pattern))
+        .parse_next(i)
+}
+
+fn set(i: &mut &str) -> PResult<Directive> {
+    (
+        "set",
+        space1,
+        quoted_string,
+        space1,
+        quoted_string,
+        space1,
+        quoted_string,
+        opt((space1, "separator=", quoted_string).map(|(_, _, v)| v)),
+    )
+        .map(
+            |(_, _, section, _, key, _, value, separator)| Directive::Set {
+                section,
+                key,
+                value,
+                separator,
+            },
+        )
+        .parse_next(i)
+}
+
+fn remove(i: &mut &str) -> PResult<Directive> {
+    ("remove", space1, matcher)
+        .map(|(_, _, matcher)| Directive::Remove(matcher))
         .parse_next(i)
 }
 
