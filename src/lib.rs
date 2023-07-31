@@ -65,11 +65,11 @@ where
             }
         }
         ChmmArgs::Update { _a } => {
-            #[cfg(feature = "updater")]
+            #[cfg(feature = "self_update")]
             {
                 update::update()?;
             }
-            #[cfg(not(feature = "updater"))]
+            #[cfg(not(feature = "self_update"))]
             {
                 println!("Support for the updater was not included in this build.");
                 println!("Please refer to the way you installed this software to determine how to update it.");
