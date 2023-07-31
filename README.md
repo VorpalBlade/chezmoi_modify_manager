@@ -59,8 +59,11 @@ For detailed usage instructions on the filtering see `chezmoi_modify_manager --h
 * Ignore entire section.
 * Ignore specific key in specific section.
 * Ignore key in section based on regular expressions.
-* Apply a transformation to the value of a specified key. These are implemented
-  as python functions. A list of transforms is available via `--help-transforms`.
+* Force set a value (useful together with templating).
+* Force remove a section, key or entries matching a regex (useful together with templating).
+* Apply a transformation to the value of a specified key. These are special
+  operations that built in and provide more complicated transformations.
+  A list of transforms is available via `--help-transforms`.
 
 The command can also be used to add files (see `chezmoi_ini_add --help` for details):
 
