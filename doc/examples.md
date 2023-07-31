@@ -186,3 +186,24 @@ else
     cat
 fi
 ```
+
+# Examples - set/remove
+
+The `set` and `remove` directives are meant to be used together with templating
+in the modify scripts. For example, there might be a key binding in KDE you only
+want on computers were a specific program is installed. This could be accomplished
+by something like the following for `kglobalshortcutsrc`
+
+```
+{{if lookPath "my-fancy-program"}}
+set "my-fancy-program.desktop" _k_friendly_name "My fancy program" separator="="
+set "my-fancy-program.desktop" _launch "Ctrl+Shift+Y,none,my-fancy-program" separator="="
+{{end}}
+```
+
+(In this case, note that you might need to manage the `.desktop` file with
+chezmoi as well. KDE normally creates these in `$HOME/.local/share/applications/`.)
+
+Similarly, `remove` can be used to remove entries, but be careful when readding
+the source files: If you blindly re-add the file on the computer where the lines
+are filtered out, they will get lost for all computers.
