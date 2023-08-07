@@ -135,14 +135,22 @@ chezmoi_modify_manager --smart-add ~/.config/PrusaSlicer/PrusaSlicer.ini
 Some examples on various ignore flags and transforms can be found in
 [examples.md](doc/examples.md).
 
-## Requirements
+## Platform support and requirements
 
-The binary is self contained, only needing:
-* Linux: glibc and OpenSSL
-* Other OSes: TBD
+The binary is self contained with no non-optional dependencies. For certain platforms where RustTLS isn't supported, the optional self-updater needs OpenSSL, which can be from either the system or built and linked statically.
 
 Requirements to build (if there is no native binary for your platform):
 * Rust 1.69 or newer
+
+Platforms:
+
+| Platform | Architecture | Continuous Integration | Tested manually           |
+|----------|--------------|------------------------|---------------------------|
+| Linux    | All major    | Yes                    | Yes (x86-64, i686, ARMv7) |
+| Windows  | x86-64       | Yes                    | No                        |
+| MacOS    | x86-64       | Yes                    | No                        |
+
+The above table is limited to what I myself have access to and what works in GitHub CI. Other Unixes are likely to work, if [Rust has support](https://doc.rust-lang.org/stable/rustc/platform-support.html).
 
 ## Limitations
 
