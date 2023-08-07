@@ -33,7 +33,6 @@ jobs:
           - x86_64-unknown-linux-musl
         rust:
           - stable
-          - beta
           - nightly
     steps:
       - uses: actions/checkout@v3
@@ -45,6 +44,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.target }}
+          save-if: ${{ github.ref == 'refs/head/main' }}
       - name: Cross compile and test
         run: cross test --locked --target ${{ matrix.target }} --verbose
 
@@ -69,6 +69,9 @@ jobs:
         run: rustup install --profile minimal  ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
       - name: Cache builds
         uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.features }}
+          save-if: ${{ github.ref == 'refs/head/main' }}
       - name: Compile and test
         run: cargo test --locked ${{ matrix.features }} --verbose
 
@@ -97,6 +100,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.target }}
+          save-if: ${{ github.ref == 'refs/head/main' }}
       - name: Cross compile and test
         run: cross test --locked --no-default-features --features=updater-tls-native-vendored --target ${{ matrix.target }} --verbose
 
@@ -118,5 +122,7 @@ jobs:
         run: rustup install --profile minimal stable && rustup default stable
       - name: Cache builds
         uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.ref == 'refs/head/main' }}
       - name: Compile and test
         run: cargo test --locked --target ${{ matrix.target }} --verbose
