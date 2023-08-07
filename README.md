@@ -82,13 +82,14 @@ Finally, the command has a built in updater (similar to `chezmoi upgrade`).
    the modify script.
 2. Do *one* of these:
    * Recommended: Install `chezmoi_modify_manager` into your `$PATH`. This can be
-     done by one of:
+     done by one of (in descending order of preference):
      * Using a distro package (if available for what you use)
-     * Download the binary from the releases here.
+     * Download the binary from the [releases on GitHub](https://github.com/VorpalBlade/chezmoi_modify_manager/releases) and install it somewhere into your `PATH`.
+     * Install from [crates.io] using `cargo` (only do this if you know what you are doing).
    * Not recommended: Install `chezmoi_modify_manager` from the releases page
-     into `.utils/chezmoi_modify_manager-<os>-<arch>` where `<os>` is typically
-     `linux` and `<arch>` is typically `x86-64`. If you use another path, the
-     template modify script that is added will be wrong.
+     into `<chezmoi-source-directory>/.utils/chezmoi_modify_manager-<os>-<arch>`
+     where `<os>` is typically `linux` and `<arch>` is typically `x86-64`. If
+     you use another path, the template modify script that is added will be wrong.
 
 4. **You** are in control of updates. Nothing will happen unless you pass
    `--upgrade`. Consider subscribing to be notified of new releases on the
