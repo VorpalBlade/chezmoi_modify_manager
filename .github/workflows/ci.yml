@@ -69,7 +69,7 @@ jobs:
       - name: Cache builds
         uses: Swatinem/rust-cache@v2
         with:
-          key: ${{ matrix.features }}
+          save-if: ${{ matrix.features == '--no-default-features --features=updater-tls-native-vendored' }}
       - name: Compile and test
         run: cargo test --locked ${{ matrix.features }} --verbose
 
