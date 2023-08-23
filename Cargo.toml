@@ -8,7 +8,7 @@ license = "GPL-3.0-only"
 name = "chezmoi_modify_manager"
 repository = "https://github.com/VorpalBlade/chezmoi_modify_manager"
 version = "2.1.1"
-rust-version = "1.69.0"
+rust-version = "1.70.0"
 
 [features]
 default = ["updater-tls-rusttls"]
