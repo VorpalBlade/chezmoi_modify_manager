@@ -60,7 +60,7 @@ jobs:
           - --no-default-features --features=updater-tls-native-vendored
           - --no-default-features --features=updater-tls-rusttls
         rust:
-          - 1.69.0
+          - 1.70.0
           - stable
     steps:
       - uses: actions/checkout@v3
