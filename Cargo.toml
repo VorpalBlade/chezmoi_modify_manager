@@ -13,20 +13,18 @@ rust-version = "1.69.0"
 [features]
 default = ["updater-tls-rusttls"]
 # Built in updater, distro packages probably wants to disable this.
-
-# Native TLS: OpenSSL or platform specific
-# Note that vendored variant does not apply to Windows or OS X that don't use OpenSSL.
-
-# With native TLS (linking to system OpenSSL)
-updater-tls-native = ["self_update", "reqwest", "reqwest/default-tls"]
-# With vendored native TLS (vendored OpenSSL)
+# This is the version based on native TLS: platform OpenSSL or platform specific
+updater-tls-native = ["dep:self_update", "dep:reqwest", "reqwest/default-tls"]
+# Built in updater, distro packages probably wants to disable this.
+# This is the version based on vendored OpenSSL
 updater-tls-native-vendored = [
-    "self_update",
-    "reqwest",
+    "dep:self_update",
+    "dep:reqwest",
     "reqwest/native-tls-vendored",
 ]
-# Rusttls: TLS entirely in rust.
-updater-tls-rusttls = ["self_update", "self_update/rustls"]
+# Built in updater, distro packages probably wants to disable this.
+# This is the version based on RustTLS: TLS entirely in rust.
+updater-tls-rusttls = ["dep:self_update", "self_update/rustls"]
 
 [target.'cfg(windows)'.dependencies]
 self_update = { version = "0.37.0", optional = true, default-features = false, features = [
