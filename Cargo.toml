@@ -7,7 +7,7 @@ keywords = ["ini", "config", "configuration", "chezmoi"]
 license = "GPL-3.0-only"
 name = "chezmoi_modify_manager"
 repository = "https://github.com/VorpalBlade/chezmoi_modify_manager"
-version = "2.1.2"
+version = "2.1.3"
 rust-version = "1.70.0"
 
 [features]
