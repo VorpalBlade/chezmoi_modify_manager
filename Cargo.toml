@@ -43,14 +43,14 @@ anyhow = { version = "1.0.75", features = ["backtrace"] }
 bpaf = { version = "0.9", features = ["autocomplete", "derive"] }
 duct = "0.13.6"
 indoc = "2.0.3"
-ini-merge = { version = "0.2.1", default-features = false, features = [
+ini-merge = { version = "0.2.2", default-features = false, features = [
     "keyring",
 ] }
 itertools = "0.11.0"
 reqwest = { version = "0.11", default-features = false, optional = true }
 strum = { version = "0.25.0", features = ["derive"] }
 thiserror = "1.0.47"
-winnow = "0.5.14"
+winnow = "0.5.15"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
