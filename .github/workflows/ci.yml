@@ -1,4 +1,4 @@
-name: Continuous integration
+name: Build
 
 permissions:
   contents: read
@@ -16,7 +16,7 @@ env:
 jobs:
   modern-default:
     # Test modern compilers on standard platforms on Linux.
-    name: Test - ${{ matrix.target }} with rust ${{ matrix.rust }} (default configuration)
+    name: "Test: ${{ matrix.target }}, Rust ${{ matrix.rust }} (default configuration)"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -49,7 +49,7 @@ jobs:
 
   configurations:
     # Test non-standard configurations, MSRV and Rust versions
-    name: Test - "${{ matrix.features }}" on Linux with Rust ${{ matrix.rust }}
+    name: "Test: \"${{ matrix.features }}\" (Linux), Rust ${{ matrix.rust }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -75,7 +75,7 @@ jobs:
 
   exotic-linux:
     # Test exotic Linux configs that only work with vendored OpenSSL
-    name: Test - ${{ matrix.target }} with rust ${{ matrix.rust }} (vendored OpenSSL)
+    name: "Test: ${{ matrix.target }}, Rust ${{ matrix.rust }} (vendored OpenSSL)"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -102,7 +102,7 @@ jobs:
 
   exotic-os:
     # Test native builds on non-Linux platforms
-    name: Test - ${{ matrix.target }} on ${{ matrix.os }} with stable rust
+    name: "Test: ${{ matrix.target }} on ${{ matrix.os }} with stable rust"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
