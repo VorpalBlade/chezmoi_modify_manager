@@ -49,7 +49,7 @@ ini-merge = { version = "0.2.2", default-features = false, features = [
 itertools = "0.11.0"
 reqwest = { version = "0.11", default-features = false, optional = true }
 strum = { version = "0.25.0", features = ["derive"] }
-thiserror = "1.0.47"
+thiserror = "1.0.48"
 winnow = "0.5.15"
 
 [dev-dependencies]
