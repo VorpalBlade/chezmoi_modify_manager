@@ -100,6 +100,7 @@ PrusaSlicer and the fork SuperSlicer also use INI style files:
 
 ```bash
 ignore "<NO_SECTION>" "auto_toolbar_size"
+ignore "<NO_SECTION>" "downloader_url_registered"
 ignore "<NO_SECTION>" "freecad_path"
 ignore "<NO_SECTION>" "last_output_path_removable"
 ignore "<NO_SECTION>" "last_output_path"
@@ -111,6 +112,7 @@ ignore "<NO_SECTION>" "window_mainframe"
 ignore "font" "active_font"
 ignore "presets" "filament"
 ignore "presets" "print"
+ignore "presets" "printer"
 ignore "presets" "sla_material"
 ignore "presets" "sla_print"
 ignore regex "<NO_SECTION>" "desktop_integration_.*"
