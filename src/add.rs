@@ -1,13 +1,13 @@
 //! Support for adding files
 
+use crate::utils::chezmoi_source_path;
+use anyhow::anyhow;
+use duct::cmd;
 use std::{
     fs::File,
     io::Write,
     path::{Path, PathBuf},
 };
-
-use anyhow::anyhow;
-use duct::cmd;
 use strum::{Display, EnumIter, EnumMessage, EnumString, IntoStaticStr};
 
 /// The style of calls to the executable
@@ -53,19 +53,6 @@ const IN_SRC: &str =
 /// Format the template
 fn template(path: &str) -> String {
     TEMPLATE.replace("(PATH)", path)
-}
-
-/// Get the source path of a file
-fn chezmoi_source_path(path: &Path) -> anyhow::Result<Option<PathBuf>> {
-    let output = cmd!("chezmoi", "source-path", path)
-        .stdout_capture()
-        .stderr_null()
-        .unchecked()
-        .run()?;
-    if !output.status.success() {
-        return Ok(None);
-    }
-    Ok(Some(String::from_utf8(output.stdout)?.trim_end().into()))
 }
 
 /// Get the path for the hook script, if it exists

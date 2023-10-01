@@ -80,6 +80,11 @@ pub enum ChmmArgs {
         #[bpaf(long("help-transforms"))]
         _a: (),
     },
+    Doctor {
+        /// Perform environment sanity check
+        #[bpaf(long("doctor"))]
+        _a: (),
+    },
     Update {
         /// Perform self update
         #[bpaf(short('u'), long("upgrade"))]
