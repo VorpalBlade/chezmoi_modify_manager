@@ -14,8 +14,10 @@ pub use arguments::ChmmArgs;
 mod add;
 mod arguments;
 mod config;
+mod doctor;
 mod transforms;
 mod update;
+mod utils;
 
 use indoc::printdoc;
 use ini_merge::merge_ini;
@@ -75,6 +77,7 @@ where
                 println!("Please refer to the way you installed this software to determine how to update it.");
             }
         }
+        ChmmArgs::Doctor { _a } => doctor::doctor()?,
         ChmmArgs::HelpSyntax { _a } => help_syntax(),
         ChmmArgs::HelpTransforms { _a } => transforms::Transform::help(),
     }
