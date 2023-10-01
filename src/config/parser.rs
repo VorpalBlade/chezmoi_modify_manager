@@ -209,7 +209,7 @@ mod tests {
         assert_eq!(out, "test \" \\input");
 
         let res = quoted_string.parse_peek("\"invalid");
-        assert!(matches!(res, Err(_)));
+        assert!(res.is_err());
     }
 
     #[test]
