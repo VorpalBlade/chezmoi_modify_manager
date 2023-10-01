@@ -17,7 +17,7 @@ Describe what you have tried so far.
 
 ## Where else have you checked for solutions?
 
-* [ ] I have read the [README](README.md)
+* [ ] I have read the [README](https://github.com/VorpalBlade/chezmoi_modify_manager/blob/main/README.md)
 * [ ] I have read the output of `chezmoi_modify_manager --help-syntax` and
       `chezmoi_modify_manager --help-transforms` (if relevant to my question).
 * [ ] I have checked that `chezmoi_modify_manager --doctor` doesn't list any
