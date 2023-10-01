@@ -154,6 +154,14 @@ Platforms:
 
 The above table is limited to what I myself have access to (and use) as well as what works in GitHub CI. Other Unixes are likely to work, if [Rust has support](https://doc.rust-lang.org/stable/rustc/platform-support.html).
 
+## Troubleshooting
+
+The first step should be to run `chezmoi_modify_manager --doctor` and correct any issues reported.
+This will help identify the two common issues:
+
+* chezmoi_modify_manager needs to be in `PATH`
+* `**/*.src.ini` needs to be ignored in the root `.chezmoiignore` file
+
 ## Limitations
 
 * When a key exists in the `.src.ini` file but not in the target state it will

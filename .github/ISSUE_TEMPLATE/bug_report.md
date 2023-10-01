@@ -24,17 +24,15 @@ A clear and concise description of what you expected to happen.
 A clear and concise description of what actually happens instead.
 
 ## Environment (please complete the following information):
- - OS: [e.g. Ubuntu 22.04, Arch Linux, ...]
- - Architecture: [e.g. x86-64, arm64, ...]
- - Chezmoi version: [e.g. 2.16]
- - chezmoi_modify_manager version/commit ID: [e.g. v1.0]
+ - chezmoi version (or commit if built from git): [e.g. 1.2.3]
+ - chezmoi_modify_manager version (or commit if built from git) ID: [e.g. v2.0]
 
-### chezmoi doctor output
+## Output of `chezmoi_modify_manager --doctor`
 
 <details>
 
 ```console
-$ chezmoi doctor
+$ chezmoi_modify_manager --doctor
 ```
 
 </details>
