@@ -3,7 +3,6 @@
 use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
-use std::path::{Path, PathBuf};
 use std::process::Command;
 use strum::Display;
 
@@ -29,8 +28,7 @@ pub(crate) fn doctor() -> anyhow::Result<()> {
             }
         }
     }
-
-    if let Some(p) = find_in_path("chezmoi") {
+    if let Ok(p) = which::which("chezmoi") {
         println!("\nOutput of chezmoi doctor:");
         _ = std::io::stdout().flush();
         match Command::new(p).arg("doctor").spawn().as_mut() {
@@ -106,14 +104,17 @@ const CHECKS: [Check; 6] = [
     },
     Check {
         name: "in-path",
-        func: || match find_in_path("chezmoi_modify_manager") {
-            Some(_) => Ok((
-                CheckResult::Ok,
-                "chezmoi_modify_manager is in PATH".to_owned(),
-            )),
-            None => Ok((
+        func: || match which::which("chezmoi_modify_manager") {
+            Ok(p) => {
+                let p = p.to_string_lossy();
+                Ok((
+                    CheckResult::Ok,
+                    format!("chezmoi_modify_manager is in PATH at {p}"),
+                ))
+            }
+            Err(err) => Ok((
                 CheckResult::Error,
-                "chezmoi_modify_manager is NOT in PATH".to_owned(),
+                format!("chezmoi_modify_manager is NOT in PATH: {err}"),
             )),
         },
     },
@@ -125,34 +126,38 @@ const CHECKS: [Check; 6] = [
 
 /// Find chezmoi and check it's version
 fn chezmoi_check() -> anyhow::Result<(CheckResult, String)> {
-    if let Some(p) = find_in_path("chezmoi") {
-        let res = Command::new(p).arg("--version").output();
-        match res {
-            Ok(out) => match std::str::from_utf8(&out.stdout) {
-                Ok(version) => {
-                    let version = version.trim_end();
-                    Ok((
-                        CheckResult::Info,
-                        format!("Chezmoi found. Version: {version}"),
-                    ))
-                }
+    match which::which("chezmoi") {
+        Ok(p) => {
+            let res = Command::new(p).arg("--version").output();
+            match res {
+                Ok(out) => match std::str::from_utf8(&out.stdout) {
+                    Ok(version) => {
+                        let version = version.trim_end();
+                        Ok((
+                            CheckResult::Info,
+                            format!("Chezmoi found. Version: {version}"),
+                        ))
+                    }
+                    Err(err) => Ok((
+                        CheckResult::Error,
+                        format!("Failed to parse --version output as UTF-8: {err}"),
+                    )),
+                },
                 Err(err) => Ok((
                     CheckResult::Error,
-                    format!("Failed to parse --version output as UTF-8: {err}"),
+                    format!("Failed to execute chezmoi: {err}"),
                 )),
-            },
-            Err(err) => Ok((
-                CheckResult::Error,
-                format!("Failed to execute chezmoi: {err}"),
-            )),
+            }
         }
-    } else {
-        Ok((CheckResult::Error, "chezmoi not found in PATH".to_owned()))
+        Err(err) => Ok((
+            CheckResult::Error,
+            format!("chezmoi not found in PATH: {err}"),
+        )),
     }
 }
 
 fn check_has_ignore() -> anyhow::Result<(CheckResult, String)> {
-    if find_in_path("chezmoi").is_some() {
+    if which::which("chezmoi").is_ok() {
         let src_path = chezmoi_source_root()?;
         let mut src_path = src_path.ok_or(anyhow!("No chezmoi source root found"))?;
         src_path.push(".chezmoiignore");
@@ -180,23 +185,4 @@ fn check_has_ignore() -> anyhow::Result<(CheckResult, String)> {
             "chezmoi not found, can't check source directory".to_owned(),
         ))
     }
-}
-
-/// From https://stackoverflow.com/questions/37498864/finding-executable-in-path-with-rust/37499032#37499032
-fn find_in_path<P>(exe_name: P) -> Option<PathBuf>
-where
-    P: AsRef<Path>,
-{
-    env::var_os("PATH").and_then(|paths| {
-        env::split_paths(&paths)
-            .filter_map(|dir| {
-                let full_path = dir.join(&exe_name);
-                if full_path.is_file() {
-                    Some(full_path)
-                } else {
-                    None
-                }
-            })
-            .next()
-    })
 }
