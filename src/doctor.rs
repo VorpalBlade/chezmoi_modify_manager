@@ -93,8 +93,7 @@ const CHECKS: [Check; 6] = [
                     std::env::consts::OS,
                     std::env::consts::ARCH,
                     info
-                )
-                .to_string(),
+                ),
             ))
         },
     },
