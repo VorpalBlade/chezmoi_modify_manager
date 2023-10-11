@@ -7,8 +7,8 @@ keywords = ["ini", "config", "configuration", "chezmoi"]
 license = "GPL-3.0-only"
 name = "chezmoi_modify_manager"
 repository = "https://github.com/VorpalBlade/chezmoi_modify_manager"
-version = "2.1.4"
 rust-version = "1.70.0"
+version = "2.1.4"
 
 [features]
 default = ["updater-tls-rusttls"]
@@ -43,7 +43,7 @@ anyhow = { version = "1.0.75", features = ["backtrace"] }
 bpaf = { version = "0.9", features = ["autocomplete", "derive"] }
 duct = "0.13.6"
 indoc = "2.0.4"
-ini-merge = { version = "0.2.3", default-features = false, features = [
+ini-merge = { version = "0.2.4", default-features = false, features = [
     "keyring",
 ] }
 itertools = "0.11.0"
