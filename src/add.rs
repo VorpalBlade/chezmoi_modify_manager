@@ -64,12 +64,31 @@ fn hook_path() -> anyhow::Result<Option<PathBuf>> {
     if !output.status.success() {
         return Err(anyhow!("No chezmoi source directory seems to exist?"));
     }
-    let path = PathBuf::from(String::from_utf8(output.stdout)?.trim_end())
-        .join(".chezmoi_modify_manager.add_hook");
-    if !path.exists() {
-        return Ok(None);
+    let ch_path = PathBuf::from(String::from_utf8(output.stdout)?.trim_end());
+    if cfg!(win32) {
+        let base_path = ch_path.join(".chezmoi_modify_manager.add_hook.*");
+        let mut candidates: Vec<_> = glob::glob_with(
+            base_path
+                .to_str()
+                .ok_or_else(|| anyhow!("Invalid path {base_path:?} for chezmoi source directory: not convertible to UTF-8."))?,
+            glob::MatchOptions {
+                case_sensitive: true,
+                require_literal_separator: true,
+                require_literal_leading_dot: true,
+            },
+        )?.collect();
+        match candidates.len() {
+            0 => Ok(None),
+            1 => Ok(Some(candidates.remove(0)?)),
+            _ => Err(anyhow!("Too many add_hook scripts found")),
+        }
+    } else {
+        let path = ch_path.join(".chezmoi_modify_manager.add_hook");
+        if !path.exists() {
+            return Ok(None);
+        }
+        Ok(Some(path))
     }
-    Ok(Some(path))
 }
 
 /// Perform actual adding with a script
