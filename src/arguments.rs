@@ -15,7 +15,7 @@ fn style() -> impl Parser<Style> {
     const DEFAULT: Style = Style::InPath;
     let iter = Style::iter().map(|x| -> String {
         if x == DEFAULT {
-            format!("{} (default)", x)
+            format!("{x} (default)")
         } else {
             x.to_string()
         }

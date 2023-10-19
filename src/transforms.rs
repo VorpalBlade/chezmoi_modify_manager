@@ -64,7 +64,7 @@ impl Transform {
 
     /// Construct transform with arguments
     pub(crate) fn construct(
-        &self,
+        self,
         args: &HashMap<String, String>,
     ) -> Result<Box<dyn ini_transforms::Transformer>, ini_transforms::TransformerError> {
         use ini_transforms::Transformer;
