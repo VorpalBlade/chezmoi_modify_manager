@@ -65,7 +65,7 @@ fn hook_path() -> anyhow::Result<Option<PathBuf>> {
         return Err(anyhow!("No chezmoi source directory seems to exist?"));
     }
     let ch_path = PathBuf::from(String::from_utf8(output.stdout)?.trim_end());
-    if cfg!(win32) {
+    if cfg!(windows) {
         let base_path = ch_path.join(".chezmoi_modify_manager.add_hook.*");
         let mut candidates: Vec<_> = glob::glob_with(
             base_path
