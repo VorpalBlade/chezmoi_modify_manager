@@ -86,8 +86,8 @@ fn add_with_script(path: &Path, style: Style) -> anyhow::Result<()> {
         .file_name()
         .ok_or(anyhow!("File has no filename"))?
         .to_string_lossy();
-    let data_path = src_path.with_file_name(format!("{}.src.ini", src_name));
-    let script_path = src_path.with_file_name(format!("modify_{}.tmpl", src_name));
+    let data_path = src_path.with_file_name(format!("{src_name}.src.ini"));
+    let script_path = src_path.with_file_name(format!("modify_{src_name}.tmpl"));
     // Run user provided hook script (if one exists)
     add_or_hook(path, &data_path, &src_path, true)?;
 
