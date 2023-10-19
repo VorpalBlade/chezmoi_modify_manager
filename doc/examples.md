@@ -189,6 +189,11 @@ else
 fi
 ```
 
+> ⚠️ Windows note! On Windows chezmoi_modify_manager will instead look for a
+file `.chezmoi_modify_manager.add_hook.*`, where `*` is any file extension.
+At most one such file may be present. This allows you to use a suitable
+scripting language for that platform.
+
 # Examples - set/remove
 
 The `set` and `remove` directives are meant to be used together with templating
