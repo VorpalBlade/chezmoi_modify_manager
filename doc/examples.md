@@ -159,6 +159,13 @@ ignore "Settings" "gtk-xft-dpi"
 
 ## Add hook
 
+> ⚠️ NOTE! This approach is set to be replaced at some point with simple
+`add:remove` and `add:hide` directives in the configuration file, which
+will be suitable for the password use case as well as when using `set` on
+specific systems. If you use add hooks for anything else, please leave a
+comment on [issue #46](https://github.com/VorpalBlade/chezmoi_modify_manager/issues/46)
+so that I can take it into consideration for the design.
+
 A user defined hook script can optionally be executed by chezmoi_ini_add to
 filter the data when adding it. This can be useful when readding files to
 automatically remove passwords that are managed by a transform.
