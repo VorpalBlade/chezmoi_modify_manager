@@ -35,7 +35,7 @@ jobs:
           - stable
           - nightly
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Rust
         run: rustup install --profile minimal ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
       - name: Install cross
@@ -63,7 +63,7 @@ jobs:
           - 1.70.0
           - stable
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Rust
         run: rustup install --profile minimal  ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
       - name: Cache builds
@@ -88,7 +88,7 @@ jobs:
         rust:
           - stable
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Rust
         run: rustup install --profile minimal  ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
       - name: Install cross
@@ -113,7 +113,7 @@ jobs:
           - target: x86_64-apple-darwin
             os: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Rust
         run: rustup install --profile minimal stable && rustup default stable
       - name: Cache builds
