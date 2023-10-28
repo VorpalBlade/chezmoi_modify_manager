@@ -91,15 +91,14 @@ fn help_syntax() {
     ===================
 
     chezmoi_modify_manager uses basic configuration files to control how to
-    merge INI files. The easiest way to get started is to use -a to add a
-    file and generate a skeleton configuration file.
+    merge INI files. The easiest way to get started is to use -a to add a file
+    and generate a skeleton configuration file.
 
     Syntax
     ======
 
-    The file consists of directives, one per line. Comments are supported
-    by prefixing a line with #. Comments are only supported at the start
-    of lines.
+    The file consists of directives, one per line. Comments are supported by
+    prefixing a line with #. Comments are only supported at the start of lines.
 
     Directives
     ==========
@@ -113,9 +112,9 @@ fn help_syntax() {
 
     ignore
     ------
-    Ignore a certain line, always taking it from the target file (i.e. file
-    in your home directory), instead of the source state. The following
-    variants are supported:
+    Ignore a certain line, always taking it from the target file (i.e. file in
+    your home directory), instead of the source state. The following variants
+    are supported:
 
     ignore section "my-section"
     ignore "my-section" "my-key"
@@ -131,6 +130,9 @@ fn help_syntax() {
     An additional effect is that lines that are missing in the source state
     will not be deleted if they are ignored.
 
+    Finally, ignored lines will not be added back when using --add or
+    --smart-add, in order to reduce git diffs.
+
     set
     ---
     Set an entry to a specific value. This is primarily useful together with
@@ -142,7 +144,7 @@ fn help_syntax() {
 
     By default separator is " = ", which might not match what the program that
     the ini files belongs to uses.
-    
+
     Notes:
     * Only exact literal matches are supported.
     * It works better if the line exists in the source & target state, otherwise
@@ -160,6 +162,8 @@ fn help_syntax() {
     remove "my-section" "my-key"
     remove regex "section.*regex" "key regex.*"
 
+    (Matching works identically to ignore, see above for more details.)
+
     transform
     ---------
     Some specific situations need more complicated merging that a simple
@@ -169,6 +173,9 @@ fn help_syntax() {
     transform "section" "key" transform-name arg1="value" arg2="value" ...
     transform regex "section-regex.*" "key-regex.*" transform-name arg1="value" ...
 
+    (Matching works identically to ignore except matching entire sections is
+    not supported. See above for more details.)
+
     For example, to treat mykey in mysection as an unsorted comma separated
     list, you could use:
 
@@ -176,6 +183,32 @@ fn help_syntax() {
 
     The full list of supported transforms, and how to use them can be listed
     using --help-transforms.
+
+    add:remove & add:hide
+    ---------------------
+    These two directives control the behaviour when using --add or --smart-add.
+    In particular, these allow filtering lines that will be added back to the
+    source state.
+
+    add:remove will remove the matching lines entirely. The following forms are
+    supported:
+
+    add:remove section "section name"
+    add:remove "section name" "key"
+    add:remove regex  "section-regex.*" "key-regex.*"
+
+    (Matching works identically to ignore, see above for more details.)
+
+    add:hide will instead keep the entries but replace the value associated with
+    those keys. This is useful together with the keyring transform in particular,
+    as the key needs to exist in the source or target state for it to trigger
+    the replacement. The following forms are supported:
+
+    add:hide section "section name"
+    add:hide "section name" "key"
+    add:hide regex  "section-regex.*" "key-regex.*"
+
+    (Matching works identically to ignore, see above for more details.)
     "#,
     r#"source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini""#};
 }

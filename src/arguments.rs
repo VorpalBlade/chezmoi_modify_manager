@@ -46,7 +46,7 @@ fn style() -> impl Parser<Style> {
         .fallback(DEFAULT)
 }
 
-/// Add-on for chezmoi to handle mixed settings and state  
+/// Add-on for chezmoi to handle mixed settings and state
 #[derive(Debug, Bpaf)]
 #[bpaf(options, version)]
 pub enum ChmmArgs {
