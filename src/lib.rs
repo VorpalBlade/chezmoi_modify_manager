@@ -39,7 +39,7 @@ where
             let mut buf = String::new();
             f.read_to_string(&mut buf)
                 .with_context(|| format!("Failed to read script from {file_name:?}"))?;
-            let c = config::parse(&buf)
+            let c = config::parse_for_merge(&buf)
                 .with_context(|| format!("Failed to parse script from {file_name:?}"))?;
 
             let mut stdin = stdin();
