@@ -198,7 +198,7 @@ fi
 
 ## Add hook on Windows (or multiplatform solution)
 
-On Windows chezmoi_modify_manager will instead look for a file `.chezmoi_modify_manager.add_hook.*`. At most one such file may be present. Currently, `bat` extension is confirmed to be working well. This allows you to use a suitable scripting language for that platform.
+On Windows chezmoi_modify_manager will instead look for a file `.chezmoi_modify_manager.add_hook.*`. At most one such file may be present. This allows you to use a suitable scripting language for that platform. Currently, `bat` extension is confirmed to be working well. However not all scripting languages seem to work here (for unknown reason).
 
 Below is an example for a cross-platform solution, in which both `.chezmoi_modify_manager.add_hook` (Linux/MacOS) and `.chezmoi_modify_manager.add_hook.bat` (Windows) scripts pass input arguments to a common `.chezmoi_modify_manager.add_hook_wrapped.py` Python script:
 
@@ -207,8 +207,8 @@ Below is an example for a cross-platform solution, in which both `.chezmoi_modif
 ```bash
 #!/bin/sh
 
-CHEZMOI_SOURCE_DIR="$HOME/.local/share/chezmoi"
-python3 "${CHEZMOI_SOURCE_DIR}/.chezmoi_modify_manager.add_hook_wrapped.py" "$1" "$2" "$3"
+CHEZMOI_SOURCE_DIR="$(chezmoi source-path)"
+exec python3 "${CHEZMOI_SOURCE_DIR}/.chezmoi_modify_manager.add_hook_wrapped.py" "$1" "$2" "$3"
 ```
 
 `.chezmoi_modify_manager.add_hook.bat` (Windows) contents:
@@ -222,6 +222,7 @@ python3 "%CHEZMOI_SOURCE_DIR%\.chezmoi_modify_manager.add_hook_wrapped.py" "%1" 
 `.chezmoi_modify_manager.add_hook_wrapped.py` contents:
 
 ```python
+#!/usr/bin/env python3
 # The file from the target directory will be available on STDIN.
 # The data to add to the source state should be printed to STDOUT.
 
