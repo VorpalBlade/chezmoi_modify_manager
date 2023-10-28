@@ -3,6 +3,7 @@
 use crate::utils::chezmoi_source_path;
 use anyhow::anyhow;
 use duct::cmd;
+use indoc::formatdoc;
 use std::{
     fs::File,
     io::Write,
@@ -192,6 +193,20 @@ pub(crate) fn add(mode: Mode, style: Style, path: &Path) -> anyhow::Result<()> {
                     + ".src.ini";
                 let mut targeted_file: PathBuf = src_dir.into();
                 targeted_file.push(data_file);
+                // Make sure the data file exists! If it doesn't, the user has
+                // probably changed the "source" directive (or just removed the file).
+                // Bail in that case, we can't reasonably fix the situation automatically.
+                if !targeted_file.exists() {
+                    let err_str = formatdoc!(
+                        r#"Found existing modify_ script but no associated .src.ini file (looked at {targeted_file:?}).
+                        Possible causes:
+                        * Did you change the "source" directive from the default value?
+                        * Remove the file by mistake?
+
+                        Either way: the automated adding code is not smart enough to handle this situation by itself."#
+                    );
+                    return Err(anyhow!(err_str));
+                }
                 add_or_hook(path, targeted_file.as_ref(), path, false)?;
             } else {
                 println!("    Existing, but not a modify script...");
