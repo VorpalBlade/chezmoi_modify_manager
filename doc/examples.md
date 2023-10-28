@@ -215,7 +215,7 @@ exec python3 "${CHEZMOI_SOURCE_DIR}/.chezmoi_modify_manager.add_hook_wrapped.py"
 
 ```bat
 @echo off
-set CHEZMOI_SOURCE_DIR=%userprofile%\.local\share\chezmoi
+for /f %%i in ('chezmoi source-path') do set "CHEZMOI_SOURCE_DIR=%%i"
 python3 "%CHEZMOI_SOURCE_DIR%\.chezmoi_modify_manager.add_hook_wrapped.py" "%1" "%2" "%3"
 ```
 
