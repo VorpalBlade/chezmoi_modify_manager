@@ -196,10 +196,55 @@ else
 fi
 ```
 
-> ⚠️ Windows note! On Windows chezmoi_modify_manager will instead look for a
-file `.chezmoi_modify_manager.add_hook.*`, where `*` is any file extension.
-At most one such file may be present. This allows you to use a suitable
-scripting language for that platform.
+## Add hook on Windows (or multiplatform solution)
+
+On Windows chezmoi_modify_manager will instead look for a file `.chezmoi_modify_manager.add_hook.*`. At most one such file may be present. This allows you to use a suitable scripting language for that platform. Currently, `bat` extension is confirmed to be working well. However not all scripting languages seem to work here (for unknown reason).
+
+Below is an example for a cross-platform solution, in which both `.chezmoi_modify_manager.add_hook` (Linux/MacOS) and `.chezmoi_modify_manager.add_hook.bat` (Windows) scripts pass input arguments to a common `.chezmoi_modify_manager.add_hook_wrapped.py` Python script:
+
+`.chezmoi_modify_manager.add_hook` (Linux/MacOS) contents:
+
+```bash
+#!/bin/sh
+
+CHEZMOI_SOURCE_DIR="$(chezmoi source-path)"
+exec python3 "${CHEZMOI_SOURCE_DIR}/.chezmoi_modify_manager.add_hook_wrapped.py" "$1" "$2" "$3"
+```
+
+`.chezmoi_modify_manager.add_hook.bat` (Windows) contents:
+
+```bat
+@echo off
+for /f %%i in ('chezmoi source-path') do set "CHEZMOI_SOURCE_DIR=%%i"
+python3 "%CHEZMOI_SOURCE_DIR%\.chezmoi_modify_manager.add_hook_wrapped.py" "%1" "%2" "%3"
+```
+
+`.chezmoi_modify_manager.add_hook_wrapped.py` contents:
+
+```python
+#!/usr/bin/env python3
+# The file from the target directory will be available on STDIN.
+# The data to add to the source state should be printed to STDOUT.
+
+import re
+import sys
+
+# Currently only "ini"
+type = sys.argv[1]
+# Path of file as provided by the user to the command, may be a relative path
+target_path = sys.argv[2]
+# Path in the source state we are writing to. Will end in .src.ini for ini files.
+source_data_path = sys.argv[3]
+
+# Read data from STDIN
+input_data = sys.stdin.read()
+
+if "konversationrc" in source_data_path:
+    # Filter out any set password.
+    input_data = re.sub(r'Password=.*$', 'Password=PLACEHOLDER', input_data)
+
+print(input_data)
+```
 
 # Examples - set/remove
 
