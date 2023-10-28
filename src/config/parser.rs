@@ -36,6 +36,10 @@ pub(super) enum Directive {
     },
     /// Remove everything matching a specific matcher
     Remove(Matcher),
+    /// On add: remove everything matching a specific matcher
+    AddRemove(Matcher),
+    /// On add: hide the value of everything matching a specific matcher
+    AddHide(Matcher),
 }
 
 /// The different ways things can be matched.
@@ -58,6 +62,8 @@ pub(super) fn parse_config(i: &mut &str) -> PResult<Vec<Directive>> {
         transform.context(StrContext::Label("transform")),
         set.context(StrContext::Label("set")),
         remove.context(StrContext::Label("remove")),
+        add_remove.context(StrContext::Label("add:remove")),
+        add_hide.context(StrContext::Label("add:hide")),
         "".map(|_| Directive::WS)
             .context(StrContext::Label("whitespace")), // Blank lines
     );
@@ -125,6 +131,18 @@ fn set(i: &mut &str) -> PResult<Directive> {
 fn remove(i: &mut &str) -> PResult<Directive> {
     ("remove", space1, matcher)
         .map(|(_, _, matcher)| Directive::Remove(matcher))
+        .parse_next(i)
+}
+
+fn add_remove(i: &mut &str) -> PResult<Directive> {
+    ("add:remove", space1, matcher)
+        .map(|(_, _, matcher)| Directive::AddRemove(matcher))
+        .parse_next(i)
+}
+
+fn add_hide(i: &mut &str) -> PResult<Directive> {
+    ("add:hide", space1, matcher)
+        .map(|(_, _, matcher)| Directive::AddHide(matcher))
         .parse_next(i)
 }
 
@@ -201,6 +219,7 @@ mod tests {
     use indoc::indoc;
 
     use super::*;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn check_quoted_string() {
@@ -287,6 +306,11 @@ mod tests {
     transform regex "d.*" "e.*" kde-shortcut
     # Random comment
 
+    # Test adding
+    add:hide "f g" "h"
+    add:remove regex "quux.*" "eh?"
+    add:remove section "very secret"
+    add:hide section "somewhat secret"
     "#};
 
     #[test]
@@ -326,6 +350,10 @@ mod tests {
                     "kde-shortcut".into(),
                     HashMap::new()
                 ),
+                Directive::AddHide(Matcher::Literal("f g".into(), "h".into())),
+                Directive::AddRemove(Matcher::Regex("quux.*".into(), "eh?".into())),
+                Directive::AddRemove(Matcher::Section("very secret".into())),
+                Directive::AddHide(Matcher::Section("somewhat secret".into())),
             ]
         )
     }
