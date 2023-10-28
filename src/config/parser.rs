@@ -87,12 +87,15 @@ fn comment(i: &mut &str) -> PResult<Directive> {
 
 /// A source statement
 fn source(i: &mut &str) -> PResult<Directive> {
+    // To support working on the raw templated files before chezmoi processes
+    // them we parse to the end of the line, instead of end of the quotation
+    // mark.
     (
         "source",
         space1,
         alt((
             "auto".map(|_| Directive::SourceAuto),
-            quoted_string.map(Directive::Source),
+            quoted_string_nl.map(Directive::Source),
         )),
     )
         .map(|(_, _, result)| result)
@@ -214,6 +217,30 @@ fn quoted_string(i: &mut &str) -> PResult<String> {
     .parse_next(i)
 }
 
+/// Quoted string ending in newline value
+fn quoted_string_nl(i: &mut &str) -> PResult<String> {
+    delimited(
+        '"',
+        escaped_transform(
+            take_till1(['\n', '\r', '\\']),
+            '\\',
+            alt(("\\".value("\\"), "\"".value("\""), "n".value("\n"))),
+        ),
+        alt(('\n', '\r')),
+    )
+    // Trim any trailing ws and "
+    .map(|mut v: String| {
+        while v.ends_with(['\r', '\n', ' ', '\t']) {
+            v.pop();
+        }
+        if v.ends_with('"') {
+            v.pop();
+        }
+        v
+    })
+    .parse_next(i)
+}
+
 #[cfg(test)]
 mod tests {
     use indoc::indoc;
@@ -229,6 +256,46 @@ mod tests {
 
         let res = quoted_string.parse_peek("\"invalid");
         assert!(res.is_err());
+    }
+
+    #[test]
+    fn check_quoted_string_nl() {
+        let (rem, out) = quoted_string_nl
+            .parse_peek("\"test \\\" \\\\input\"\n")
+            .unwrap();
+        assert_eq!(rem, "");
+        assert_eq!(out, "test \" \\input");
+
+        let (rem, out) = quoted_string_nl.parse_peek("\"a \" b\"\n").unwrap();
+        assert_eq!(rem, "");
+        assert_eq!(out, "a \" b");
+
+        let res = quoted_string_nl.parse_peek("\"invalid");
+        assert!(res.is_err());
+    }
+
+    #[test]
+    fn check_chezmoi_raw_source() {
+        let input = concat!(
+            r#"source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini""#,
+            "\n"
+        );
+        let (rem, out) = source.parse_peek(input).unwrap();
+        assert_eq!(rem, "");
+        assert!(
+            matches!(out, Directive::Source(s) if s == r#"{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini"#)
+        );
+
+        // Trailing WS should be OK too
+        let input = concat!(
+            r#"source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini"  "#,
+            "\t  \n"
+        );
+        let (rem, out) = source.parse_peek(input).unwrap();
+        assert_eq!(rem, "");
+        assert!(
+            matches!(out, Directive::Source(s) if s == r#"{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini"#)
+        );
     }
 
     #[test]
