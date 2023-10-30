@@ -52,15 +52,17 @@ where
             }
         }
         ChmmArgs::Add { _a, files, style } => {
+            let mut stdout = stdout();
             for file in files {
                 println!("Adding {file:?}");
-                add::add(add::Mode::Normal, style, &file)?;
+                add::add(add::Mode::Normal, style, &file, &mut stdout)?;
             }
         }
         ChmmArgs::Smart { _a, files, style } => {
+            let mut stdout = stdout();
             for file in files {
                 println!("Adding {file:?}");
-                add::add(add::Mode::Smart, style, &file)?;
+                add::add(add::Mode::Smart, style, &file, &mut stdout)?;
             }
         }
         ChmmArgs::Update { _a } => {
