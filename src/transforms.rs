@@ -1,6 +1,6 @@
 //! Defines supported transforms.
 
-use std::collections::HashMap;
+use std::{collections::HashMap, rc::Rc};
 
 use ini_merge::mutations::transforms as ini_transforms;
 use itertools::Itertools;
@@ -66,16 +66,16 @@ impl Transform {
     pub(crate) fn construct(
         self,
         args: &HashMap<String, String>,
-    ) -> Result<Box<dyn ini_transforms::Transformer>, ini_transforms::TransformerError> {
+    ) -> Result<Rc<dyn ini_transforms::Transformer>, ini_transforms::TransformerError> {
         use ini_transforms::Transformer;
         match self {
-            Transform::UnsortedLists => Ok(Box::new(
+            Transform::UnsortedLists => Ok(Rc::new(
                 ini_transforms::TransformUnsortedLists::from_user_input(args)?,
             )),
-            Transform::KdeShortcut => Ok(Box::new(
+            Transform::KdeShortcut => Ok(Rc::new(
                 ini_transforms::TransformKdeShortcut::from_user_input(args)?,
             )),
-            Transform::Keyring => Ok(Box::new(ini_transforms::TransformKeyring::from_user_input(
+            Transform::Keyring => Ok(Rc::new(ini_transforms::TransformKeyring::from_user_input(
                 args,
             )?)),
         }

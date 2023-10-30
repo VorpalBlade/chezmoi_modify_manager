@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::path::Path;
 use std::path::PathBuf;
+use std::rc::Rc;
 use std::str::FromStr;
 
 use anyhow::anyhow;
@@ -63,7 +64,7 @@ impl Config {
 fn make_transformer(
     transform: &str,
     args: &HashMap<String, String>,
-) -> anyhow::Result<Box<dyn transforms::Transformer>> {
+) -> anyhow::Result<Rc<dyn transforms::Transformer>> {
     Ok(Transform::from_str(transform)
         .map_err(|err| anyhow!("Invalid transform specified: {}: {}", transform, err))?
         .construct(args)?)
@@ -95,14 +96,14 @@ pub(crate) fn parse(src: &str) -> Result<Config, anyhow::Error> {
                 source = Some(Source::Auto);
             }
             Directive::Ignore(Matcher::Section(section)) => {
-                builder = builder.add_section_action(section, SectionAction::Ignore);
+                builder.add_section_action(section, SectionAction::Ignore);
             }
             Directive::Ignore(matcher) => {
-                builder = add_action(builder, matcher, Action::Ignore);
+                add_action(&mut builder, matcher, Action::Ignore);
             }
             Directive::Transform(matcher, transform, args) => {
                 let t = make_transformer(&transform, &args)?;
-                builder = add_action(builder, matcher, Action::Transform(t));
+                add_action(&mut builder, matcher, Action::Transform(t));
             }
             Directive::Set {
                 section,
@@ -113,7 +114,7 @@ pub(crate) fn parse(src: &str) -> Result<Config, anyhow::Error> {
                 // Set is a transform under the hood, but needs special support
                 // to enable adding lines that don't exist. This is handled inside
                 // the mutations builder.
-                builder = builder.add_setter(
+                builder.add_setter(
                     section,
                     key,
                     value,
@@ -121,10 +122,10 @@ pub(crate) fn parse(src: &str) -> Result<Config, anyhow::Error> {
                 );
             }
             Directive::Remove(Matcher::Section(section)) => {
-                builder = builder.add_section_action(section, SectionAction::Delete);
+                builder.add_section_action(section, SectionAction::Delete);
             }
             Directive::Remove(matcher) => {
-                builder = add_action(builder, matcher, Action::Delete);
+                add_action(&mut builder, matcher, Action::Delete);
             }
         }
     }
@@ -135,7 +136,7 @@ pub(crate) fn parse(src: &str) -> Result<Config, anyhow::Error> {
     })
 }
 
-fn add_action(builder: MutationsBuilder, matcher: Matcher, action: Action) -> MutationsBuilder {
+fn add_action(builder: &mut MutationsBuilder, matcher: Matcher, action: Action) {
     match matcher {
         Matcher::Section(_) => panic!("Section match not valid in add_action()"),
         Matcher::Literal(section, key) => builder.add_literal_action(section, key, action),

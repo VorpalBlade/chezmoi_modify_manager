@@ -1078,9 +1078,9 @@ checksum = "1e186cfbae8084e513daff4240b4797e342f988cecda4fb6c939150f96315fd8"
 
 [[package]]
 name = "ini-merge"
-version = "0.2.4"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "683b4237a3983e6c7b50f4a035310fe73e750abdbef7a256acef91e53565c7c4"
+checksum = "14f3b06618a4acb1cd07f040710bf9db018627bad92d13a405234abf2ba536a7"
 dependencies = [
  "ini-roundtrip",
  "itertools",

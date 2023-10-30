@@ -20,7 +20,7 @@ mod update;
 mod utils;
 
 use indoc::printdoc;
-use ini_merge::merge_ini;
+use ini_merge::merge::merge_ini;
 
 /// Main function, amenable to integration tests.
 pub fn inner_main<R: Read, W: Write, FR, FW>(
