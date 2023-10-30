@@ -54,26 +54,53 @@ section.
 
 ### Supported features
 
-For detailed usage instructions on the filtering see `chezmoi_modify_manager --help-syntax`.
+#### Feature: Merging & filtering INI files
 
-* Ignore entire section.
-* Ignore specific key in specific section.
-* Ignore key in section based on regular expressions.
+This is the main mode and reason for the existance of this tool.
+
+`chezmoi_modify_manager` allows you to:
+
+* Ignore an entire section.
+* Ignore a specific key in specific section.
+* Ignore a key in section based on regular expressions.
 * Force set a value (useful together with templating).
 * Force remove a section, key or entries matching a regex (useful together with templating).
 * Apply a transformation to the value of a specified key. These are special
-  operations that built in and provide more complicated transformations.
-  A list of transforms is available via `--help-transforms`.
+  operations that are built in and provide more complicated transformations.
+  A list of transforms is available via `--help-transforms`. Some examples
+  that this can do:
+  * Look up a password in the platform keyring
+  * Ignore the sorting order of a list style value (`key=a,b,c,d`)
+  * etc.
+
+For detailed usage instructions see `chezmoi_modify_manager --help-syntax`.
+
+#### Feature: Assisted adding to the chezmoi source state
 
 The command can also be used to add files (see `chezmoi_ini_add --help` for details):
 
 * Smart re-add mode (re-add files as managed `.src.ini` if they are already
   managed, otherwise add with plain chezmoi).
 * Conversion mode (convert from plain chezmoi to managed to `.src.ini`).
-* User specified hook. Can be used to filter out passwords when adding or
-  re-adding configuration files. See [examples.md](doc/examples.md#add-hook) for details.
 
-Finally, the command has a built in updater (similar to `chezmoi upgrade`).
+`chezmoi_modify_manager` also allows filtering the added files when re-adding
+them after they changed:
+
+* Any ignored keys will be removed (since we always use the system version of
+  these, this reduces churn and the diff size in git).
+* The value can be hidden (`add:hide` directive), useful in case of passwords
+  that comes from keyrings.
+* Or they can be removed entirely using the `add:remove` directive (useful in
+  combination with `set` and a templated modify script).
+
+See the section on `add:hide` & `add:remove` in `--help-syntax` for more details.
+
+#### Feature: Self updater
+
+Finally, the command has a built-in updater (similar to `chezmoi upgrade`).
+
+Note! This can (and should) be configured out using cargo features if you are
+building a distro package.
 
 ## Installation
 

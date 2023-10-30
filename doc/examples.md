@@ -54,6 +54,8 @@ Konversation has two relevant quirks:
 ignore "ServerListDialog" "Size"
 transform "Aliases" "AliasList" unsorted_list separator=","
 transform "Identity 0" "Password" keyring service="konversation" user="konversation_id0"
+# Make sure the password isn't added back into the config file on re-add
+add:hide "Identity 0" "Password"
 ```
 
 To store the password for Identity 0 in your keyring of choice you can use the
@@ -63,10 +65,6 @@ To store the password for Identity 0 in your keyring of choice you can use the
 $ secret-tool store --label="Konversation password" service konversation username konversation_id0
 [Enter your password at the prompt]
 ```
-
-***Caution!*** Remember to also remove the password from the .src.ini that was
-added to the chezmoi directory. Using an [add hook](#add-hook) can help with
-this.
 
 ### kwinrc
 Similar to kglobalshortcutsrc there are computer specific UUIDs. In addition,
@@ -155,16 +153,17 @@ following:
 ignore "Settings" "gtk-xft-dpi"
 ```
 
-# Examples - hook scripts
+# Examples - hook scripts (LEGACY)
 
-## Add hook
+## Add hook (LEGACY)
 
-> ⚠️ NOTE! This approach is set to be replaced at some point with simple
-`add:remove` and `add:hide` directives in the configuration file, which
-will be suitable for the password use case as well as when using `set` on
-specific systems. If you use add hooks for anything else, please leave a
-comment on [issue #46](https://github.com/VorpalBlade/chezmoi_modify_manager/issues/46)
-so that I can take it into consideration for the design.
+> ⚠️ LEGACY! ⚠️ This approach is has been replaced with `add:remove` and
+`add:hide` directives in the configuration file, which is suitable for the
+password use case as well as when using `set` on specific systems. If you use
+add hooks for anything else where the new directives don't work, please leave
+a comment on
+[issue #46](https://github.com/VorpalBlade/chezmoi_modify_manager/issues/46)
+so that I can look into other possible ways to support it.
 
 A user defined hook script can optionally be executed by chezmoi_ini_add to
 filter the data when adding it. This can be useful when readding files to
@@ -177,6 +176,9 @@ Here is an example that will filter out passwords of the `konversationrc` file:
 
 ```zsh
 #!/bin/zsh
+#
+# NOTE: LEGACY, use add:hide & add:remove directives instead
+#
 # The file from the target directory will be available on STDIN.
 # The data to add to the source state should be printed to STDOUT.
 
@@ -196,16 +198,24 @@ else
 fi
 ```
 
-## Add hook on Windows (or multiplatform solution)
+## Add hook on Windows (or multiplatform solution) (LEGACY)
 
-On Windows chezmoi_modify_manager will instead look for a file `.chezmoi_modify_manager.add_hook.*`. At most one such file may be present. This allows you to use a suitable scripting language for that platform. Currently, `bat` extension is confirmed to be working well. However not all scripting languages seem to work here (for unknown reason).
+On Windows chezmoi_modify_manager will instead look for a file
+`.chezmoi_modify_manager.add_hook.*`. At most one such file may be present.
+This allows you to use a suitable scripting language for that platform.
+Currently, `bat` extension is confirmed to be working well. However not all
+scripting languages seem to work here (for unknown reason).
 
-Below is an example for a cross-platform solution, in which both `.chezmoi_modify_manager.add_hook` (Linux/MacOS) and `.chezmoi_modify_manager.add_hook.bat` (Windows) scripts pass input arguments to a common `.chezmoi_modify_manager.add_hook_wrapped.py` Python script:
+Below is an example for a cross-platform solution, in which both
+`.chezmoi_modify_manager.add_hook` (Linux/MacOS) and
+`.chezmoi_modify_manager.add_hook.bat` (Windows) scripts pass input arguments to
+a common `.chezmoi_modify_manager.add_hook_wrapped.py` Python script:
 
 `.chezmoi_modify_manager.add_hook` (Linux/MacOS) contents:
 
 ```bash
 #!/bin/sh
+# NOTE: LEGACY, use add:hide & add:remove directives instead
 
 CHEZMOI_SOURCE_DIR="$(chezmoi source-path)"
 exec python3 "${CHEZMOI_SOURCE_DIR}/.chezmoi_modify_manager.add_hook_wrapped.py" "$1" "$2" "$3"
@@ -215,6 +225,9 @@ exec python3 "${CHEZMOI_SOURCE_DIR}/.chezmoi_modify_manager.add_hook_wrapped.py"
 
 ```bat
 @echo off
+
+REM NOTE: LEGACY, use add:hide & add:remove directives instead
+
 for /f %%i in ('chezmoi source-path') do set "CHEZMOI_SOURCE_DIR=%%i"
 python3 "%CHEZMOI_SOURCE_DIR%\.chezmoi_modify_manager.add_hook_wrapped.py" "%1" "%2" "%3"
 ```
@@ -223,6 +236,9 @@ python3 "%CHEZMOI_SOURCE_DIR%\.chezmoi_modify_manager.add_hook_wrapped.py" "%1" 
 
 ```python
 #!/usr/bin/env python3
+#
+# NOTE: LEGACY, use add:hide & add:remove directives instead
+#
 # The file from the target directory will be available on STDIN.
 # The data to add to the source state should be printed to STDOUT.
 
@@ -253,10 +269,14 @@ in the modify scripts. For example, there might be a key binding in KDE you only
 want on computers were a specific program is installed. This could be accomplished
 by something like the following for `kglobalshortcutsrc`
 
-```
+```bash
 {{if lookPath "my-fancy-program"}}
 set "my-fancy-program.desktop" _k_friendly_name "My fancy program" separator="="
 set "my-fancy-program.desktop" _launch "Ctrl+Shift+Y,none,my-fancy-program" separator="="
+
+# Make sure the lines aren't added back into the config for all systems
+add:remove "my-fancy-program.desktop" _k_friendly_name
+add:remove "my-fancy-program.desktop" _launch
 {{end}}
 ```
 
