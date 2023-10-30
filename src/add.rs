@@ -133,6 +133,22 @@ fn filtered_add(
     // First pass through hook if one exists, otherwise load directly.
     let file_contents = if let Some(hook_path) = hook_path()? {
         _ = writeln!(status_out, "Executing hook script...");
+        _ = writeln!(
+            status_out,
+            "\n!!! Hook scripts are deprecated (and will be removed at a future point) !!!"
+        );
+        _ = writeln!(
+            status_out,
+            "    Migrate to the new add:remove and add:hide attributes if possible."
+        );
+        _ = writeln!(
+            status_out,
+            "    If not possible, please leave a comment on this issue describing your use case:"
+        );
+        _ = writeln!(
+            status_out,
+            "    https://github.com/VorpalBlade/chezmoi_modify_manager/issues/46\n"
+        );
         run_hook(&hook_path, input_path, target_path, src_path)?
     } else {
         std::fs::read(src_path).context("Failed to load data from file we are adding")?
@@ -144,7 +160,14 @@ fn filtered_add(
 
     // If we are updating an existing script, run the contents through the filtering
     let file_contents = if let Some(sp) = script_path {
-        internal_filter(sp, &file_contents, status_out)?
+        _ = writeln!(
+            status_out,
+            "Has existing modify script, parsing to check for filtering..."
+        );
+        let config = config::parse_for_add(
+            &std::fs::read_to_string(sp).context("Failed to load modify script")?,
+        )?;
+        internal_filter(&config, &file_contents)?
     } else {
         file_contents
     };
@@ -154,25 +177,18 @@ fn filtered_add(
     Ok(())
 }
 
+/// Perform internal filtering using add:hide and add:remove (modern filtering)
 fn internal_filter(
-    script_path: &Path,
+    config: &config::Config<ini_merge::filter::FilterActions>,
     contents: &[u8],
-    status_out: &mut impl Write,
 ) -> anyhow::Result<Vec<u8>> {
-    _ = writeln!(
-        status_out,
-        "Has existing modify script, parsing to check for filtering..."
-    );
-    let config = config::parse_for_add(
-        &std::fs::read_to_string(script_path).context("Failed to load modify script")?,
-    )?;
     let mut file = std::io::Cursor::new(contents);
     let result = filter_ini(&mut file, &config.mutations)?;
     let s: String = itertools::intersperse(result, "\n".into()).collect();
     Ok(s.as_bytes().into())
 }
 
-/// Run hook script
+/// Run hook script (legacy filtering)
 fn run_hook(
     hook_path: &Path,
     input_path: &Path,
