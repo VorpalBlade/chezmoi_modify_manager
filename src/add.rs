@@ -1,9 +1,10 @@
 //! Support for adding files
 
-use crate::utils::chezmoi_source_path;
-use anyhow::anyhow;
+use crate::{config, utils::chezmoi_source_path};
+use anyhow::{anyhow, Context};
 use duct::cmd;
 use indoc::formatdoc;
+use ini_merge::filter::filter_ini;
 use std::{
     fs::File,
     io::Write,
@@ -109,7 +110,7 @@ fn add_with_script(path: &Path, style: Style) -> anyhow::Result<()> {
     let data_path = src_path.with_file_name(format!("{src_name}.src.ini"));
     let script_path = src_path.with_file_name(format!("modify_{src_name}.tmpl"));
     // Run user provided hook script (if one exists)
-    add_or_hook(path, &data_path, &src_path, true)?;
+    filtered_add(path, &data_path, &src_path, None, true)?;
 
     maybe_create_script(script_path, style)?;
     Ok(())
@@ -120,31 +121,66 @@ fn add_with_script(path: &Path, style: Style) -> anyhow::Result<()> {
 /// * `input_path`: Path provided by user
 /// * `target_path`: Path to write to
 /// * `src_path`: Path to actually read file data from
-fn add_or_hook(
+/// * `script_path`: Path to modify script (if it exists)
+fn filtered_add(
     input_path: &Path,
     target_path: &Path,
     src_path: &Path,
+    script_path: Option<&Path>,
     input_is_temporary: bool,
 ) -> Result<(), anyhow::Error> {
-    if let Some(hook_path) = hook_path()? {
+    // First pass through hook if one exists, otherwise load directly.
+    let file_contents = if let Some(hook_path) = hook_path()? {
         println!("    Executing hook script...");
-        let out = cmd!(hook_path, "ini", input_path, &target_path)
-            .stdin_path(src_path)
-            .stdout_path(target_path)
-            .unchecked()
-            .run()?;
-        if !out.status.success() {
-            return Err(anyhow!("Hook script failed with error code {}", out.status));
-        }
-        if input_is_temporary {
-            std::fs::remove_file(src_path)?;
-        }
-    } else if input_is_temporary {
-        std::fs::rename(dbg!(src_path), dbg!(target_path))?;
+        run_hook(&hook_path, input_path, target_path, src_path)?
     } else {
-        std::fs::copy(src_path, target_path)?;
+        std::fs::read(src_path).context("Failed to load data from file we are adding")?
+    };
+    // Remove temporary file if we are supposed to.
+    if input_is_temporary {
+        std::fs::remove_file(src_path)?;
     }
+
+    // If we are updating an existing script, run the contents through the filtering
+    let file_contents = if let Some(sp) = script_path {
+        internal_filter(sp, &file_contents)?
+    } else {
+        file_contents
+    };
+
+    println!("    Writing out file data");
+    std::fs::write(target_path, file_contents)?;
     Ok(())
+}
+
+fn internal_filter(script_path: &Path, contents: &[u8]) -> anyhow::Result<Vec<u8>> {
+    println!("    Has existing modify script, parsing to check for filtering...");
+    let config = config::parse_for_add(
+        &std::fs::read_to_string(script_path).context("Failed to load modify script")?,
+    )?;
+    let mut file = std::io::Cursor::new(contents);
+    let result = filter_ini(&mut file, &config.mutations)?;
+    let s: String = itertools::intersperse(result, "\n".into()).collect();
+    Ok(s.as_bytes().into())
+}
+
+/// Run hook script
+fn run_hook(
+    hook_path: &Path,
+    input_path: &Path,
+    target_path: &Path,
+    src_path: &Path,
+) -> Result<Vec<u8>, anyhow::Error> {
+    let out = cmd!(hook_path, "ini", input_path, &target_path)
+        .stdin_path(src_path)
+        .stdout_capture()
+        .unchecked()
+        .run()?;
+
+    if !out.status.success() {
+        return Err(anyhow!("Hook script failed with error code {}", out.status));
+    }
+    Ok(out.stdout)
 }
 
 /// Create a modify script if one doesn't exist
@@ -170,6 +206,7 @@ pub(crate) fn add(mode: Mode, style: Style, path: &Path) -> anyhow::Result<()> {
     if !path.is_file() {
         return Err(anyhow!("{:?} is not a regular file", path));
     }
+    // First check if the file exists.
     let src_path = chezmoi_source_path(path)?;
     match src_path {
         Some(existing_file) => {
@@ -185,46 +222,59 @@ pub(crate) fn add(mode: Mode, style: Style, path: &Path) -> anyhow::Result<()> {
             let is_mod_script = src_filename.starts_with("modify_");
             if is_mod_script {
                 println!("    Updating existing .src.ini file for {existing_file:?}...");
-                let data_file = src_filename
-                    .strip_prefix("modify_")
-                    .and_then(|s| s.strip_suffix(".tmpl").or(Some(s)))
-                    .ok_or(anyhow!("This should never happen"))?
-                    .to_owned()
-                    + ".src.ini";
-                let mut targeted_file: PathBuf = src_dir.into();
-                targeted_file.push(data_file);
-                // Make sure the data file exists! If it doesn't, the user has
-                // probably changed the "source" directive (or just removed the file).
-                // Bail in that case, we can't reasonably fix the situation automatically.
-                if !targeted_file.exists() {
-                    let err_str = formatdoc!(
-                        r#"Found existing modify_ script but no associated .src.ini file (looked at {targeted_file:?}).
-                        Possible causes:
-                        * Did you change the "source" directive from the default value?
-                        * Remove the file by mistake?
-
-                        Either way: the automated adding code is not smart enough to handle this situation by itself."#
-                    );
-                    return Err(anyhow!(err_str));
-                }
-                add_or_hook(path, targeted_file.as_ref(), path, false)?;
+                readd_managed(&existing_file, src_dir, path)?;
             } else {
                 println!("    Existing, but not a modify script...");
-                // Existing, but not modify script.
-                add_file_basic(mode, path, style)?;
+                add_unmanaged(mode, path, style)?;
             }
         }
         None => {
             // New file
             println!("  New (to chezmoi) file {path:?}");
-            add_file_basic(mode, path, style)?;
+            add_unmanaged(mode, path, style)?;
         }
     }
     Ok(())
 }
 
-/// Basic file adding
-fn add_file_basic(mode: Mode, path: &Path, style: Style) -> Result<(), anyhow::Error> {
+/// Handle case of readding a file that already has a modify script.
+fn readd_managed(modify_script: &Path, src_dir: &Path, path: &Path) -> Result<(), anyhow::Error> {
+    let data_file = modify_script
+        .file_name()
+        .ok_or(anyhow!("Failed to get filename"))?
+        .to_string_lossy()
+        .strip_prefix("modify_")
+        .and_then(|s| s.strip_suffix(".tmpl").or(Some(s)))
+        .ok_or(anyhow!("This should never happen"))?
+        .to_owned()
+        + ".src.ini";
+    let mut targeted_file: PathBuf = src_dir.into();
+    targeted_file.push(data_file);
+    if !targeted_file.exists() {
+        let err_str = formatdoc!(
+            r#"Found existing modify_ script but no associated .src.ini file (looked at {targeted_file:?}).
+                        Possible causes:
+                        * Did you change the "source" directive from the default value?
+                        * Remove the file by mistake?
+
+                        Either way: the automated adding code is not smart enough to handle this situation by itself."#
+        );
+        return Err(anyhow!(err_str));
+    }
+    filtered_add(
+        path,
+        targeted_file.as_ref(),
+        path,
+        Some(modify_script),
+        false,
+    )?;
+    Ok(())
+}
+
+/// Basic file adding (when the file doesn't exist as a modify script already)
+///
+/// Note: It *may or may not* exist in chezmoi already, but not managed by this program.
+fn add_unmanaged(mode: Mode, path: &Path, style: Style) -> Result<(), anyhow::Error> {
     match mode {
         Mode::Normal => {
             println!("    Setting up new modify_ script...");
