@@ -1,5 +1,8 @@
 //! Support for adding files
 
+#[cfg(test)]
+mod tests;
+
 use crate::{config, utils::chezmoi_source_path};
 use anyhow::{anyhow, Context};
 use duct::cmd;
@@ -164,10 +167,8 @@ fn filtered_add(
             status_out,
             "Has existing modify script, parsing to check for filtering..."
         );
-        let config = config::parse_for_add(
-            &std::fs::read_to_string(sp).context("Failed to load modify script")?,
-        )?;
-        internal_filter(&config, &file_contents)?
+        let config_data = std::fs::read_to_string(sp).context("Failed to load modify script")?;
+        internal_filter(&config_data, &file_contents)?
     } else {
         file_contents
     };
@@ -178,10 +179,8 @@ fn filtered_add(
 }
 
 /// Perform internal filtering using add:hide and add:remove (modern filtering)
-fn internal_filter(
-    config: &config::Config<ini_merge::filter::FilterActions>,
-    contents: &[u8],
-) -> anyhow::Result<Vec<u8>> {
+fn internal_filter(config_data: &str, contents: &[u8]) -> anyhow::Result<Vec<u8>> {
+    let config = config::parse_for_add(config_data)?;
     let mut file = std::io::Cursor::new(contents);
     let result = filter_ini(&mut file, &config.mutations)?;
     let s: String = itertools::intersperse(result, "\n".into()).collect();
