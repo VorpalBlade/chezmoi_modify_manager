@@ -81,7 +81,7 @@ fn make_transformer(
 }
 
 /// Parse directives for operation
-pub(crate) fn parse_for_merge(src: &str) -> Result<Config<Mutations>, anyhow::Error> {
+pub(crate) fn parse_for_merge(src: &str) -> anyhow::Result<Config<Mutations>> {
     let result = parser::parse_config
         .parse(src)
         .map_err(|e| anyhow::format_err!("{e}"))?;
