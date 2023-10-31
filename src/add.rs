@@ -162,7 +162,7 @@ fn filtered_add(
     }
 
     // If we are updating an existing script, run the contents through the filtering
-    let file_contents = if let Some(sp) = script_path {
+    let mut file_contents = if let Some(sp) = script_path {
         _ = writeln!(
             status_out,
             "Has existing modify script, parsing to check for filtering..."
@@ -172,6 +172,10 @@ fn filtered_add(
     } else {
         file_contents
     };
+
+    if !file_contents.ends_with(b"\n") {
+        file_contents.push(b'\n');
+    }
 
     _ = writeln!(status_out, "Writing out file data");
     std::fs::write(target_path, file_contents)?;
