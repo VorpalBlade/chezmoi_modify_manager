@@ -10,39 +10,66 @@ struct FilterTest {
     expected: &'static str,
 }
 
-const FILTER_TESTS: &'static [FilterTest] = &[FilterTest {
-    cfg: indoc!(
-        r#"
-        source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini"
+const FILTER_TESTS: &'static [FilterTest] = &[
+    FilterTest {
+        cfg: indoc!(
+            r#"
+            source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini"
 
-        add:hide "a" "b"
-        add:remove "a" "c"
-        ignore "quux" "e"
-        "#
-    ),
-    input: indoc!(
-        r#"
-        [a]
-        b=foo
-        c=bar
-        d=quux
+            add:hide "a" "b"
+            add:remove "a" "c"
+            ignore "quux" "e"
+            "#
+        ),
+        input: indoc!(
+            r#"
+            [a]
+            b=foo
+            c=bar
+            d=quux
 
-        [quux]
-        e=f
-        g=h
-        "#
-    ),
-    expected: indoc!(
-        r#"
-        [a]
-        b=HIDDEN
-        d=quux
+            [quux]
+            e=f
+            g=h
+            "#
+        ),
+        expected: indoc!(
+            r#"
+            [a]
+            b=HIDDEN
+            d=quux
 
-        [quux]
-        g=h
-        "#
-    ),
-}];
+            [quux]
+            g=h
+            "#
+        ),
+    },
+    FilterTest {
+        cfg: indoc!(
+            r#"
+            source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini"
+
+            {{ if (chezmoi templating) }}
+            set "a" "b" "c"
+            {{ endif }}
+            add:remove "a" "b"
+            "#
+        ),
+        input: indoc!(
+            r#"
+            [a]
+            b=c
+            d=e
+            "#
+        ),
+        expected: indoc!(
+            r#"
+            [a]
+            d=e
+            "#
+        ),
+    },
+];
 
 #[test]
 fn check_filtering() {
