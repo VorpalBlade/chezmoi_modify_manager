@@ -273,11 +273,12 @@ by something like the following for `kglobalshortcutsrc`
 {{if lookPath "my-fancy-program"}}
 set "my-fancy-program.desktop" _k_friendly_name "My fancy program" separator="="
 set "my-fancy-program.desktop" _launch "Ctrl+Shift+Y,none,my-fancy-program" separator="="
+{{end}}
 
 # Make sure the lines aren't added back into the config for all systems
+# This should be outside the if statement
 add:remove "my-fancy-program.desktop" _k_friendly_name
 add:remove "my-fancy-program.desktop" _launch
-{{end}}
 ```
 
 (In this case, note that you might need to manage the `.desktop` file with
