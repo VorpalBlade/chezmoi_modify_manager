@@ -12,6 +12,7 @@ use winnow::error::StrContext;
 use winnow::prelude::*;
 use winnow::token::take_till0;
 use winnow::token::take_till1;
+use winnow::token::take_until0;
 use winnow::Parser;
 
 /// A directive in the config file
@@ -57,6 +58,7 @@ pub(super) enum Matcher {
 pub(super) fn parse_config(i: &mut &str) -> PResult<Vec<Directive>> {
     let alternatives = (
         comment.context(StrContext::Label("comment")),
+        chezmoi_template.context(StrContext::Label("chezmoi template")),
         source.context(StrContext::Label("source")),
         ignore.context(StrContext::Label("ignore")),
         transform.context(StrContext::Label("transform")),
@@ -80,6 +82,14 @@ fn newline(i: &mut &str) -> PResult<()> {
 /// A comment
 fn comment(i: &mut &str) -> PResult<Directive> {
     ('#', take_till0(['\n', '\r']))
+        .void()
+        .map(|_| Directive::WS)
+        .parse_next(i)
+}
+
+/// A chezmoi template. Ignored when re-adding
+fn chezmoi_template(i: &mut &str) -> PResult<Directive> {
+    delimited("{{", take_until0("}}"), "}}")
         .void()
         .map(|_| Directive::WS)
         .parse_next(i)
