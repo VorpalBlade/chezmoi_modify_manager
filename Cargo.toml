@@ -54,7 +54,7 @@ rustc_version_runtime = "0.3.0"
 strum = { version = "0.25.0", features = ["derive"] }
 thiserror = "1.0.50"
 which = { version = "5.0.0", default-features = false }
-winnow = "0.5.18"
+winnow = "0.5.19"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"

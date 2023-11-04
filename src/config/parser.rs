@@ -7,7 +7,7 @@ use winnow::combinator::alt;
 use winnow::combinator::delimited;
 use winnow::combinator::opt;
 use winnow::combinator::preceded;
-use winnow::combinator::separated0;
+use winnow::combinator::separated;
 use winnow::error::StrContext;
 use winnow::prelude::*;
 use winnow::token::take_till0;
@@ -69,7 +69,7 @@ pub(super) fn parse_config(i: &mut &str) -> PResult<Vec<Directive>> {
         "".map(|_| Directive::WS)
             .context(StrContext::Label("whitespace")), // Blank lines
     );
-    (separated0(alt(alternatives), newline), opt(newline))
+    (separated(0.., alt(alternatives), newline), opt(newline))
         .map(|(val, _)| val)
         .parse_next(i)
 }
@@ -167,7 +167,7 @@ fn transform(i: &mut &str) -> PResult<Directive> {
         matcher_transform,
         space1,
         take_till1([' ', '\r', '\n']),
-        opt(preceded(space1, separated0(transform_arg, space1))),
+        opt(preceded(space1, separated(0.., transform_arg, space1))),
     )
         .map(|(_, _, pattern, _, transform, args)| {
             Directive::Transform(pattern, transform.to_owned(), args.unwrap_or_default())
