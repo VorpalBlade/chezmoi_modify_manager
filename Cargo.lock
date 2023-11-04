@@ -364,6 +364,7 @@ dependencies = [
  "anyhow",
  "bpaf",
  "duct",
+ "env_logger",
  "glob",
  "indoc",
  "ini-merge",
@@ -620,6 +621,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.38",
+]
+
+[[package]]
+name = "env_logger"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "85cdab6a89accf66733ad5a1693a4dcced6aeff64602b634530dd73c1f3ee9f0"
+dependencies = [
+ "log",
 ]
 
 [[package]]
@@ -1078,14 +1088,15 @@ checksum = "1e186cfbae8084e513daff4240b4797e342f988cecda4fb6c939150f96315fd8"
 
 [[package]]
 name = "ini-merge"
-version = "0.3.1"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "65dfd8f957e4f5a67bed191284eca66ec909c999771aed4c1f31b96057959830"
+checksum = "a40d89ee065f8a144839fd826c1df4cedd67b9203cce8b0ace0e23e6208b166c"
 dependencies = [
  "ini-roundtrip",
  "itertools",
  "keyring",
  "lending-iterator",
+ "log",
  "ouroboros",
  "regex",
  "thiserror",
