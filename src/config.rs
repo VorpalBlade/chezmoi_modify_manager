@@ -196,15 +196,25 @@ pub(crate) fn parse_for_add(src: &str) -> Result<Config<FilterActions>, anyhow::
 fn add_merge_action(builder: &mut MutationsBuilder, matcher: Matcher, action: Action) {
     match matcher {
         Matcher::Section(_) => panic!("Section match not valid in add_merge_action()"),
-        Matcher::Literal(section, key) => builder.add_literal_action(section, key, action),
-        Matcher::Regex(section, key) => builder.add_regex_action(section, key, action),
+        Matcher::Literal(section, key) => {
+            builder.add_literal_action(section, key, action);
+        }
+        Matcher::Regex(section, key) => {
+            builder.add_regex_action(section, key, action);
+        }
     }
 }
 
 fn add_filter_action(builder: &mut FilterActionsBuilder, matcher: Matcher, action: FilterAction) {
     match matcher {
-        Matcher::Section(section) => builder.add_section_action(section, action),
-        Matcher::Literal(section, key) => builder.add_literal_action(section, key, action),
-        Matcher::Regex(section, key) => builder.add_regex_action(section, key, action),
+        Matcher::Section(section) => {
+            builder.add_section_action(section, action);
+        }
+        Matcher::Literal(section, key) => {
+            builder.add_literal_action(section, key, action);
+        }
+        Matcher::Regex(section, key) => {
+            builder.add_regex_action(section, key, action);
+        }
     }
 }
