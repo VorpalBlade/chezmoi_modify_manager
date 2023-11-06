@@ -6,6 +6,7 @@ use std::io::Write;
 use std::io::{stdin, stdout};
 
 fn main() -> anyhow::Result<()> {
+    // Set up logging
     let mut builder = Builder::from_env(Env::default().default_filter_or("warn"));
     builder.target(env_logger::Target::Pipe(Box::new(anstream::stderr())));
     builder.format(|buf, record| {
@@ -28,6 +29,7 @@ fn main() -> anyhow::Result<()> {
     });
     builder.init();
 
+    // Run the program proper
     let opts = parse_args();
     inner_main(opts, || stdin().lock(), || stdout().lock())
 }
