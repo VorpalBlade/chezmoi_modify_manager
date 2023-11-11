@@ -44,7 +44,7 @@ anstyle = "1.0.4"
 anyhow = { version = "1.0.75", features = ["backtrace"] }
 bpaf = { version = "0.9", features = ["autocomplete", "derive"] }
 duct = "0.13.6"
-env_logger = { version = "0.10.0", default-features = false }
+env_logger = { version = "0.10.1", default-features = false }
 glob = "0.3.1"
 indoc = "2.0.4"
 ini-merge = { version = "0.3.3", default-features = false, features = [
