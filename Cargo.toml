@@ -47,7 +47,7 @@ duct = "0.13.6"
 env_logger = { version = "0.10.1", default-features = false }
 glob = "0.3.1"
 indoc = "2.0.4"
-ini-merge = { version = "0.3.3", default-features = false, features = [
+ini-merge = { version = "0.3.4", default-features = false, features = [
     "keyring",
 ] }
 itertools = "0.12.0"
