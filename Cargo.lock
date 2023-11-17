@@ -431,7 +431,7 @@ dependencies = [
  "glob",
  "indoc",
  "ini-merge",
- "itertools",
+ "itertools 0.12.0",
  "log",
  "os_info",
  "pretty_assertions",
@@ -1163,12 +1163,12 @@ checksum = "1e186cfbae8084e513daff4240b4797e342f988cecda4fb6c939150f96315fd8"
 
 [[package]]
 name = "ini-merge"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a40d89ee065f8a144839fd826c1df4cedd67b9203cce8b0ace0e23e6208b166c"
+checksum = "20cf7246fa1cd86411a9179a5375596ce3627d0b12e8836f4f08e28cbe4fdea4"
 dependencies = [
  "ini-roundtrip",
- "itertools",
+ "itertools 0.12.0",
  "keyring",
  "lending-iterator",
  "log",
@@ -1217,6 +1217,15 @@ name = "itertools"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25db6b064527c5d482d0423354fcd07a89a2dfe07b67892e62411946db7f07b0"
 dependencies = [
  "either",
 ]
@@ -1644,7 +1653,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8cad0c4b129e9696e37cb712b243777b90ef489a0bfaa0ac34e7d9b860e4f134"
 dependencies = [
  "heck",
- "itertools",
+ "itertools 0.11.0",
  "proc-macro-error",
  "proc-macro2",
  "quote",
