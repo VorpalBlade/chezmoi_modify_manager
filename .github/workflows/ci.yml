@@ -44,8 +44,19 @@ jobs:
         uses: Swatinem/rust-cache@v2.7.1
         with:
           key: ${{ matrix.target }}
-      - name: Cross compile and test
+      - name: Cross compile
+        run: cross build --locked --target ${{ matrix.target }} --verbose
+      - name: Cross test
         run: cross test --locked --target ${{ matrix.target }} --verbose
+      - name: Compress binary
+        if: matrix.rust == 'stable' && matrix.target != 'x86_64-pc-windows-gnu'
+        run: zstd -T0 -6 target/${{ matrix.target }}/debug/chezmoi_modify_manager
+      - uses: actions/upload-artifact@v3
+        if: matrix.rust == 'stable' && matrix.target != 'x86_64-pc-windows-gnu'
+        with:
+          name: chezmoi_modify_manager_${{ matrix.target }}.zst
+          path: target/${{ matrix.target }}/debug/chezmoi_modify_manager.zst
+          retention-days: 7
 
   configurations:
     # Test non-standard configurations, MSRV and Rust versions
@@ -110,13 +121,24 @@ jobs:
         include:
           - target: x86_64-pc-windows-msvc
             os: windows-latest
+            suffix: .exe
           - target: x86_64-apple-darwin
             os: macos-latest
+            suffix:
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust
         run: rustup install --profile minimal stable && rustup default stable
       - name: Cache builds
         uses: Swatinem/rust-cache@v2.7.1
-      - name: Compile and test
+      - name: Compile
+        run: cargo build --locked --target ${{ matrix.target }} --verbose
+      - name: Test
         run: cargo test --locked --target ${{ matrix.target }} --verbose
+      - name: Compress binary
+        run: zstd -T0 -6 target/${{ matrix.target }}/debug/chezmoi_modify_manager${{ matrix.suffix }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: chezmoi_modify_manager_${{ matrix.target }}.zst
+          path: target/${{ matrix.target }}/debug/chezmoi_modify_manager${{ matrix.suffix }}.zst
+          retention-days: 7
