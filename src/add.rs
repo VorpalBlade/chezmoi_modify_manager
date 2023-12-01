@@ -105,10 +105,10 @@ fn add_with_script(path: &Path, style: Style, status_out: &mut impl Write) -> an
     if !out.status.success() {
         return Err(anyhow!("chezmoi add failed with error code {}", out.status));
     }
-    let src_path = chezmoi_source_path(path)?.ok_or(anyhow!("chezmoi couldn't find added file"))?;
+    let src_path = chezmoi_source_path(path)?.context("chezmoi couldn't find added file")?;
     let src_name = src_path
         .file_name()
-        .ok_or(anyhow!("File has no filename"))?
+        .context("File has no filename")?
         .to_string_lossy();
     let data_path = src_path.with_file_name(format!("{src_name}.src.ini"));
     let script_path = src_path.with_file_name(format!("modify_{src_name}.tmpl"));
@@ -250,11 +250,11 @@ pub(crate) fn add(
             // Existing file
             let src_filename = existing_file
                 .file_name()
-                .ok_or(anyhow!("No file name?"))?
+                .context("No file name?")?
                 .to_string_lossy();
             let src_dir = existing_file
                 .parent()
-                .ok_or(anyhow!("Couldn't extract directory"))?;
+                .context("Couldn't extract directory")?;
             let is_mod_script = src_filename.starts_with("modify_");
             if is_mod_script {
                 _ = writeln!(
@@ -285,11 +285,11 @@ fn readd_managed(
 ) -> Result<(), anyhow::Error> {
     let data_file = modify_script
         .file_name()
-        .ok_or(anyhow!("Failed to get filename"))?
+        .context("Failed to get filename")?
         .to_string_lossy()
         .strip_prefix("modify_")
         .and_then(|s| s.strip_suffix(".tmpl").or(Some(s)))
-        .ok_or(anyhow!("This should never happen"))?
+        .context("This should never happen")?
         .to_owned()
         + ".src.ini";
     let mut targeted_file: PathBuf = src_dir.into();
