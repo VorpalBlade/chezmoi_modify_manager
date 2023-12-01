@@ -8,7 +8,7 @@ use strum::Display;
 
 use anyhow::anyhow;
 
-use crate::utils::chezmoi_source_root;
+use crate::utils::{Chezmoi, RealChezmoi};
 
 /// Perform environment sanity check
 pub(crate) fn doctor() -> anyhow::Result<()> {
@@ -157,7 +157,7 @@ fn chezmoi_check() -> anyhow::Result<(CheckResult, String)> {
 
 fn check_has_ignore() -> anyhow::Result<(CheckResult, String)> {
     if which::which("chezmoi").is_ok() {
-        let src_path = chezmoi_source_root()?;
+        let src_path = RealChezmoi::default().source_root()?;
         let mut src_path = src_path.ok_or(anyhow!("No chezmoi source root found"))?;
         src_path.push(".chezmoiignore");
         let file = File::open(src_path)?;

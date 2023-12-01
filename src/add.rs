@@ -3,10 +3,7 @@
 #[cfg(test)]
 mod tests;
 
-use crate::{
-    config,
-    utils::{chezmoi_source_path, chezmoi_source_root},
-};
+use crate::{config, utils::Chezmoi};
 use anyhow::{anyhow, Context};
 use duct::cmd;
 use indoc::formatdoc;
@@ -64,8 +61,9 @@ fn template(path: &str) -> String {
 }
 
 /// Get the path for the hook script, if it exists
-fn hook_path() -> anyhow::Result<Option<PathBuf>> {
-    let ch_path = chezmoi_source_root()
+fn hook_path(chezmoi: &impl Chezmoi) -> anyhow::Result<Option<PathBuf>> {
+    let ch_path = chezmoi
+        .source_root()
         .context("Failed to run chezmoi")?
         .context("No chezmoi source directory seems to exist?")?;
     if cfg!(windows) {
@@ -95,15 +93,16 @@ fn hook_path() -> anyhow::Result<Option<PathBuf>> {
 }
 
 /// Perform actual adding with a script
-fn add_with_script(path: &Path, style: Style, status_out: &mut impl Write) -> anyhow::Result<()> {
-    let out = cmd!("chezmoi", "add", path)
-        .stdout_null()
-        .unchecked()
-        .run()?;
-    if !out.status.success() {
-        return Err(anyhow!("chezmoi add failed with error code {}", out.status));
-    }
-    let src_path = chezmoi_source_path(path)?.context("chezmoi couldn't find added file")?;
+fn add_with_script(
+    chezmoi: &impl Chezmoi,
+    path: &Path,
+    style: Style,
+    status_out: &mut impl Write,
+) -> anyhow::Result<()> {
+    chezmoi.add(path)?;
+    let src_path = chezmoi
+        .source_path(path)?
+        .context("chezmoi couldn't find added file")?;
     let src_name = src_path
         .file_name()
         .context("File has no filename")?
@@ -111,7 +110,7 @@ fn add_with_script(path: &Path, style: Style, status_out: &mut impl Write) -> an
     let data_path = src_path.with_file_name(format!("{src_name}.src.ini"));
     let script_path = src_path.with_file_name(format!("modify_{src_name}.tmpl"));
     // Run user provided hook script (if one exists)
-    filtered_add(path, &data_path, &src_path, None, true, status_out)?;
+    filtered_add(chezmoi, path, &data_path, &src_path, None, true, status_out)?;
 
     maybe_create_script(script_path, style, status_out)?;
     Ok(())
@@ -124,6 +123,7 @@ fn add_with_script(path: &Path, style: Style, status_out: &mut impl Write) -> an
 /// * `src_path`: Path to actually read file data from
 /// * `script_path`: Path to modify script (if it exists)
 fn filtered_add(
+    chezmoi: &impl Chezmoi,
     input_path: &Path,
     target_path: &Path,
     src_path: &Path,
@@ -132,7 +132,7 @@ fn filtered_add(
     status_out: &mut impl Write,
 ) -> Result<(), anyhow::Error> {
     // First pass through hook if one exists, otherwise load directly.
-    let file_contents = if let Some(hook_path) = hook_path()? {
+    let file_contents = if let Some(hook_path) = hook_path(chezmoi)? {
         _ = writeln!(status_out, "Executing hook script...");
         _ = writeln!(
             status_out,
@@ -232,6 +232,7 @@ fn maybe_create_script(
 
 /// Add a file
 pub(crate) fn add(
+    chezmoi: &impl Chezmoi,
     mode: Mode,
     style: Style,
     path: &Path,
@@ -241,7 +242,7 @@ pub(crate) fn add(
         return Err(anyhow!("{:?} is not a regular file", path));
     }
     // First check if the file exists.
-    let src_path = chezmoi_source_path(path)?;
+    let src_path = chezmoi.source_path(path)?;
     match src_path {
         Some(existing_file) => {
             _ = writeln!(status_out, "Existing (to chezmoi) file: {existing_file:?}");
@@ -259,16 +260,16 @@ pub(crate) fn add(
                     status_out,
                     "Updating existing .src.ini file for {existing_file:?}..."
                 );
-                readd_managed(&existing_file, src_dir, path, status_out)?;
+                readd_managed(chezmoi, &existing_file, src_dir, path, status_out)?;
             } else {
                 _ = writeln!(status_out, "Existing, but not a modify script...");
-                add_unmanaged(mode, path, style, status_out)?;
+                add_unmanaged(chezmoi, mode, path, style, status_out)?;
             }
         }
         None => {
             // New file
             _ = writeln!(status_out, "New (to chezmoi) file {path:?}");
-            add_unmanaged(mode, path, style, status_out)?;
+            add_unmanaged(chezmoi, mode, path, style, status_out)?;
         }
     }
     Ok(())
@@ -276,6 +277,7 @@ pub(crate) fn add(
 
 /// Handle case of readding a file that already has a modify script.
 fn readd_managed(
+    chezmoi: &impl Chezmoi,
     modify_script: &Path,
     src_dir: &Path,
     path: &Path,
@@ -304,6 +306,7 @@ fn readd_managed(
         return Err(anyhow!(err_str));
     }
     filtered_add(
+        chezmoi,
         path,
         targeted_file.as_ref(),
         path,
@@ -318,6 +321,7 @@ fn readd_managed(
 ///
 /// Note: It *may or may not* exist in chezmoi already, but not managed by this program.
 fn add_unmanaged(
+    chezmoi: &impl Chezmoi,
     mode: Mode,
     path: &Path,
     style: Style,
@@ -326,17 +330,11 @@ fn add_unmanaged(
     match mode {
         Mode::Normal => {
             _ = writeln!(status_out, "Setting up new modify_ script...");
-            add_with_script(path, style, status_out)?
+            add_with_script(chezmoi, path, style, status_out)?
         }
         Mode::Smart => {
             _ = writeln!(status_out, "In smart mode... Adding as plain chezmoi...");
-            let out = cmd!("chezmoi", "add", path)
-                .stdout_null()
-                .unchecked()
-                .run()?;
-            if !out.status.success() {
-                return Err(anyhow!("Failed to add file {:?} with chezmoi", path));
-            }
+            chezmoi.add(path)?;
         }
     }
     Ok(())

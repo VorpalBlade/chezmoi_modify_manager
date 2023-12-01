@@ -22,6 +22,8 @@ mod utils;
 use indoc::printdoc;
 use ini_merge::merge::merge_ini;
 
+use crate::utils::RealChezmoi;
+
 /// Main function, amenable to integration tests.
 ///
 /// In order to support integration tests we need to be able to provide stdin
@@ -62,14 +64,26 @@ where
             let mut stdout = stdout();
             for file in files {
                 println!("Adding {file:?}");
-                add::add(add::Mode::Normal, style, &file, &mut stdout)?;
+                add::add(
+                    &RealChezmoi::default(),
+                    add::Mode::Normal,
+                    style,
+                    &file,
+                    &mut stdout,
+                )?;
             }
         }
         ChmmArgs::Smart { _a, files, style } => {
             let mut stdout = stdout();
             for file in files {
                 println!("Adding {file:?}");
-                add::add(add::Mode::Smart, style, &file, &mut stdout)?;
+                add::add(
+                    &RealChezmoi::default(),
+                    add::Mode::Smart,
+                    style,
+                    &file,
+                    &mut stdout,
+                )?;
             }
         }
         ChmmArgs::Update { _a } => {
