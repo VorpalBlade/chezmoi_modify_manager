@@ -5,14 +5,11 @@ mod tests;
 
 use crate::{config, utils::Chezmoi};
 use anyhow::{anyhow, Context};
+use camino::{Utf8Path, Utf8PathBuf};
 use duct::cmd;
 use indoc::formatdoc;
 use ini_merge::filter::filter_ini;
-use std::{
-    fs::File,
-    io::Write,
-    path::{Path, PathBuf},
-};
+use std::{fs::File, io::Write};
 use strum::{Display, EnumIter, EnumMessage, EnumString, IntoStaticStr};
 
 /// The style of calls to the executable
@@ -61,7 +58,7 @@ fn template(path: &str) -> String {
 }
 
 /// Get the path for the hook script, if it exists
-fn hook_path(chezmoi: &impl Chezmoi) -> anyhow::Result<Option<PathBuf>> {
+fn hook_path(chezmoi: &impl Chezmoi) -> anyhow::Result<Option<Utf8PathBuf>> {
     let ch_path = chezmoi
         .source_root()
         .context("Failed to run chezmoi")?
@@ -69,18 +66,22 @@ fn hook_path(chezmoi: &impl Chezmoi) -> anyhow::Result<Option<PathBuf>> {
     if cfg!(windows) {
         let base_path = ch_path.join(".chezmoi_modify_manager.add_hook.*");
         let mut candidates: Vec<_> = glob::glob_with(
-            base_path
-                .to_str()
-                .ok_or_else(|| anyhow!("Invalid path {base_path:?} for chezmoi source directory: not convertible to UTF-8."))?,
+            base_path.as_str(),
             glob::MatchOptions {
                 case_sensitive: true,
                 require_literal_separator: true,
                 require_literal_leading_dot: true,
             },
-        )?.collect();
+        )?
+        .collect();
         match candidates.len() {
             0 => Ok(None),
-            1 => Ok(Some(candidates.remove(0)?)),
+            1 => Ok(Some(
+                candidates
+                    .remove(0)?
+                    .try_into()
+                    .context("Only valid Unicode file names supported")?,
+            )),
             _ => Err(anyhow!("Too many add_hook scripts found")),
         }
     } else {
@@ -95,7 +96,7 @@ fn hook_path(chezmoi: &impl Chezmoi) -> anyhow::Result<Option<PathBuf>> {
 /// Perform actual adding with a script
 fn add_with_script(
     chezmoi: &impl Chezmoi,
-    path: &Path,
+    path: &Utf8Path,
     style: Style,
     status_out: &mut impl Write,
 ) -> anyhow::Result<()> {
@@ -103,10 +104,7 @@ fn add_with_script(
     let src_path = chezmoi
         .source_path(path)?
         .context("chezmoi couldn't find added file")?;
-    let src_name = src_path
-        .file_name()
-        .context("File has no filename")?
-        .to_string_lossy();
+    let src_name = src_path.file_name().context("File has no filename")?;
     let data_path = src_path.with_file_name(format!("{src_name}.src.ini"));
     let script_path = src_path.with_file_name(format!("modify_{src_name}.tmpl"));
     // Run user provided hook script (if one exists)
@@ -124,10 +122,10 @@ fn add_with_script(
 /// * `script_path`: Path to modify script (if it exists)
 fn filtered_add(
     chezmoi: &impl Chezmoi,
-    input_path: &Path,
-    target_path: &Path,
-    src_path: &Path,
-    script_path: Option<&Path>,
+    input_path: &Utf8Path,
+    target_path: &Utf8Path,
+    src_path: &Utf8Path,
+    script_path: Option<&Utf8Path>,
     input_is_temporary: bool,
     status_out: &mut impl Write,
 ) -> Result<(), anyhow::Error> {
@@ -191,12 +189,12 @@ fn internal_filter(config_data: &str, contents: &[u8]) -> anyhow::Result<Vec<u8>
 
 /// Run hook script (legacy filtering)
 fn run_hook(
-    hook_path: &Path,
-    input_path: &Path,
-    target_path: &Path,
-    src_path: &Path,
+    hook_path: &Utf8Path,
+    input_path: &Utf8Path,
+    target_path: &Utf8Path,
+    src_path: &Utf8Path,
 ) -> Result<Vec<u8>, anyhow::Error> {
-    let out = cmd!(hook_path, "ini", input_path, &target_path)
+    let out = cmd!(hook_path.as_std_path(), "ini", input_path, &target_path)
         .stdin_path(src_path)
         .stdout_capture()
         .unchecked()
@@ -210,7 +208,7 @@ fn run_hook(
 
 /// Create a modify script if one doesn't exist
 fn maybe_create_script(
-    script_path: PathBuf,
+    script_path: Utf8PathBuf,
     style: Style,
     status_out: &mut impl Write,
 ) -> anyhow::Result<()> {
@@ -235,7 +233,7 @@ pub(crate) fn add(
     chezmoi: &impl Chezmoi,
     mode: Mode,
     style: Style,
-    path: &Path,
+    path: &Utf8Path,
     status_out: &mut impl Write,
 ) -> anyhow::Result<()> {
     if !path.is_file() {
@@ -247,10 +245,7 @@ pub(crate) fn add(
         Some(existing_file) => {
             _ = writeln!(status_out, "Existing (to chezmoi) file: {existing_file:?}");
             // Existing file
-            let src_filename = existing_file
-                .file_name()
-                .context("No file name?")?
-                .to_string_lossy();
+            let src_filename = existing_file.file_name().context("No file name?")?;
             let src_dir = existing_file
                 .parent()
                 .context("Couldn't extract directory")?;
@@ -278,21 +273,20 @@ pub(crate) fn add(
 /// Handle case of readding a file that already has a modify script.
 fn readd_managed(
     chezmoi: &impl Chezmoi,
-    modify_script: &Path,
-    src_dir: &Path,
-    path: &Path,
+    modify_script: &Utf8Path,
+    src_dir: &Utf8Path,
+    path: &Utf8Path,
     status_out: &mut impl Write,
 ) -> Result<(), anyhow::Error> {
     let data_file = modify_script
         .file_name()
         .context("Failed to get filename")?
-        .to_string_lossy()
         .strip_prefix("modify_")
         .and_then(|s| s.strip_suffix(".tmpl").or(Some(s)))
         .context("This should never happen")?
         .to_owned()
         + ".src.ini";
-    let mut targeted_file: PathBuf = src_dir.into();
+    let mut targeted_file: Utf8PathBuf = src_dir.into();
     targeted_file.push(data_file);
     if !targeted_file.exists() {
         let err_str = formatdoc!(
@@ -323,7 +317,7 @@ fn readd_managed(
 fn add_unmanaged(
     chezmoi: &impl Chezmoi,
     mode: Mode,
-    path: &Path,
+    path: &Utf8Path,
     style: Style,
     status_out: &mut impl Write,
 ) -> Result<(), anyhow::Error> {

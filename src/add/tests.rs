@@ -16,10 +16,9 @@
 //! | Existing (modify_)    | Normal  | Update data file               |
 //! | Existing (modify_)    | Smart   | Update data file               |
 
-use std::path::PathBuf;
-
+use camino::{Utf8Path, Utf8PathBuf};
 use indoc::indoc;
-use pathdiff::diff_paths;
+use pathdiff::diff_utf8_paths;
 use pretty_assertions::assert_eq;
 use tempfile::{tempdir, TempDir};
 
@@ -114,17 +113,17 @@ struct DummyChezmoi {
     // tmp_dir is a RAII guard
     #[allow(dead_code)]
     tmp_dir: TempDir,
-    input_dir: PathBuf,
-    src_dir: PathBuf,
-    dummy_file: PathBuf,
+    input_dir: Utf8PathBuf,
+    src_dir: Utf8PathBuf,
+    dummy_file: Utf8PathBuf,
 }
 
 impl DummyChezmoi {
     fn new() -> Self {
         let tmp_dir = tempdir().unwrap();
-        let input_dir = tmp_dir.path().join("input");
-        let src_dir = tmp_dir.path().join("source");
-        let dummy_file = input_dir.join("dummy_file");
+        let input_dir: Utf8PathBuf = tmp_dir.path().join("input").try_into().unwrap();
+        let src_dir: Utf8PathBuf = tmp_dir.path().join("source").try_into().unwrap();
+        let dummy_file: Utf8PathBuf = input_dir.join("dummy_file").try_into().unwrap();
         std::fs::create_dir(input_dir.as_path()).unwrap();
         std::fs::create_dir(src_dir.as_path()).unwrap();
         std::fs::write(dummy_file.as_path(), "[a]\nb=c").unwrap();
@@ -136,19 +135,17 @@ impl DummyChezmoi {
         }
     }
 
-    fn basic_source_path(&self, path: &std::path::Path) -> PathBuf {
-        let rel_path = diff_paths(path, self.input_dir.as_path()).unwrap();
+    fn basic_source_path(&self, path: &Utf8Path) -> Utf8PathBuf {
+        let rel_path = diff_utf8_paths(path, self.input_dir.as_path()).unwrap();
         self.src_dir.join(rel_path)
     }
 }
 
 impl Chezmoi for DummyChezmoi {
-    fn source_path(&self, path: &std::path::Path) -> anyhow::Result<Option<std::path::PathBuf>> {
+    fn source_path(&self, path: &Utf8Path) -> anyhow::Result<Option<Utf8PathBuf>> {
         let normal_path = self.basic_source_path(path);
-        let script_path = normal_path.with_file_name(format!(
-            "modify_{}.tmpl",
-            normal_path.file_name().unwrap().to_str().unwrap()
-        ));
+        let script_path =
+            normal_path.with_file_name(format!("modify_{}.tmpl", normal_path.file_name().unwrap()));
         if script_path.exists() {
             Ok(Some(script_path))
         } else if normal_path.exists() {
@@ -158,11 +155,11 @@ impl Chezmoi for DummyChezmoi {
         }
     }
 
-    fn source_root(&self) -> anyhow::Result<Option<std::path::PathBuf>> {
+    fn source_root(&self) -> anyhow::Result<Option<Utf8PathBuf>> {
         Ok(Some(self.src_dir.clone()))
     }
 
-    fn add(&self, path: &std::path::Path) -> anyhow::Result<()> {
+    fn add(&self, path: &Utf8Path) -> anyhow::Result<()> {
         let expected_path = self.basic_source_path(path);
         std::fs::copy(path, expected_path).unwrap();
         Ok(())

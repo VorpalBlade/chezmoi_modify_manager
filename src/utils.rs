@@ -1,7 +1,7 @@
 //! Some shared utility functions
 
 use anyhow::anyhow;
-use std::path::{Path, PathBuf};
+use camino::{Utf8Path, Utf8PathBuf};
 
 use duct::cmd;
 
@@ -10,9 +10,9 @@ use duct::cmd;
 /// The purpose of making this a trait is to allow testing without using
 /// the real chezmoi directory of the user (or even without chezmoi installed)
 pub(crate) trait Chezmoi: std::fmt::Debug {
-    fn source_path(&self, path: &Path) -> anyhow::Result<Option<PathBuf>>;
-    fn source_root(&self) -> anyhow::Result<Option<PathBuf>>;
-    fn add(&self, path: &Path) -> anyhow::Result<()>;
+    fn source_path(&self, path: &Utf8Path) -> anyhow::Result<Option<Utf8PathBuf>>;
+    fn source_root(&self) -> anyhow::Result<Option<Utf8PathBuf>>;
+    fn add(&self, path: &Utf8Path) -> anyhow::Result<()>;
 }
 
 /// Trait implementation using the real chezmoi
@@ -21,7 +21,7 @@ pub(crate) struct RealChezmoi();
 
 impl Chezmoi for RealChezmoi {
     /// Get the source path of a file
-    fn source_path(&self, path: &Path) -> anyhow::Result<Option<PathBuf>> {
+    fn source_path(&self, path: &Utf8Path) -> anyhow::Result<Option<Utf8PathBuf>> {
         let output = cmd!("chezmoi", "source-path", path)
             .stdout_capture()
             .stderr_null()
@@ -34,7 +34,7 @@ impl Chezmoi for RealChezmoi {
     }
 
     /// Get the path of the chezmoi source root
-    fn source_root(&self) -> anyhow::Result<Option<PathBuf>> {
+    fn source_root(&self) -> anyhow::Result<Option<Utf8PathBuf>> {
         let output = cmd!("chezmoi", "source-path")
             .stdout_capture()
             .stderr_null()
@@ -46,7 +46,7 @@ impl Chezmoi for RealChezmoi {
         Ok(Some(String::from_utf8(output.stdout)?.trim_end().into()))
     }
 
-    fn add(&self, path: &Path) -> anyhow::Result<()> {
+    fn add(&self, path: &Utf8Path) -> anyhow::Result<()> {
         let out = cmd!("chezmoi", "add", path)
             .stdout_null()
             .unchecked()

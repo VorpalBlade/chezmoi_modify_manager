@@ -1,11 +1,11 @@
 //! Command line argument parser
-use std::path::PathBuf;
 
 use crate::add::Style;
 use bpaf::short;
 use bpaf::Bpaf;
 use bpaf::Parser;
 use bpaf::ShellComp;
+use camino::Utf8PathBuf;
 use itertools::Itertools;
 use strum::EnumMessage;
 use strum::IntoEnumIterator;
@@ -51,7 +51,7 @@ fn style() -> impl Parser<Style> {
 #[bpaf(options, version)]
 pub enum ChmmArgs {
     /// Process a single file (containing settings).
-    Process(#[bpaf(positional("FILE"), complete_shell(ShellComp::File{mask: None}))] PathBuf),
+    Process(#[bpaf(positional("FILE"), complete_shell(ShellComp::File{mask: None}))] Utf8PathBuf),
     Add {
         /// Add a file to be tracked by chezmoi_mm
         #[bpaf(short('a'), long("add"))]
@@ -59,7 +59,7 @@ pub enum ChmmArgs {
         #[bpaf(external)]
         style: Style,
         #[bpaf(positional("FILE"), complete_shell(ShellComp::File{mask: None}))]
-        files: Vec<PathBuf>,
+        files: Vec<Utf8PathBuf>,
     },
     Smart {
         /// Smartly add a file to be tracked by either chezmoi or chezmoi_mm
@@ -68,7 +68,7 @@ pub enum ChmmArgs {
         #[bpaf(external)]
         style: Style,
         #[bpaf(positional("FILE"), complete_shell(ShellComp::File{mask: None}))]
-        files: Vec<PathBuf>,
+        files: Vec<Utf8PathBuf>,
     },
     HelpSyntax {
         /// Print help about about the config file syntax
