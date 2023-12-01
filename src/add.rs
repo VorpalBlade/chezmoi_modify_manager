@@ -3,7 +3,10 @@
 #[cfg(test)]
 mod tests;
 
-use crate::{config, utils::chezmoi_source_path};
+use crate::{
+    config,
+    utils::{chezmoi_source_path, chezmoi_source_root},
+};
 use anyhow::{anyhow, Context};
 use duct::cmd;
 use indoc::formatdoc;
@@ -62,14 +65,9 @@ fn template(path: &str) -> String {
 
 /// Get the path for the hook script, if it exists
 fn hook_path() -> anyhow::Result<Option<PathBuf>> {
-    let output = cmd!("chezmoi", "source-path")
-        .stdout_capture()
-        .unchecked()
-        .run()?;
-    if !output.status.success() {
-        return Err(anyhow!("No chezmoi source directory seems to exist?"));
-    }
-    let ch_path = PathBuf::from(String::from_utf8(output.stdout)?.trim_end());
+    let ch_path = chezmoi_source_root()
+        .context("Failed to run chezmoi")?
+        .context("No chezmoi source directory seems to exist?")?;
     if cfg!(windows) {
         let base_path = ch_path.join(".chezmoi_modify_manager.add_hook.*");
         let mut candidates: Vec<_> = glob::glob_with(
