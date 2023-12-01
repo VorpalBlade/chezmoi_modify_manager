@@ -53,7 +53,7 @@ where
             let src_path = c
                 .source_path(&file_name)
                 .context("Failed to get source path")?;
-            let mut src_file = File::open(&src_path)
+            let mut src_file = File::open(src_path.as_std_path())
                 .with_context(|| format!("Failed to open source file at: {src_path:?}"))?;
             let merged = merge_ini(&mut stdin, &mut src_file, &c.mutations)?;
             for line in merged {

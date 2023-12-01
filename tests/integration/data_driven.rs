@@ -3,27 +3,28 @@
 use std::{
     fs::File,
     io::{BufReader, Read},
-    path::PathBuf,
 };
+
+use camino::Utf8PathBuf;
 
 use pretty_assertions::assert_eq;
 
 use chezmoi_modify_manager::{inner_main, ChmmArgs};
 
 /// Find all the test cases
-fn find_test_cases() -> anyhow::Result<Vec<PathBuf>> {
-    let mut path: PathBuf = std::env::var("CARGO_MANIFEST_DIR")?.into();
+fn find_test_cases() -> anyhow::Result<Vec<Utf8PathBuf>> {
+    let mut path: Utf8PathBuf = std::env::var("CARGO_MANIFEST_DIR")?.into();
     path.push("tests");
     path.push("data");
 
     let mut results = vec![];
     for entry in std::fs::read_dir(path)? {
         let entry = entry?;
-        let path = entry.path();
+        let path: Utf8PathBuf = entry.path().try_into().unwrap();
         if !path.is_file() {
             continue;
         }
-        if let Some("cfg") = path.extension().and_then(|x| x.to_str()) {
+        if let Some("cfg") = path.extension() {
             results.push(path);
         }
     }
