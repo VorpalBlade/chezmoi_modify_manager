@@ -1,31 +1,59 @@
 //! Some shared utility functions
 
+use anyhow::anyhow;
 use std::path::{Path, PathBuf};
 
 use duct::cmd;
 
-/// Get the source path of a file
-pub(crate) fn chezmoi_source_path(path: &Path) -> anyhow::Result<Option<PathBuf>> {
-    let output = cmd!("chezmoi", "source-path", path)
-        .stdout_capture()
-        .stderr_null()
-        .unchecked()
-        .run()?;
-    if !output.status.success() {
-        return Ok(None);
-    }
-    Ok(Some(String::from_utf8(output.stdout)?.trim_end().into()))
+/// Trait for interacting with chezmoi.
+///
+/// The purpose of making this a trait is to allow testing without using
+/// the real chezmoi directory of the user (or even without chezmoi installed)
+pub(crate) trait Chezmoi: std::fmt::Debug {
+    fn source_path(&self, path: &Path) -> anyhow::Result<Option<PathBuf>>;
+    fn source_root(&self) -> anyhow::Result<Option<PathBuf>>;
+    fn add(&self, path: &Path) -> anyhow::Result<()>;
 }
 
-/// Get the path of the chezmoi source root
-pub(crate) fn chezmoi_source_root() -> anyhow::Result<Option<PathBuf>> {
-    let output = cmd!("chezmoi", "source-path")
-        .stdout_capture()
-        .stderr_null()
-        .unchecked()
-        .run()?;
-    if !output.status.success() {
-        return Ok(None);
+/// Trait implementation using the real chezmoi
+#[derive(Debug, Clone, Copy, Default)]
+pub(crate) struct RealChezmoi();
+
+impl Chezmoi for RealChezmoi {
+    /// Get the source path of a file
+    fn source_path(&self, path: &Path) -> anyhow::Result<Option<PathBuf>> {
+        let output = cmd!("chezmoi", "source-path", path)
+            .stdout_capture()
+            .stderr_null()
+            .unchecked()
+            .run()?;
+        if !output.status.success() {
+            return Ok(None);
+        }
+        Ok(Some(String::from_utf8(output.stdout)?.trim_end().into()))
     }
-    Ok(Some(String::from_utf8(output.stdout)?.trim_end().into()))
+
+    /// Get the path of the chezmoi source root
+    fn source_root(&self) -> anyhow::Result<Option<PathBuf>> {
+        let output = cmd!("chezmoi", "source-path")
+            .stdout_capture()
+            .stderr_null()
+            .unchecked()
+            .run()?;
+        if !output.status.success() {
+            return Ok(None);
+        }
+        Ok(Some(String::from_utf8(output.stdout)?.trim_end().into()))
+    }
+
+    fn add(&self, path: &Path) -> anyhow::Result<()> {
+        let out = cmd!("chezmoi", "add", path)
+            .stdout_null()
+            .unchecked()
+            .run()?;
+        if !out.status.success() {
+            return Err(anyhow!("chezmoi add failed with error code {}", out.status));
+        }
+        Ok(())
+    }
 }
