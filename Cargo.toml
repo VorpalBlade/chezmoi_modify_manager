@@ -61,4 +61,6 @@ which = { version = "5.0.0", default-features = false }
 winnow = "0.5.19"
 
 [dev-dependencies]
+pathdiff = "0.2.1"
 pretty_assertions = "1.4.0"
+tempfile = "3.8.1"
