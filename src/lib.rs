@@ -1,8 +1,11 @@
 //! This is not a stable API, and is to be used internally by the binary and
 //! the integration tests only.
 
-#![warn(clippy::wildcard_imports)]
+#![warn(clippy::doc_markdown)]
 #![warn(clippy::needless_pass_by_value)]
+#![warn(clippy::redundant_closure_for_method_calls)]
+#![warn(clippy::semicolon_if_nothing_returned)]
+#![warn(clippy::wildcard_imports)]
 
 use std::{
     fs::File,
