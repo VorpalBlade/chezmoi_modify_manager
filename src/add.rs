@@ -110,7 +110,7 @@ fn add_with_script(
     // Run user provided hook script (if one exists)
     filtered_add(chezmoi, path, &data_path, &src_path, None, true, status_out)?;
 
-    maybe_create_script(script_path, style, status_out)?;
+    maybe_create_script(&script_path, style, status_out)?;
     Ok(())
 }
 
@@ -202,14 +202,14 @@ fn run_hook(
 
 /// Create a modify script if one doesn't exist
 fn maybe_create_script(
-    script_path: Utf8PathBuf,
+    script_path: &Utf8Path,
     style: Style,
     status_out: &mut impl Write,
 ) -> anyhow::Result<()> {
     if script_path.exists() {
         return Ok(());
     }
-    let mut file = File::create(&script_path)?;
+    let mut file = File::create(script_path)?;
     file.write_all(
         template(match style {
             Style::InPath => IN_PATH,
@@ -318,7 +318,7 @@ fn add_unmanaged(
     match mode {
         Mode::Normal => {
             _ = writeln!(status_out, "Setting up new modify_ script...");
-            add_with_script(chezmoi, path, style, status_out)?
+            add_with_script(chezmoi, path, style, status_out)?;
         }
         Mode::Smart => {
             _ = writeln!(status_out, "In smart mode... Adding as plain chezmoi...");

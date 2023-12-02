@@ -83,7 +83,7 @@ fn newline(i: &mut &str) -> PResult<()> {
 fn comment(i: &mut &str) -> PResult<Directive> {
     ('#', take_till0(['\n', '\r']))
         .void()
-        .map(|_| Directive::WS)
+        .map(|()| Directive::WS)
         .parse_next(i)
 }
 
@@ -91,7 +91,7 @@ fn comment(i: &mut &str) -> PResult<Directive> {
 fn chezmoi_template(i: &mut &str) -> PResult<Directive> {
     delimited("{{", take_until0("}}"), "}}")
         .void()
-        .map(|_| Directive::WS)
+        .map(|()| Directive::WS)
         .parse_next(i)
 }
 
