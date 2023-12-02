@@ -63,7 +63,7 @@ process_file() {
     cmds=( "${(f)$(load_options_array "$in_file")}" )
 
     local -a result_cmds
-    
+
     while [[ ${#cmds} -gt 0 ]]; do
         case $cmds[1] in
             -ik)
