@@ -66,7 +66,7 @@ where
         ChmmArgs::Add { _a, files, style } => {
             let mut stdout = stdout();
             for file in files {
-                println!("Adding {file:?}");
+                _ = writeln!(stdout, "Adding {file:?}");
                 add::add(
                     &RealChezmoi::default(),
                     add::Mode::Normal,
@@ -79,7 +79,7 @@ where
         ChmmArgs::Smart { _a, files, style } => {
             let mut stdout = stdout();
             for file in files {
-                println!("Adding {file:?}");
+                _ = writeln!(stdout, "Adding {file:?}");
                 add::add(
                     &RealChezmoi::default(),
                     add::Mode::Smart,
