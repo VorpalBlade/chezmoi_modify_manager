@@ -131,22 +131,16 @@ fn filtered_add(
 ) -> Result<(), anyhow::Error> {
     // First pass through hook if one exists, otherwise load directly.
     let file_contents = if let Some(hook_path) = hook_path(chezmoi)? {
-        _ = writeln!(status_out, "Executing hook script...");
-        _ = writeln!(
+        _ = indoc::writedoc!(
             status_out,
-            "\n!!! Hook scripts are deprecated (and will be removed at a future point) !!!"
-        );
-        _ = writeln!(
-            status_out,
-            "    Migrate to the new add:remove and add:hide attributes if possible."
-        );
-        _ = writeln!(
-            status_out,
-            "    If not possible, please leave a comment on this issue describing your use case:"
-        );
-        _ = writeln!(
-            status_out,
-            "    https://github.com/VorpalBlade/chezmoi_modify_manager/issues/46\n"
+            r"Executing hook script...
+
+            !!! Hook scripts are deprecated (and will be removed at a future point) !!!
+                Migrate to the new add:remove and add:hide attributes if possible.
+                If not possible, please leave a comment on this issue describing your use case:
+                https://github.com/VorpalBlade/chezmoi_modify_manager/issues/46
+
+            "
         );
         run_hook(&hook_path, input_path, target_path, src_path)?
     } else {
