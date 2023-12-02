@@ -1,6 +1,9 @@
 //! This is not a stable API, and is to be used internally by the binary and
 //! the integration tests only.
 
+#![warn(clippy::wildcard_imports)]
+#![warn(clippy::needless_pass_by_value)]
+
 use std::{
     fs::File,
     io::{Read, Write},
