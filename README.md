@@ -32,7 +32,7 @@ will be two files in your chezmoi source directory:
 
 The `modify_` script is responsible for generating the new state of the file
 given the current state in your home directory. The `modify_` script is set
-up to use `chezmoi_modify_manager` as an interpreter to do so. 
+up to use `chezmoi_modify_manager` as an interpreter to do so.
 `chezmoi_modify_manager` will read the modify script to read configuration and
 the `.src.ini` file and by default will apply that file exactly (ignoring blank
 lines and comments).

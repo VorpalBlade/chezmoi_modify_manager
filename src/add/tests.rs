@@ -1,9 +1,9 @@
 //! Two things are tested here:
 //! * New style filtering
 //! * Overall basic successful adding
-//! 
+//!
 //! ## Full tests for adding
-//! 
+//!
 //! There are several scenarios for adding files, all of these are tested
 //! separately.
 //!
