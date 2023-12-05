@@ -103,6 +103,6 @@ mod tests {
 
     #[test]
     fn check_options() {
-        chmm_args().check_invariants(false)
+        chmm_args().check_invariants(false);
     }
 }

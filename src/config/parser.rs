@@ -431,7 +431,7 @@ mod tests {
                 Directive::AddRemove(Matcher::Section("very secret".into())),
                 Directive::AddHide(Matcher::Section("somewhat secret".into())),
             ]
-        )
+        );
     }
 
     #[test]
@@ -449,6 +449,6 @@ mod tests {
                 Directive::Ignore(Matcher::Section("bar".into())),
                 Directive::Ignore(Matcher::Section("quux".into()))
             ]
-        )
+        );
     }
 }
