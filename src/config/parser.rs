@@ -10,8 +10,7 @@ use winnow::combinator::preceded;
 use winnow::combinator::separated;
 use winnow::error::StrContext;
 use winnow::prelude::*;
-use winnow::token::take_till0;
-use winnow::token::take_till1;
+use winnow::token::take_till;
 use winnow::token::take_until0;
 use winnow::Parser;
 
@@ -81,7 +80,7 @@ fn newline(i: &mut &str) -> PResult<()> {
 
 /// A comment
 fn comment(i: &mut &str) -> PResult<Directive> {
-    ('#', take_till0(['\n', '\r']))
+    ('#', take_till(0.., ['\n', '\r']))
         .void()
         .map(|()| Directive::WS)
         .parse_next(i)
@@ -166,7 +165,7 @@ fn transform(i: &mut &str) -> PResult<Directive> {
         space1,
         matcher_transform,
         space1,
-        take_till1([' ', '\r', '\n']),
+        take_till(1.., [' ', '\r', '\n']),
         opt(preceded(space1, separated(0.., transform_arg, space1))),
     )
         .map(|(_, _, pattern, _, transform, args)| {
@@ -177,7 +176,7 @@ fn transform(i: &mut &str) -> PResult<Directive> {
 
 /// One argument to a transformer on the form `arg="value"`
 fn transform_arg(i: &mut &str) -> PResult<(String, String)> {
-    (take_till1([' ', '=']), '=', quoted_string)
+    (take_till(1.., [' ', '=']), '=', quoted_string)
         .map(|(key, _, value)| (key.to_owned(), value))
         .parse_next(i)
 }
@@ -218,7 +217,7 @@ fn quoted_string(i: &mut &str) -> PResult<String> {
     delimited(
         '"',
         escaped_transform(
-            take_till1(['"', '\\']),
+            take_till(1.., ['"', '\\']),
             '\\',
             alt(("\\".value("\\"), "\"".value("\""), "n".value("\n"))),
         ),
@@ -232,7 +231,7 @@ fn quoted_string_nl(i: &mut &str) -> PResult<String> {
     delimited(
         '"',
         escaped_transform(
-            take_till1(['\n', '\r', '\\']),
+            take_till(1.., ['\n', '\r', '\\']),
             '\\',
             alt(("\\".value("\\"), "\"".value("\""), "n".value("\n"))),
         ),
