@@ -142,3 +142,12 @@ jobs:
           name: chezmoi_modify_manager_${{ matrix.target }}.zst
           path: target/${{ matrix.target }}/debug/chezmoi_modify_manager${{ matrix.suffix }}.zst
           retention-days: 7
+
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Rust
+      run: rustup install --profile minimal stable && rustup default stable && rustup component add rustfmt
+    - run: cargo fmt -- --check
