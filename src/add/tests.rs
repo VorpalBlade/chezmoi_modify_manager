@@ -123,7 +123,7 @@ impl DummyChezmoi {
         let tmp_dir = tempdir().unwrap();
         let input_dir: Utf8PathBuf = tmp_dir.path().join("input").try_into().unwrap();
         let src_dir: Utf8PathBuf = tmp_dir.path().join("source").try_into().unwrap();
-        let dummy_file: Utf8PathBuf = input_dir.join("dummy_file").try_into().unwrap();
+        let dummy_file: Utf8PathBuf = input_dir.join("dummy_file");
         std::fs::create_dir(input_dir.as_path()).unwrap();
         std::fs::create_dir(src_dir.as_path()).unwrap();
         std::fs::write(dummy_file.as_path(), "[a]\nb=c").unwrap();
