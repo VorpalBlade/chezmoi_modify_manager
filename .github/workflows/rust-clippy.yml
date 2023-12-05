@@ -38,6 +38,7 @@ jobs:
         run:
           cargo clippy
           --all-features
+          --all-targets
           --message-format=json -- -D warnings | clippy-sarif | tee rust-clippy-results.sarif | sarif-fmt
         continue-on-error: true
 
@@ -46,3 +47,6 @@ jobs:
         with:
           sarif_file: rust-clippy-results.sarif
           wait-for-processing: true
+
+      - name: Report status
+        run: cargo clippy --all-features --all-targets -- -D warnings
