@@ -95,7 +95,8 @@ jobs:
           - i586-unknown-linux-gnu
           - powerpc-unknown-linux-gnu
           - powerpc64-unknown-linux-gnu
-          - riscv64gc-unknown-linux-gnu
+          # OpenSSL broken on RISCV
+          #- riscv64gc-unknown-linux-gnu
         rust:
           - stable
     steps:
