@@ -447,7 +447,6 @@ dependencies = [
  "self_update",
  "strum",
  "tempfile",
- "thiserror",
  "which",
  "winnow",
 ]
