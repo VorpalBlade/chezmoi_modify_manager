@@ -28,7 +28,9 @@ jobs:
           - armv7-unknown-linux-musleabihf
           - i686-unknown-linux-gnu
           - i686-unknown-linux-musl
-          - x86_64-pc-windows-gnu
+          # Unfortunately, As of 1.76 nightly rust uses calls not supported by
+          # wine, so we can't run the cross-tests any more
+          #- x86_64-pc-windows-gnu
           - x86_64-unknown-linux-gnu
           - x86_64-unknown-linux-musl
         rust:
@@ -43,7 +45,7 @@ jobs:
       - name: Cache builds
         uses: Swatinem/rust-cache@v2.7.1
         with:
-          key: ${{ matrix.target }}
+          key: ${{ matrix.target }}-${{ matrix.rust }}
       - name: Cross compile
         run: cross build --locked --target ${{ matrix.target }} --verbose
       - name: Cross test
@@ -114,7 +116,7 @@ jobs:
 
   exotic-os:
     # Test native builds on non-Linux platforms
-    name: "Test: ${{ matrix.target }} on ${{ matrix.os }} with stable rust"
+    name: "Test: ${{ matrix.target }} on ${{ matrix.os }} with ${{ matrix.rust }}"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -123,22 +125,44 @@ jobs:
           - target: x86_64-pc-windows-msvc
             os: windows-latest
             suffix: .exe
+            rust: stable
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            suffix: .exe
+            rust: nightly
+          - target: x86_64-pc-windows-gnu
+            os: windows-latest
+            suffix: .exe
+            rust: stable
+          - target: x86_64-pc-windows-gnu
+            os: windows-latest
+            suffix: .exe
+            rust: nightly
           - target: x86_64-apple-darwin
             os: macos-latest
             suffix:
+            rust: stable
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            suffix:
+            rust: nightly
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust
-        run: rustup install --profile minimal stable && rustup default stable
+        run: rustup install --profile minimal ${{ matrix.rust }} && rustup default ${{ matrix.rust }} && rustup target add ${{ matrix.target }}
       - name: Cache builds
         uses: Swatinem/rust-cache@v2.7.1
+        with:
+          key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.rust }}
       - name: Compile
         run: cargo build --locked --target ${{ matrix.target }} --verbose
       - name: Test
         run: cargo test --locked --target ${{ matrix.target }} --verbose
       - name: Compress binary
+        if: matrix.rust == 'stable' && matrix.target != 'x86_64-pc-windows-gnu'
         run: zstd -T0 -6 target/${{ matrix.target }}/debug/chezmoi_modify_manager${{ matrix.suffix }}
       - uses: actions/upload-artifact@v3
+        if: matrix.rust == 'stable' && matrix.target != 'x86_64-pc-windows-gnu'
         with:
           name: chezmoi_modify_manager_${{ matrix.target }}.zst
           path: target/${{ matrix.target }}/debug/chezmoi_modify_manager${{ matrix.suffix }}.zst
