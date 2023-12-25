@@ -10,8 +10,11 @@ on:
     branches: [ "main" ]
 
 env:
+  CARGO_INCREMENTAL: 0
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
+  RUSTFLAGS: "-D warnings"
+  RUSTUP_MAX_RETRIES: 10
 
 jobs:
   modern-default:
@@ -47,7 +50,7 @@ jobs:
         with:
           key: ${{ matrix.target }}-${{ matrix.rust }}
       - name: Cross compile
-        run: cross build --locked --target ${{ matrix.target }} --verbose
+        run: cross test --no-run --locked --target ${{ matrix.target }} --verbose
       - name: Cross test
         run: cross test --locked --target ${{ matrix.target }} --verbose
       - name: Compress binary
@@ -155,7 +158,7 @@ jobs:
         with:
           key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.rust }}
       - name: Compile
-        run: cargo build --locked --target ${{ matrix.target }} --verbose
+        run: cargo test --no-run --locked --target ${{ matrix.target }} --verbose
       - name: Test
         run: cargo test --locked --target ${{ matrix.target }} --verbose
       - name: Compress binary

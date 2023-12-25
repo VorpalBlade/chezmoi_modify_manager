@@ -1,6 +1,7 @@
 //! This is not a stable API, and is to be used internally by the binary and
 //! the integration tests only.
 
+#![warn(unreachable_pub)]
 #![warn(clippy::doc_markdown)]
 #![warn(clippy::needless_pass_by_value)]
 #![warn(clippy::redundant_closure_for_method_calls)]
