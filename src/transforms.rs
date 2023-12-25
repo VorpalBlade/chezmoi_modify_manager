@@ -66,7 +66,7 @@ impl Transform {
     pub(crate) fn construct(
         self,
         args: &HashMap<String, String>,
-    ) -> Result<Rc<dyn ini_transforms::Transformer>, ini_transforms::TransformerError> {
+    ) -> anyhow::Result<Rc<dyn ini_transforms::Transformer>> {
         use ini_transforms::Transformer;
         match self {
             Transform::UnsortedLists => Ok(Rc::new(
@@ -75,9 +75,14 @@ impl Transform {
             Transform::KdeShortcut => Ok(Rc::new(
                 ini_transforms::TransformKdeShortcut::from_user_input(args)?,
             )),
+            #[cfg(feature = "keyring")]
             Transform::Keyring => Ok(Rc::new(ini_transforms::TransformKeyring::from_user_input(
                 args,
             )?)),
+            #[cfg(not(feature = "keyring"))]
+            Transform::Keyring => Err(anyhow::anyhow!(
+                "This build of chezmoi_modify_manager does not support the keyring transform"
+            )),
         }
     }
 }

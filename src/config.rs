@@ -73,9 +73,9 @@ fn make_transformer(
     transform: &str,
     args: &HashMap<String, String>,
 ) -> anyhow::Result<Rc<dyn transforms::Transformer>> {
-    Ok(Transform::from_str(transform)
+    Transform::from_str(transform)
         .map_err(|err| anyhow!("Invalid transform specified: {}: {}", transform, err))?
-        .construct(args)?)
+        .construct(args)
 }
 
 /// Parse directives for operation
