@@ -86,7 +86,9 @@ jobs:
         uses: Swatinem/rust-cache@v2.7.1
         with:
           save-if: ${{ matrix.features == '--no-default-features --features=updater-tls-native-vendored' }}
-      - name: Compile and test
+      - name: Compile
+        run: cargo test --locked ${{ matrix.features }} --verbose --no-run
+      - name: Test
         run: cargo test --locked ${{ matrix.features }} --verbose
 
   exotic-linux:
@@ -114,7 +116,9 @@ jobs:
         uses: Swatinem/rust-cache@v2.7.1
         with:
           key: ${{ matrix.target }}
-      - name: Cross compile and test
+      - name: Cross compile
+        run: cross test --locked --no-default-features --features=updater-tls-native-vendored --target ${{ matrix.target }} --verbose --no-run
+      - name: Cross test
         run: cross test --locked --no-default-features --features=updater-tls-native-vendored --target ${{ matrix.target }} --verbose
 
   exotic-os:
