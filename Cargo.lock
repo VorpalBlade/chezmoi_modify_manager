@@ -1184,9 +1184,9 @@ checksum = "1e186cfbae8084e513daff4240b4797e342f988cecda4fb6c939150f96315fd8"
 
 [[package]]
 name = "ini-merge"
-version = "0.3.4"
+version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20cf7246fa1cd86411a9179a5375596ce3627d0b12e8836f4f08e28cbe4fdea4"
+checksum = "6158f1850e3b56c5deb28970df78b544831ddc2f59b456c7f217495330abdb14"
 dependencies = [
  "ini-roundtrip",
  "itertools 0.12.0",
@@ -1268,13 +1268,12 @@ dependencies = [
 
 [[package]]
 name = "keyring"
-version = "2.1.0"
+version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec6488afbd1d8202dbd6e2dd38c0753d8c0adba9ac9985fc6f732a0d551f75e1"
+checksum = "43454e972324c0259f00c874c40645f736ed8dd9454fe748022d8fc88b1c6ef7"
 dependencies = [
  "byteorder",
  "lazy_static",
- "linux-keyutils",
  "secret-service",
  "security-framework",
  "winapi",
@@ -1316,16 +1315,6 @@ name = "libc"
 version = "0.2.151"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "302d7ab3130588088d277783b1e2d2e10c9e9e4a16dd9050e6ec93fb3e7048f4"
-
-[[package]]
-name = "linux-keyutils"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f27bb67f6dd1d0bb5ab582868e4f65052e58da6401188a08f0da09cf512b84b"
-dependencies = [
- "bitflags 1.3.2",
- "libc",
-]
 
 [[package]]
 name = "linux-raw-sys"
@@ -2462,18 +2451,18 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.51"
+version = "1.0.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f11c217e1416d6f036b870f14e0413d480dbf28edbee1f877abaf0206af43bb7"
+checksum = "83a48fd946b02c0a526b2e9481c8e2a17755e47039164a86c4070446e3a4614d"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.51"
+version = "1.0.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01742297787513b79cf8e29d1056ede1313e2420b7b3b15d0a768b4921f549df"
+checksum = "e7fbe9b594d6568a6a1443250a7e67d80b74e1e96f6d1715e1e21cc1888291d3"
 dependencies = [
  "proc-macro2",
  "quote",
