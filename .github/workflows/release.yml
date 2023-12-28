@@ -58,6 +58,11 @@ jobs:
           archive: $bin-$tag-$target
           # (required) GitHub token for uploading assets to GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CARGO_INCREMENTAL: 0
+          CARGO_PROFILE_RELEASE_CODEGEN_UNITS: 1
+          CARGO_PROFILE_RELEASE_LTO: true
+          CARGO_PROFILE_RELEASE_OPT_LEVEL: "s"
 
   upload-crates-io:
     runs-on: ubuntu-latest
