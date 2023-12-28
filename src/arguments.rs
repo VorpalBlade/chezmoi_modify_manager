@@ -89,6 +89,9 @@ pub enum ChmmArgs {
         /// Perform self update
         #[bpaf(short('u'), long("upgrade"))]
         _a: (),
+        /// Do not ask for confirmation before applying updates
+        #[bpaf(long("no-confirm"))]
+        no_confirm: bool
     },
 }
 

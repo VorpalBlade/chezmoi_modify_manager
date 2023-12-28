@@ -93,10 +93,10 @@ where
                 )?;
             }
         }
-        ChmmArgs::Update { _a } => {
+        ChmmArgs::Update { _a, no_confirm } => {
             #[cfg(feature = "self_update")]
             {
-                update::update()?;
+                update::update(no_confirm)?;
             }
             #[cfg(not(feature = "self_update"))]
             {
