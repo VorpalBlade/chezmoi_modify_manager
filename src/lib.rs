@@ -93,16 +93,14 @@ where
                 )?;
             }
         }
+        #[cfg(feature = "self_update")]
         ChmmArgs::Update { _a, no_confirm } => {
-            #[cfg(feature = "self_update")]
-            {
-                update::update(no_confirm)?;
-            }
-            #[cfg(not(feature = "self_update"))]
-            {
-                println!("Support for the updater was not included in this build.");
-                println!("Please refer to the way you installed this software to determine how to update it.");
-            }
+            update::update(no_confirm)?;
+        }
+        #[cfg(not(feature = "self_update"))]
+        ChmmArgs::Update { .. } => {
+            println!("Support for the updater was not included in this build.");
+            println!("Please refer to the way you installed this software to determine how to update it.");
         }
         ChmmArgs::Doctor { _a } => doctor::doctor()?,
         ChmmArgs::HelpSyntax { _a } => help_syntax(),

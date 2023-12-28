@@ -91,7 +91,7 @@ pub enum ChmmArgs {
         _a: (),
         /// Do not ask for confirmation before applying updates
         #[bpaf(long("no-confirm"))]
-        no_confirm: bool
+        no_confirm: bool,
     },
 }
 
