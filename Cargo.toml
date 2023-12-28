@@ -83,8 +83,3 @@ pretty_assertions = { version = "1.4.0", default-features = false, features = [
     "std",
 ] }
 tempfile = { version = "3.9.0", default-features = false }
-
-[profile.dev]
-# Disabling debug info speeds up builds a bunch,
-# and we don't rely on it for debugging that much.
-debug = 0
