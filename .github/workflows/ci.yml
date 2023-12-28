@@ -11,6 +11,7 @@ on:
 
 env:
   CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   RUSTFLAGS: "-D warnings"
@@ -21,6 +22,8 @@ jobs:
     # Test modern compilers on standard platforms on Linux.
     name: "Test: ${{ matrix.target }}, Rust ${{ matrix.rust }} (default configuration)"
     runs-on: ubuntu-latest
+    env:
+      CARGO_PROFILE_DEV_DEBUG: "line-tables-only"
     strategy:
       fail-fast: false
       matrix:
@@ -125,6 +128,8 @@ jobs:
     # Test native builds on non-Linux platforms
     name: "Test: ${{ matrix.target }} on ${{ matrix.os }} with ${{ matrix.rust }}"
     runs-on: ${{ matrix.os }}
+    env:
+      CARGO_PROFILE_DEV_DEBUG: "line-tables-only"
     strategy:
       fail-fast: false
       matrix:
