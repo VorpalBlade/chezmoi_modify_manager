@@ -133,7 +133,7 @@ fn chezmoi_check() -> anyhow::Result<(CheckResult, String)> {
                     Ok(version) => {
                         let version = version.trim_end();
                         Ok((
-                            CheckResult::Info,
+                            CheckResult::Ok,
                             format!("Chezmoi found. Version: {version}"),
                         ))
                     }
@@ -169,7 +169,7 @@ fn check_has_ignore() -> anyhow::Result<(CheckResult, String)> {
                 break;
             }
             if buffer.trim_end() == "**/*.src.ini" {
-                return Ok((CheckResult::Info, "Ignore of **/*.src.ini found".to_owned()));
+                return Ok((CheckResult::Ok, "Ignore of **/*.src.ini found".to_owned()));
             }
             buffer.clear();
         }
