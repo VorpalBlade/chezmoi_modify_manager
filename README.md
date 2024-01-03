@@ -2,9 +2,11 @@
 
 [ [lib.rs] ] [ [crates.io] ] [ [AUR] ]
 
-**NOTE**! This is version 2, which is a rewrite in Rust. See the
-[migration guide](doc/migration.md) if you are upgrading from the previous
-Python version. Good news: This version is ~50x faster.
+
+## News
+
+* If you are upgrading from version 2.x to 3.x see this [migration guide](doc/migration_3.md).
+* If you are upgrading from version 1.x *also* see this [migration guide](doc/migration_2.md).
 
 ---
 
