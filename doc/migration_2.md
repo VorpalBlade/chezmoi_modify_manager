@@ -1,7 +1,7 @@
-# Migrating from chezmoi_modify_manager 1.x
+# Migrating from chezmoi_modify_manager 1.x to 2.x
 
-Both the old and the new version have the same feature set. However the
-rust implementation is about 50x faster (release builds, 25x in debug builds).
+The new Rust code base has a superset of the features of the 1.x version, and it
+is also about 50x faster (in release builds, about 25x in debug builds).
 
 However, there is some work involved in migrating:
 * Different [installation](#installation) method.
