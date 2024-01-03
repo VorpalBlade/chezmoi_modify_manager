@@ -77,7 +77,7 @@ jobs:
           - --no-default-features
           - --no-default-features --features=updater-tls-native
           - --no-default-features --features=updater-tls-native-vendored
-          - --no-default-features --features=updater-tls-rusttls
+          - --no-default-features --features=updater-tls-rusttls,keyring
         rust:
           - 1.70.0
           - stable
