@@ -153,115 +153,6 @@ following:
 ignore "Settings" "gtk-xft-dpi"
 ```
 
-# Examples - hook scripts (LEGACY)
-
-## Add hook (LEGACY)
-
-> ⚠️ LEGACY! ⚠️ This approach is has been replaced with `add:remove` and
-`add:hide` directives in the configuration file, which is suitable for the
-password use case as well as when using `set` on specific systems. If you use
-add hooks for anything else where the new directives don't work, please leave
-a comment on
-[issue #46](https://github.com/VorpalBlade/chezmoi_modify_manager/issues/46)
-so that I can look into other possible ways to support it.
-
-A user defined hook script can optionally be executed by chezmoi_ini_add to
-filter the data when adding it. This can be useful when readding files to
-automatically remove passwords that are managed by a transform.
-
-The hook script should be an executable file in the root of the chezmoi
-directory and must be named `.chezmoi_modify_manager.add_hook`.
-
-Here is an example that will filter out passwords of the `konversationrc` file:
-
-```zsh
-#!/bin/zsh
-#
-# NOTE: LEGACY, use add:hide & add:remove directives instead
-#
-# The file from the target directory will be available on STDIN.
-# The data to add to the source state should be printed to STDOUT.
-
-# Currently only "ini"
-type=$1
-# Path of file as provided by the user to the command, may be a relative path
-target_path=$2
-# Path in the source state we are writing to. Will end in .src.ini for ini files.
-source_data_path=$3
-
-if [[ $source_data_path =~ konversationrc ]]; then
-    # Filter out any set password.
-    sed '/Password=./s/=.*$/=PLACEHOLDER/'
-else
-    # Let other files through as they are without changes
-    cat
-fi
-```
-
-## Add hook on Windows (or multiplatform solution) (LEGACY)
-
-On Windows chezmoi_modify_manager will instead look for a file
-`.chezmoi_modify_manager.add_hook.*`. At most one such file may be present.
-This allows you to use a suitable scripting language for that platform.
-Currently, `bat` extension is confirmed to be working well. However not all
-scripting languages seem to work here (for unknown reason).
-
-Below is an example for a cross-platform solution, in which both
-`.chezmoi_modify_manager.add_hook` (Linux/MacOS) and
-`.chezmoi_modify_manager.add_hook.bat` (Windows) scripts pass input arguments to
-a common `.chezmoi_modify_manager.add_hook_wrapped.py` Python script:
-
-`.chezmoi_modify_manager.add_hook` (Linux/MacOS) contents:
-
-```bash
-#!/bin/sh
-# NOTE: LEGACY, use add:hide & add:remove directives instead
-
-CHEZMOI_SOURCE_DIR="$(chezmoi source-path)"
-exec python3 "${CHEZMOI_SOURCE_DIR}/.chezmoi_modify_manager.add_hook_wrapped.py" "$1" "$2" "$3"
-```
-
-`.chezmoi_modify_manager.add_hook.bat` (Windows) contents:
-
-```bat
-@echo off
-
-REM NOTE: LEGACY, use add:hide & add:remove directives instead
-
-for /f %%i in ('chezmoi source-path') do set "CHEZMOI_SOURCE_DIR=%%i"
-python3 "%CHEZMOI_SOURCE_DIR%\.chezmoi_modify_manager.add_hook_wrapped.py" "%1" "%2" "%3"
-```
-
-`.chezmoi_modify_manager.add_hook_wrapped.py` contents:
-
-```python
-#!/usr/bin/env python3
-#
-# NOTE: LEGACY, use add:hide & add:remove directives instead
-#
-# The file from the target directory will be available on STDIN.
-# The data to add to the source state should be printed to STDOUT.
-
-import re
-import sys
-
-# Currently only "ini"
-type = sys.argv[1]
-# Path of file as provided by the user to the command, may be a relative path
-target_path = sys.argv[2]
-# Path in the source state we are writing to. Will end in .src.ini for ini files.
-source_data_path = sys.argv[3]
-
-# Read data from STDIN
-input_data = sys.stdin.read()
-
-if "konversationrc" in source_data_path:
-    # Filter out any set password.
-    input_data = re.sub(r'Password=.*$', 'Password=PLACEHOLDER', input_data)
-
-print(input_data)
-```
-
 # Examples - set/remove
 
 The `set` and `remove` directives are meant to be used together with templating
@@ -287,3 +178,42 @@ chezmoi as well. KDE normally creates these in `$HOME/.local/share/applications/
 Similarly, `remove` can be used to remove entries, but be careful when readding
 the source files: If you blindly re-add the file on the computer where the lines
 are filtered out, they will get lost for all computers.
+
+# Examples - add:remove/add:hide
+
+The directives `add:remove` and `add:hide` can be used to remove entries and
+hide values respectively when re-adding files from the system to the chezmoi
+source state.
+
+Some use cases for this are:
+* Use `add:hide` to prevent a password from being added back to the source state
+  when you re-add a file with other changes. See the
+  [konversationrc example](#konversationrc) for an example of this. By using
+  `add:hide`, the line will still be present in the source file, but without its
+  value. This ensures that the keyring transform is able to find it in the source
+  state and do its work when checking out the file on a new system.
+* Use `add:remove` to prevent a line from entering the source state at all. This
+  can be useful together with system specific configuration with the `set`
+  directive:
+  ```bash
+  {{ if (.is_work) }}
+  set "Default Applications" "x-scheme-handler/jetbrains" "jetbrains-toolbox.desktop" separator="="
+  {{ end }}
+  # Completely remove the line when adding back (regardless of which computer this is on).
+  add:remove "Default Applications" "x-scheme-handler/jetbrains"
+  ```
+  This example for the `mimeapps.list` file will add a specific line only if
+  `is_work` is true. The `add:remove` directive helps prevent that line from being
+  added back to the source state by mistake (where it would be applied to other
+  computers unintentionally).
+
+> **NOTE:** The `add:hide` and `add:remove` directives are processed as is
+without going through chezmoi's template engine when re-adding files. This means
+it won't matter if they are inside an if block, nor can you use template
+expressions in their arguments.
+
+> **NOTE:** `ignore` directives also result in an implicit `add:remove`. Again,
+it doesn't matter if it is inside an if block or not currently during adding of
+files, and any template expressions will not be expanded.
+
+Both of these limitations *may* change in the future.
