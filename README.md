@@ -129,7 +129,7 @@ Optionally you can install tab completion. The tab completion can be generated
 using the hidden command line flag `--bpaf-complete-style-SHELL_NAME`, (e.g.
 `--bpaf-complete-style-zsh`, `--bpaf-complete-style-bash`, ...). As this is
 handled internally by the command line parsing library we use, please see
-[their documentation](https://docs.rs/bpaf/0.7.10/bpaf/index.html#dynamic-shell-completion)
+[their documentation](https://docs.rs/bpaf/0.9.8/bpaf/_documentation/_2_howto/_1_completion/index.html)
 for detailed instructions.
 
 ## Updating
