@@ -56,13 +56,13 @@ where
                 .with_context(|| format!("Failed to parse {file_name:?}"))?;
 
             let mut stdin = stdin();
-            let mut stdout = stdout();
             let src_path = c
                 .source_path(&file_name)
                 .context("Failed to get source path")?;
             let mut src_file = File::open(src_path.as_std_path())
                 .with_context(|| format!("Failed to open source file at: {src_path:?}"))?;
             let merged = merge_ini(&mut stdin, &mut src_file, &c.mutations)?;
+            let mut stdout = stdout();
             for line in merged {
                 writeln!(stdout, "{line}")?;
             }

@@ -9,8 +9,8 @@ use anstyle::AnsiColor;
 use chezmoi_modify_manager::{inner_main, parse_args};
 use env_logger::{Builder, Env};
 use log::Level;
-use std::io::Write;
 use std::io::{stdin, stdout};
+use std::io::{BufWriter, Write};
 
 fn main() -> anyhow::Result<()> {
     // Set up logging
@@ -38,5 +38,6 @@ fn main() -> anyhow::Result<()> {
 
     // Run the program proper
     let opts = parse_args();
-    inner_main(opts, || stdin().lock(), || stdout().lock())
+    // Use BufWriter, we don't need to flush on every newline
+    inner_main(opts, || stdin().lock(), || BufWriter::new(stdout().lock()))
 }
