@@ -1,12 +1,13 @@
 //! Sanity checking of environment
 
+use itertools::Itertools;
 use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::process::Command;
 use strum::Display;
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Context};
 
 use crate::utils::{Chezmoi, RealChezmoi};
 
@@ -17,6 +18,7 @@ pub(crate) fn doctor() -> anyhow::Result<()> {
     for Check { name, func } in &CHECKS {
         match func() {
             Ok((result, text)) => {
+                let text = text.replace('\n', "\n                               ");
                 println!("{result: <9} {name: <20} {text}");
                 if result >= CheckResult::Warning {
                     issues_found = true;
@@ -68,7 +70,7 @@ struct Check {
     func: fn() -> anyhow::Result<(CheckResult, String)>,
 }
 
-const CHECKS: [Check; 6] = [
+const CHECKS: [Check; 7] = [
     Check {
         name: "version",
         func: || Ok((CheckResult::Info, env!("CARGO_PKG_VERSION").to_owned())),
@@ -121,7 +123,46 @@ const CHECKS: [Check; 6] = [
         name: "has-ignore",
         func: check_has_ignore,
     },
+    Check {
+        name: "no-hook-script",
+        func: || match hook_paths(&RealChezmoi::default())?.as_slice() {
+            [] => Ok((CheckResult::Ok, "No legacy hook script found".to_string())),
+            values => {
+                let values: String =
+                    Itertools::intersperse(values.iter().map(|v| v.as_str()), "\n* ").collect();
+                Ok((
+                    CheckResult::Error,
+                    format!("Legacy hook script(s) found:\n* {values}\nPlease read https://github.com/VorpalBlade/chezmoi_modify_manager/blob/main/doc/migration_3.md"),
+                ))
+            }
+        },
+    },
 ];
+
+// Find any legacy hook paths that might exist
+fn hook_paths(chezmoi: &impl Chezmoi) -> anyhow::Result<Vec<camino::Utf8PathBuf>> {
+    let ch_path = chezmoi
+        .source_root()
+        .context("Failed to run chezmoi")?
+        .context("No chezmoi source directory seems to exist?")?;
+    let mut paths = vec![];
+    let path = ch_path.join(".chezmoi_modify_manager.add_hook");
+    if path.exists() {
+        paths.push(path);
+    }
+    let base_path = ch_path.join(".chezmoi_modify_manager.add_hook.*");
+    for candidate in glob::glob_with(
+        base_path.as_str(),
+        glob::MatchOptions {
+            case_sensitive: true,
+            require_literal_separator: true,
+            require_literal_leading_dot: true,
+        },
+    )? {
+        paths.push(candidate?.try_into()?);
+    }
+    Ok(paths)
+}
 
 /// Find chezmoi and check it's version
 fn chezmoi_check() -> anyhow::Result<(CheckResult, String)> {

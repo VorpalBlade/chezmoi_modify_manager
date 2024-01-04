@@ -6,7 +6,6 @@ mod tests;
 use crate::{config, utils::Chezmoi};
 use anyhow::{anyhow, Context};
 use camino::{Utf8Path, Utf8PathBuf};
-use duct::cmd;
 use indoc::formatdoc;
 use ini_merge::filter::filter_ini;
 use std::{fs::File, io::Write};
@@ -57,42 +56,6 @@ fn template(path: &str) -> String {
     TEMPLATE.replace("(PATH)", path)
 }
 
-/// Get the path for the hook script, if it exists
-fn hook_path(chezmoi: &impl Chezmoi) -> anyhow::Result<Option<Utf8PathBuf>> {
-    let ch_path = chezmoi
-        .source_root()
-        .context("Failed to run chezmoi")?
-        .context("No chezmoi source directory seems to exist?")?;
-    if cfg!(windows) {
-        let base_path = ch_path.join(".chezmoi_modify_manager.add_hook.*");
-        let mut candidates: Vec<_> = glob::glob_with(
-            base_path.as_str(),
-            glob::MatchOptions {
-                case_sensitive: true,
-                require_literal_separator: true,
-                require_literal_leading_dot: true,
-            },
-        )?
-        .collect();
-        match candidates.len() {
-            0 => Ok(None),
-            1 => Ok(Some(
-                candidates
-                    .remove(0)?
-                    .try_into()
-                    .context("Only valid Unicode file names supported")?,
-            )),
-            _ => Err(anyhow!("Too many add_hook scripts found")),
-        }
-    } else {
-        let path = ch_path.join(".chezmoi_modify_manager.add_hook");
-        if !path.exists() {
-            return Ok(None);
-        }
-        Ok(Some(path))
-    }
-}
-
 /// Perform actual adding with a script
 fn add_with_script(
     chezmoi: &impl Chezmoi,
@@ -107,49 +70,30 @@ fn add_with_script(
     let src_name = src_path.file_name().context("File has no filename")?;
     let data_path = src_path.with_file_name(format!("{src_name}.src.ini"));
     let script_path = src_path.with_file_name(format!("modify_{src_name}.tmpl"));
-    // Run user provided hook script (if one exists)
-    filtered_add(chezmoi, path, &data_path, &src_path, None, true, status_out)?;
+    // Add while respecting filtering directives
+    filtered_add(&data_path, &src_path, None, status_out)?;
+
+    // Remove the temporary file that chezmoi added
+    std::fs::remove_file(src_path)?;
 
     maybe_create_script(&script_path, style, status_out)?;
     Ok(())
 }
 
-/// Maybe run the hook script
+/// Add and handle filtering directives (add:remove, add:hide and ignore)
 ///
-/// * `input_path`: Path provided by user
 /// * `target_path`: Path to write to
 /// * `src_path`: Path to actually read file data from
 /// * `script_path`: Path to modify script (if it exists)
+/// * `status_out`: Where to write status messages
 fn filtered_add(
-    chezmoi: &impl Chezmoi,
-    input_path: &Utf8Path,
     target_path: &Utf8Path,
     src_path: &Utf8Path,
     script_path: Option<&Utf8Path>,
-    input_is_temporary: bool,
     status_out: &mut impl Write,
 ) -> Result<(), anyhow::Error> {
-    // First pass through hook if one exists, otherwise load directly.
-    let file_contents = if let Some(hook_path) = hook_path(chezmoi)? {
-        _ = indoc::writedoc!(
-            status_out,
-            r"Executing hook script...
-
-            !!! Hook scripts are deprecated (and will be removed at a future point) !!!
-                Migrate to the new add:remove and add:hide attributes if possible.
-                If not possible, please leave a comment on this issue describing your use case:
-                https://github.com/VorpalBlade/chezmoi_modify_manager/issues/46
-
-            "
-        );
-        run_hook(&hook_path, input_path, target_path, src_path)?
-    } else {
-        std::fs::read(src_path).context("Failed to load data from file we are adding")?
-    };
-    // Remove temporary file if we are supposed to.
-    if input_is_temporary {
-        std::fs::remove_file(src_path)?;
-    }
+    let file_contents =
+        std::fs::read(src_path).context("Failed to load data from file we are adding")?;
 
     // If we are updating an existing script, run the contents through the filtering
     let mut file_contents = if let Some(sp) = script_path {
@@ -179,25 +123,6 @@ fn internal_filter(config_data: &str, contents: &[u8]) -> anyhow::Result<Vec<u8>
     let result = filter_ini(&mut file, &config.mutations)?;
     let s: String = itertools::intersperse(result, "\n".into()).collect();
     Ok(s.as_bytes().into())
-}
-
-/// Run hook script (legacy filtering)
-fn run_hook(
-    hook_path: &Utf8Path,
-    input_path: &Utf8Path,
-    target_path: &Utf8Path,
-    src_path: &Utf8Path,
-) -> Result<Vec<u8>, anyhow::Error> {
-    let out = cmd!(hook_path.as_std_path(), "ini", input_path, &target_path)
-        .stdin_path(src_path)
-        .stdout_capture()
-        .unchecked()
-        .run()?;
-
-    if !out.status.success() {
-        return Err(anyhow!("Hook script failed with error code {}", out.status));
-    }
-    Ok(out.stdout)
 }
 
 /// Create a modify script if one doesn't exist
@@ -249,7 +174,7 @@ pub(crate) fn add(
                     status_out,
                     "Updating existing .src.ini file for {existing_file:?}..."
                 );
-                readd_managed(chezmoi, &existing_file, src_dir, path, status_out)?;
+                readd_managed(&existing_file, src_dir, path, status_out)?;
             } else {
                 _ = writeln!(status_out, "Existing, but not a modify script...");
                 add_unmanaged(chezmoi, mode, path, style, status_out)?;
@@ -266,7 +191,6 @@ pub(crate) fn add(
 
 /// Handle case of readding a file that already has a modify script.
 fn readd_managed(
-    chezmoi: &impl Chezmoi,
     modify_script: &Utf8Path,
     src_dir: &Utf8Path,
     path: &Utf8Path,
@@ -294,12 +218,9 @@ fn readd_managed(
         return Err(anyhow!(err_str));
     }
     filtered_add(
-        chezmoi,
-        path,
         targeted_file.as_ref(),
         path,
         Some(modify_script),
-        false,
         status_out,
     )?;
     Ok(())
