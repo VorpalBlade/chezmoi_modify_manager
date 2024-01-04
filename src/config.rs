@@ -2,7 +2,6 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt::Debug;
-use std::rc::Rc;
 use std::str::FromStr;
 
 use anyhow::anyhow;
@@ -72,7 +71,7 @@ where
 fn make_transformer(
     transform: &str,
     args: &HashMap<String, String>,
-) -> anyhow::Result<Rc<dyn transforms::Transformer>> {
+) -> anyhow::Result<transforms::TransformerDispatch> {
     Transform::from_str(transform)
         .map_err(|err| anyhow!("Invalid transform specified: {}: {}", transform, err))?
         .construct(args)
