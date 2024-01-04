@@ -1,6 +1,6 @@
 //! Defines supported transforms.
 
-use std::{collections::HashMap, rc::Rc};
+use std::collections::HashMap;
 
 use ini_merge::mutations::transforms as ini_transforms;
 use itertools::Itertools;
@@ -66,19 +66,19 @@ impl Transform {
     pub(crate) fn construct(
         self,
         args: &HashMap<String, String>,
-    ) -> anyhow::Result<Rc<dyn ini_transforms::Transformer>> {
+    ) -> anyhow::Result<ini_transforms::TransformerDispatch> {
         use ini_transforms::Transformer;
         match self {
-            Transform::UnsortedLists => Ok(Rc::new(
-                ini_transforms::TransformUnsortedLists::from_user_input(args)?,
-            )),
-            Transform::KdeShortcut => Ok(Rc::new(
-                ini_transforms::TransformKdeShortcut::from_user_input(args)?,
-            )),
+            Transform::UnsortedLists => {
+                Ok(ini_transforms::TransformUnsortedLists::from_user_input(args)?.into())
+            }
+            Transform::KdeShortcut => {
+                Ok(ini_transforms::TransformKdeShortcut::from_user_input(args)?.into())
+            }
             #[cfg(feature = "keyring")]
-            Transform::Keyring => Ok(Rc::new(ini_transforms::TransformKeyring::from_user_input(
-                args,
-            )?)),
+            Transform::Keyring => {
+                Ok(ini_transforms::TransformKeyring::from_user_input(args)?.into())
+            }
             #[cfg(not(feature = "keyring"))]
             Transform::Keyring => Err(anyhow::anyhow!(
                 "This build of chezmoi_modify_manager does not support the keyring transform"
