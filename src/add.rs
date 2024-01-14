@@ -147,7 +147,7 @@ fn maybe_create_script(
         })
         .as_bytes(),
     )?;
-    _ = writeln!(status_out, "New script at {script_path:?}");
+    _ = writeln!(status_out, "New script at {script_path}");
 
     Ok(())
 }
@@ -234,7 +234,7 @@ pub(crate) fn add(
         ) => {
             _ = writeln!(
                 status_out,
-                "Action: Updating existing .src.ini file for {script_path:?}."
+                "Action: Updating existing .src.ini file for {script_path}."
             );
             filtered_add(
                 data_path.as_ref(),
@@ -276,7 +276,7 @@ fn classify_chezmoi_state(src_path: Option<Utf8PathBuf>) -> Result<ChezmoiState,
 /// Perform preliminary environment sanity checks
 fn sanity_check(path: &Utf8Path, chezmoi: &impl Chezmoi) -> Result<(), anyhow::Error> {
     if !path.is_file() {
-        return Err(anyhow!("{:?} is not a regular file", path));
+        return Err(anyhow!("{} is not a regular file", path));
     }
     match crate::doctor::hook_paths(chezmoi)?.as_slice() {
         [] => Ok(()),
@@ -303,7 +303,7 @@ fn find_data_file(
     targeted_file.push(data_file);
     if !targeted_file.exists() {
         let err_str = formatdoc!(
-            r#"Found existing modify_ script but no associated .src.ini file (looked at {targeted_file:?}).
+            r#"Found existing modify_ script but no associated .src.ini file (looked at {targeted_file}).
                         Possible causes:
                         * Did you change the "source" directive from the default value?
                         * Remove the file by mistake?
