@@ -59,14 +59,19 @@ fn template(path: &str) -> String {
 /// Perform actual adding with a script
 fn add_with_script(
     chezmoi: &impl Chezmoi,
+    src_path: Option<Utf8PathBuf>,
     path: &Utf8Path,
     style: Style,
     status_out: &mut impl Write,
 ) -> anyhow::Result<()> {
     chezmoi.add(path)?;
-    let src_path = chezmoi
-        .source_path(path)?
-        .context("chezmoi couldn't find added file")?;
+    // If we don't already know the source path (newly added file), get it now
+    let src_path = match src_path {
+        Some(path) => path,
+        None => chezmoi
+            .source_path(path)?
+            .context("chezmoi couldn't find added file")?,
+    };
     let src_name = src_path.file_name().context("File has no filename")?;
     let data_path = src_path.with_file_name(format!("{src_name}.src.ini"));
     let script_path = src_path.with_file_name(format!("modify_{src_name}.tmpl"));
@@ -147,6 +152,19 @@ fn maybe_create_script(
     Ok(())
 }
 
+/// Classifies the state of the file in chezmoi source state.
+#[derive(Debug)]
+enum ChezmoiState {
+    NotInChezmoi,
+    ExistingNormal {
+        data_path: Utf8PathBuf,
+    },
+    ExistingManaged {
+        script_path: Utf8PathBuf,
+        data_path: Utf8PathBuf,
+    },
+}
+
 /// Add a file
 pub(crate) fn add(
     chezmoi: &impl Chezmoi,
@@ -155,55 +173,124 @@ pub(crate) fn add(
     path: &Utf8Path,
     status_out: &mut impl Write,
 ) -> anyhow::Result<()> {
-    if !path.is_file() {
-        return Err(anyhow!("{:?} is not a regular file", path));
-    }
-    match crate::doctor::hook_paths(chezmoi)?.as_slice() {
-        [] => (),
-        _ => {
-            eprintln!("Error: legacy hook script found, see chezmoi_modify_manager --doctor and please read https://github.com/VorpalBlade/chezmoi_modify_manager/blob/main/doc/migration_3.md");
-            return Ok(());
-        }
-    }
-    _ = writeln!(status_out, "Adding {path:?}");
-    // First check if the file exists.
+    // Start with a sanity check on the input file and environment
+    sanity_check(path, chezmoi)?;
+
+    // Lets check if the managed path exists
     let src_path = chezmoi.source_path(path)?;
-    match src_path {
-        Some(existing_file) => {
-            _ = writeln!(status_out, "Existing (to chezmoi) file: {existing_file:?}");
-            // Existing file
-            let src_filename = existing_file.file_name().context("No file name?")?;
-            let src_dir = existing_file
-                .parent()
-                .context("Couldn't extract directory")?;
-            let is_mod_script = src_filename.starts_with("modify_");
-            if is_mod_script {
-                _ = writeln!(
-                    status_out,
-                    "Updating existing .src.ini file for {existing_file:?}..."
-                );
-                readd_managed(&existing_file, src_dir, path, status_out)?;
-            } else {
-                _ = writeln!(status_out, "Existing, but not a modify script...");
-                add_unmanaged(chezmoi, mode, path, style, status_out)?;
-            }
+
+    // Then lets classifiy the situation we are in
+    let situation = classify_chezmoi_state(src_path)?;
+
+    // Inform user of what we found
+    match &situation {
+        ChezmoiState::NotInChezmoi => {
+            _ = writeln!(status_out, "State: New (to chezmoi) file");
         }
-        None => {
-            // New file
-            _ = writeln!(status_out, "New (to chezmoi) file {path:?}");
-            add_unmanaged(chezmoi, mode, path, style, status_out)?;
+        ChezmoiState::ExistingNormal { .. } => {
+            _ = writeln!(
+                status_out,
+                "State: Managed by chezmoi, but not a modify script."
+            );
+        }
+        ChezmoiState::ExistingManaged { .. } => {
+            _ = writeln!(
+                status_out,
+                "State: Managed by chezmoi and is a modify script."
+            );
+        }
+    }
+
+    // Finaly decide on an action based on source state and the user selected mode.
+    match (situation, mode) {
+        (ChezmoiState::NotInChezmoi, Mode::Smart)
+        | (ChezmoiState::ExistingNormal { .. }, Mode::Smart) => {
+            _ = writeln!(
+                status_out,
+                "Action: Adding as plain chezmoi (since we are in smart mode)."
+            );
+            chezmoi.add(path)?;
+        }
+        (ChezmoiState::NotInChezmoi, Mode::Normal) => {
+            _ = writeln!(
+                status_out,
+                "Action: Adding & setting up new modify_ script."
+            );
+            add_with_script(chezmoi, None, path, style, status_out)?;
+        }
+        (ChezmoiState::ExistingNormal { data_path }, Mode::Normal) => {
+            _ = writeln!(
+                status_out,
+                "Action: Converting & setting up new modify_ script."
+            );
+            add_with_script(chezmoi, Some(data_path), path, style, status_out)?;
+        }
+        (
+            ChezmoiState::ExistingManaged {
+                script_path,
+                data_path,
+            },
+            _,
+        ) => {
+            _ = writeln!(
+                status_out,
+                "Action: Updating existing .src.ini file for {script_path:?}."
+            );
+            filtered_add(
+                data_path.as_ref(),
+                path,
+                Some(script_path.as_ref()),
+                status_out,
+            )?;
         }
     }
     Ok(())
 }
 
-/// Handle case of readding a file that already has a modify script.
-fn readd_managed(
+/// Find out what the state of the file in chezmoi currently is.
+fn classify_chezmoi_state(src_path: Option<Utf8PathBuf>) -> Result<ChezmoiState, anyhow::Error> {
+    let situation = match src_path {
+        Some(existing_file) => {
+            let src_filename = existing_file.file_name().context("No file name?")?;
+            let is_mod_script = src_filename.starts_with("modify_");
+            if is_mod_script {
+                let src_dir = existing_file
+                    .parent()
+                    .context("Couldn't extract directory")?;
+                let targeted_file = find_data_file(&existing_file, src_dir)?;
+                ChezmoiState::ExistingManaged {
+                    script_path: existing_file,
+                    data_path: targeted_file,
+                }
+            } else {
+                ChezmoiState::ExistingNormal {
+                    data_path: existing_file,
+                }
+            }
+        }
+        None => ChezmoiState::NotInChezmoi,
+    };
+    Ok(situation)
+}
+
+/// Perform preliminary environment sanity checks
+fn sanity_check(path: &Utf8Path, chezmoi: &impl Chezmoi) -> Result<(), anyhow::Error> {
+    if !path.is_file() {
+        return Err(anyhow!("{:?} is not a regular file", path));
+    }
+    match crate::doctor::hook_paths(chezmoi)?.as_slice() {
+        [] => Ok(()),
+        _ => {
+            Err(anyhow!("Legacy hook script found, see chezmoi_modify_manager --doctor and please read https://github.com/VorpalBlade/chezmoi_modify_manager/blob/main/doc/migration_3.md"))
+        }
+    }
+}
+
+/// Given a modify script, find the associated .src.ini file
+fn find_data_file(
     modify_script: &Utf8Path,
     src_dir: &Utf8Path,
-    path: &Utf8Path,
-    status_out: &mut impl Write,
-) -> Result<(), anyhow::Error> {
+) -> Result<Utf8PathBuf, anyhow::Error> {
     let data_file = modify_script
         .file_name()
         .context("Failed to get filename")?
@@ -225,34 +312,5 @@ fn readd_managed(
         );
         return Err(anyhow!(err_str));
     }
-    filtered_add(
-        targeted_file.as_ref(),
-        path,
-        Some(modify_script),
-        status_out,
-    )?;
-    Ok(())
-}
-
-/// Basic file adding (when the file doesn't exist as a modify script already)
-///
-/// Note: It *may or may not* exist in chezmoi already, but not managed by this program.
-fn add_unmanaged(
-    chezmoi: &impl Chezmoi,
-    mode: Mode,
-    path: &Utf8Path,
-    style: Style,
-    status_out: &mut impl Write,
-) -> Result<(), anyhow::Error> {
-    match mode {
-        Mode::Normal => {
-            _ = writeln!(status_out, "Setting up new modify_ script...");
-            add_with_script(chezmoi, path, style, status_out)?;
-        }
-        Mode::Smart => {
-            _ = writeln!(status_out, "In smart mode... Adding as plain chezmoi...");
-            chezmoi.add(path)?;
-        }
-    }
-    Ok(())
+    Ok(targeted_file)
 }
