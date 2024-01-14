@@ -56,7 +56,7 @@ where
             Source::Auto => {
                 let script_name = script_path
                     .file_name()
-                    .ok_or_else(|| anyhow!("Failed to extract filename from {script_path:?}"))?;
+                    .ok_or_else(|| anyhow!("Failed to extract filename from {script_path}"))?;
                 Ok(Cow::Owned(
                     script_path
                         .with_file_name(script_name.strip_prefix("modify_").unwrap_or(script_name))
