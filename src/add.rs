@@ -158,6 +158,14 @@ pub(crate) fn add(
     if !path.is_file() {
         return Err(anyhow!("{:?} is not a regular file", path));
     }
+    match crate::doctor::hook_paths(chezmoi)?.as_slice() {
+        [] => (),
+        _ => {
+            eprintln!("Error: legacy hook script found, see chezmoi_modify_manager --doctor and please read https://github.com/VorpalBlade/chezmoi_modify_manager/blob/main/doc/migration_3.md");
+            return Ok(());
+        }
+    }
+    _ = writeln!(status_out, "Adding {path:?}");
     // First check if the file exists.
     let src_path = chezmoi.source_path(path)?;
     match src_path {

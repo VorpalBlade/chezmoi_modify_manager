@@ -140,7 +140,7 @@ const CHECKS: [Check; 7] = [
 ];
 
 // Find any legacy hook paths that might exist
-fn hook_paths(chezmoi: &impl Chezmoi) -> anyhow::Result<Vec<camino::Utf8PathBuf>> {
+pub(crate) fn hook_paths(chezmoi: &impl Chezmoi) -> anyhow::Result<Vec<camino::Utf8PathBuf>> {
     let ch_path = chezmoi
         .source_root()
         .context("Failed to run chezmoi")?
