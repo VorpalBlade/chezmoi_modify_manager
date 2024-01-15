@@ -51,7 +51,7 @@ jobs:
       - name: Install cross
         uses: taiki-e/install-action@cross
       - name: Cache builds
-        uses: Swatinem/rust-cache@v2.7.1
+        uses: Swatinem/rust-cache@v2.7.3
         with:
           key: ${{ matrix.target }}-${{ matrix.rust }}
       - name: Cross compile
@@ -96,7 +96,7 @@ jobs:
       - name: Install Rust
         run: rustup install --profile minimal  ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
       - name: Cache builds
-        uses: Swatinem/rust-cache@v2.7.1
+        uses: Swatinem/rust-cache@v2.7.3
         with:
           save-if: ${{ matrix.features == '--no-default-features --features=updater-tls-native-vendored' }}
       - name: Compile
@@ -126,7 +126,7 @@ jobs:
       - name: Install cross
         uses: taiki-e/install-action@cross
       - name: Cache builds
-        uses: Swatinem/rust-cache@v2.7.1
+        uses: Swatinem/rust-cache@v2.7.3
         with:
           key: ${{ matrix.target }}
       - name: Cross compile
@@ -180,7 +180,7 @@ jobs:
       - name: Install Rust
         run: rustup install --profile minimal ${{ matrix.rust }} && rustup default ${{ matrix.rust }} && rustup target add ${{ matrix.target }}
       - name: Cache builds
-        uses: Swatinem/rust-cache@v2.7.1
+        uses: Swatinem/rust-cache@v2.7.3
         with:
           key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.rust }}
       - name: Compile
