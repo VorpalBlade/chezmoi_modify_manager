@@ -14,18 +14,7 @@ version = "3.0.0"
 default = ["updater-tls-rusttls", "keyring"]
 # Support for keyring transform
 keyring = ["ini-merge/keyring"]
-# Built in updater, distro packages probably wants to disable this.
-# This is the version based on native TLS: platform OpenSSL or platform specific
-updater-tls-native = ["self_update", "reqwest", "reqwest/default-tls"]
-# Built in updater, distro packages probably wants to disable this.
-# This is the version based on vendored OpenSSL
-updater-tls-native-vendored = [
-    "self_update",
-    "reqwest",
-    "reqwest/native-tls-vendored",
-]
-# Built in updater, distro packages probably wants to disable this.
-# This is the version based on RustTLS: TLS entirely in rust.
+# Built in updater, distro packages probably wants to disable this. Uses rustls for encryption.
 updater-tls-rusttls = ["self_update", "self_update/rustls"]
 
 [target.'cfg(windows)'.dependencies]
@@ -63,7 +52,6 @@ ini-merge = { version = "0.4.0", default-features = false }
 itertools = { version = "0.12.0", default-features = false }
 log = { version = "0.4.20", default-features = false }
 os_info = { version = "3.7.0", default-features = false }
-reqwest = { version = "0.11", default-features = false, optional = true }
 rustc_version_runtime = { version = "0.3.0", default-features = false }
 strum = { version = "0.25.0", features = [
     "derive",
