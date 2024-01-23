@@ -170,7 +170,7 @@ Some examples on various ignore flags and transforms can be found in
 The binary is self contained with no non-optional dependencies. For certain platforms where RustTLS isn't supported, the optional self-updater needs OpenSSL, which can be from either the system or built and linked statically.
 
 Requirements to build (if there is no native binary for your platform):
-* Rust 1.70 or newer
+* Rust 1.71 or newer
 
 Platforms:
 
