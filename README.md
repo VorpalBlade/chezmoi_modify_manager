@@ -167,10 +167,14 @@ Some examples on various ignore flags and transforms can be found in
 
 ## Platform support and requirements
 
-The binary is self contained with no non-optional dependencies. For certain platforms where RustTLS isn't supported, the optional self-updater needs OpenSSL, which can be from either the system or built and linked statically.
+The binary is self contained with no non-optional system dependencies apart
+from the platform provided basic libraries (typically libc & libm on Linux).
 
 Requirements to build (if there is no native binary for your platform):
+
 * Rust 1.71 or newer
+* A C compiler and associated toolchain (linker, headers, libraries, etc).\
+  This is needed as some dependencies may include some C code.
 
 Platforms:
 
@@ -181,7 +185,16 @@ Platforms:
 | Windows          | x86-64       | Yes                    | No                        |
 | MacOS            | x86-64       | Yes                    | No                        |
 
-The above table is limited to what I myself have access to (and use) as well as what works in GitHub CI. Other Unixes are likely to work, if [Rust has support](https://doc.rust-lang.org/stable/rustc/platform-support.html).
+The above table is limited to what I myself have access to (and use) as well as
+what works in GitHub CI. Other Unixes are likely to work, if
+[Rust has support](https://doc.rust-lang.org/stable/rustc/platform-support.html).
+
+## Minimum Supported Rust Version (MSRV) policy
+
+The current Minimum Supported Rust Version (MSRV) is documented in the previous
+[section](#platform-support-and-requirements). The MSRV may be bumped as needed.
+It will build on the current and previous stable Rust release. An MSRV change is
+not considered a breaking change and as such may change even in a patch version.
 
 ## Troubleshooting
 
