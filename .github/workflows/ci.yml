@@ -89,7 +89,7 @@ jobs:
           - --no-default-features --features=updater-tls-native-vendored
           - --no-default-features --features=updater-tls-rusttls,keyring
         rust:
-          - 1.70.0
+          - 1.71.0
           - stable
     steps:
       - uses: actions/checkout@v4
