@@ -11,7 +11,7 @@ use winnow::combinator::separated;
 use winnow::error::StrContext;
 use winnow::prelude::*;
 use winnow::token::take_till;
-use winnow::token::take_until0;
+use winnow::token::take_until;
 use winnow::Parser;
 
 /// A directive in the config file
@@ -88,7 +88,7 @@ fn comment(i: &mut &str) -> PResult<Directive> {
 
 /// A chezmoi template. Ignored when re-adding
 fn chezmoi_template(i: &mut &str) -> PResult<Directive> {
-    delimited("{{", take_until0("}}"), "}}")
+    delimited("{{", take_until(0.., "}}"), "}}")
         .void()
         .map(|()| Directive::WS)
         .parse_next(i)
