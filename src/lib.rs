@@ -29,7 +29,7 @@ mod utils;
 use indoc::printdoc;
 use ini_merge::merge::merge_ini;
 
-use crate::utils::RealChezmoi;
+use crate::utils::{RealChezmoi, CHEZMOI_AUTO_SOURCE_VERSION};
 
 /// Main function, amenable to integration tests.
 ///
@@ -129,9 +129,14 @@ fn help_syntax() {
     source
     ------
     This directive is required. It specifies where to find the source file
-    (i.e. the file in the dotfile repo). It should have the following format:
+    (i.e. the file in the dotfile repo). It should have the following format
+    to support Chezmoi versions older than {}:
 
     {}
+
+    From Chezmoi {} and forward the following also works instead:
+
+    source auto
 
     ignore
     ------
@@ -233,5 +238,7 @@ fn help_syntax() {
 
     (Matching works identically to ignore, see above for more details.)
     "#,
-    r#"source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini""#};
+    CHEZMOI_AUTO_SOURCE_VERSION,
+    r#"source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini""#,
+    CHEZMOI_AUTO_SOURCE_VERSION};
 }
