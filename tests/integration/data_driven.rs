@@ -24,7 +24,7 @@ fn find_test_cases() -> anyhow::Result<Vec<Utf8PathBuf>> {
         if !path.is_file() {
             continue;
         }
-        if let Some("cfg") = path.extension() {
+        if let Some("tmpl") = path.extension() {
             results.push(path);
         }
     }

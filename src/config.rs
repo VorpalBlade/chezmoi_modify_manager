@@ -5,6 +5,7 @@ use std::fmt::Debug;
 use std::str::FromStr;
 
 use anyhow::anyhow;
+use anyhow::Context;
 use camino::{Utf8Path, Utf8PathBuf};
 use ini_merge::filter::FilterAction;
 use ini_merge::filter::FilterActions;
@@ -28,11 +29,15 @@ mod parser;
 pub(crate) enum Source {
     /// Specific path for the source file.
     Path(Utf8PathBuf),
-    /// Auto locate the source file.
+    /// Auto locate the source file based on CHEZMOI_SOURCE_FILE
+    ///
+    /// Requires chezmoi ??? or newer.
+    AutoEnv,
+    /// Auto locate the source file based on relative path.
     ///
     /// This is currently broken with chezmoi, but needed for integration
     /// tests however.
-    Auto,
+    AutoPath,
 }
 
 /// The data from the config file
@@ -53,18 +58,31 @@ where
     pub(crate) fn source_path(&self, script_path: &Utf8Path) -> anyhow::Result<Cow<'_, Utf8Path>> {
         match self.source {
             Source::Path(ref p) => Ok(Cow::Borrowed(p)),
-            Source::Auto => {
-                let script_name = script_path
-                    .file_name()
-                    .ok_or_else(|| anyhow!("Failed to extract filename from {script_path}"))?;
-                Ok(Cow::Owned(
-                    script_path
-                        .with_file_name(script_name.strip_prefix("modify_").unwrap_or(script_name))
-                        .with_extension("src.ini"),
-                ))
+            Source::AutoEnv => {
+                let mut script_path: Utf8PathBuf = std::env::var("CHEZMOI_SOURCE_DIR")
+                    .context("CHEZMOI_SOURCE_DIR not set")?
+                    .into();
+                script_path.push(std::env::var("CHEZMOI_SOURCE_FILE")
+                    .context("Environment variable CHEZMOI_SOURCE_FILE not set, \"source auto\" not supported (upgrade chezmoi)")?.as_str());
+                Ok(Cow::Owned(resolve_relative_path(&script_path)?))
             }
+            Source::AutoPath => Ok(Cow::Owned(resolve_relative_path(script_path)?)),
         }
     }
+}
+
+/// Resolve the data path relative to a known script path
+fn resolve_relative_path(script_path: &Utf8Path) -> anyhow::Result<Utf8PathBuf> {
+    let script_name = script_path
+        .file_name()
+        .ok_or_else(|| anyhow!("Failed to extract filename from {script_path}"))?;
+    let intermediate_name = script_name.strip_prefix("modify_").unwrap_or(script_name);
+    let data_name = intermediate_name
+        .strip_suffix(".tmpl")
+        .unwrap_or(intermediate_name)
+        .to_string()
+        + ".src.ini";
+    Ok(script_path.with_file_name(data_name))
 }
 
 /// Create a transformer based on name
@@ -98,11 +116,17 @@ pub(crate) fn parse_for_merge(src: &str) -> anyhow::Result<Config<Mutations>> {
                 }
                 source = Some(Source::Path(src.into()));
             }
-            Directive::SourceAuto => {
+            Directive::SourceAutoEnv => {
                 if source.is_some() {
                     return Err(anyhow!("Duplicate source directives not allowed!"));
                 }
-                source = Some(Source::Auto);
+                source = Some(Source::AutoEnv);
+            }
+            Directive::SourceAutoPath => {
+                if source.is_some() {
+                    return Err(anyhow!("Duplicate source directives not allowed!"));
+                }
+                source = Some(Source::AutoPath);
             }
             Directive::Ignore(Matcher::Section(section)) => {
                 builder.add_section_action(section, SectionAction::Ignore);
@@ -171,11 +195,17 @@ pub(crate) fn parse_for_add(src: &str) -> Result<Config<FilterActions>, anyhow::
                 }
                 source = Some(Source::Path(src.into()));
             }
-            Directive::SourceAuto => {
+            Directive::SourceAutoEnv => {
                 if source.is_some() {
                     return Err(anyhow!("Duplicate source directives not allowed!"));
                 }
-                source = Some(Source::Auto);
+                source = Some(Source::AutoEnv);
+            }
+            Directive::SourceAutoPath => {
+                if source.is_some() {
+                    return Err(anyhow!("Duplicate source directives not allowed!"));
+                }
+                source = Some(Source::AutoPath);
             }
             // Not relevant for filtering
             Directive::Set { .. } => (),
