@@ -12,7 +12,7 @@ use strum::IntoEnumIterator;
 
 /// Parser for `--style`
 fn style() -> impl Parser<Style> {
-    const DEFAULT: Style = Style::InPath;
+    const DEFAULT: Style = Style::InPathTmpl;
     let iter = Style::iter().map(|x| -> String {
         if x == DEFAULT {
             format!("{x} (default)")
@@ -21,7 +21,7 @@ fn style() -> impl Parser<Style> {
         }
     });
     let help_msg = format!(
-        "How to call the modify manager in the generated file [{}]",
+        "Style of generated modify script [{}]",
         Itertools::intersperse(iter, ", ".to_string()).collect::<String>()
     );
 
@@ -95,9 +95,20 @@ pub enum ChmmArgs {
     },
 }
 
+/// Construct bpaf --help footer
+fn footer() -> bpaf::Doc {
+    // Leading spaces forces newlines to be inserted in bpaf documentation
+    let mut doc = bpaf::Doc::default();
+    doc.text("The --style flag controls how the script that --add generates looks:\n \n");
+    for s in Style::iter() {
+        doc.text(&format!(" * {}: {}", s, s.get_documentation().unwrap()));
+    }
+    doc
+}
+
 /// Apply arg parser to standard arguments
 pub fn parse_args() -> ChmmArgs {
-    chmm_args().run()
+    chmm_args().footer(footer()).run()
 }
 
 #[cfg(test)]

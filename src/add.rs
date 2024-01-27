@@ -3,7 +3,10 @@
 #[cfg(test)]
 mod tests;
 
-use crate::{config, utils::Chezmoi};
+use crate::{
+    config,
+    utils::{Chezmoi, ChezmoiVersion, CHEZMOI_AUTO_SOURCE_VERSION},
+};
 use anyhow::{anyhow, Context};
 use camino::{Utf8Path, Utf8PathBuf};
 use indoc::formatdoc;
@@ -16,10 +19,16 @@ use strum::{Display, EnumIter, EnumMessage, EnumString, IntoStaticStr};
     Debug, Eq, PartialEq, EnumString, Clone, Copy, EnumIter, EnumMessage, Display, IntoStaticStr,
 )]
 pub enum Style {
-    /// Program is in PATH
+    /// chezmoi_modify_manager is searched for in PATH
+    ///    (modify_ script is not templated for best performance)
     #[strum(serialize = "path")]
     InPath,
+    /// chezmoi_modify_manager is searched for in PATH
+    ///    (modify_ script is templated for your convenience)
+    #[strum(serialize = "path-tmpl")]
+    InPathTmpl,
     /// Program is in .utils of chezmoi source state
+    ///    (modify_ script is always templated)
     #[strum(serialize = "src")]
     InSrc,
 }
@@ -32,18 +41,23 @@ pub(crate) enum Mode {
 }
 
 /// Template for newly created scripts
-const TEMPLATE: &str = r#"#!(PATH)
+const TEMPLATE: &str = indoc::indoc! {r#"
+    #!(PATH)
 
-# This is needed to figure out where the source file is.
-# See https://github.com/twpayne/chezmoi/issues/2934
-source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini"
+    (SOURCE)
 
-# Add your ignores and transforms here
-#ignore section "my-section"
-#ignore "exact section name without brackets" "exact key name"
-#ignore regex "section.*" "key_prefix_.*"
-#transform "section" "key" transform_name read="the docs" for="more detail on transforms"
-"#;
+    # Add your ignores and transforms here
+    #ignore section "my-section"
+    #ignore "exact section name without brackets" "exact key name"
+    #ignore regex "section.*" "key_prefix_.*"
+    #transform "section" "key" transform_name read="the docs" for="more detail on transforms"
+"#};
+
+const SOURCE_NEW: &str = "source auto";
+const SOURCE_OLD: &str = indoc::indoc! {r#"
+    # This is needed to figure out where the source file is on older Chezmoi versions.
+    # See https://github.com/twpayne/chezmoi/issues/2934
+    source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini""#};
 
 /// Shebang line to use when command is in PATH
 const IN_PATH: &str = "/usr/bin/env chezmoi_modify_manager";
@@ -52,8 +66,13 @@ const IN_SRC: &str =
     "{{ .chezmoi.sourceDir }}/.utils/chezmoi_modify_manager-{{ .chezmoi.os }}-{{ .chezmoi.arch }}";
 
 /// Format the template
-fn template(path: &str) -> String {
-    TEMPLATE.replace("(PATH)", path)
+fn template(path: &str, version: &ChezmoiVersion) -> String {
+    let result = TEMPLATE.replace("(PATH)", path);
+    if version < &CHEZMOI_AUTO_SOURCE_VERSION {
+        result.replace("(SOURCE)", SOURCE_OLD)
+    } else {
+        result.replace("(SOURCE)", SOURCE_NEW)
+    }
 }
 
 /// Perform actual adding with a script
@@ -74,14 +93,19 @@ fn add_with_script(
     };
     let src_name = src_path.file_name().context("File has no filename")?;
     let data_path = src_path.with_file_name(format!("{src_name}.src.ini"));
-    let script_path = src_path.with_file_name(format!("modify_{src_name}.tmpl"));
+    let script_path = match style {
+        Style::InPath => src_path.with_file_name(format!("modify_{src_name}")),
+        Style::InPathTmpl | Style::InSrc => {
+            src_path.with_file_name(format!("modify_{src_name}.tmpl"))
+        }
+    };
     // Add while respecting filtering directives
     filtered_add(&data_path, &src_path, None, status_out)?;
 
     // Remove the temporary file that chezmoi added
     std::fs::remove_file(src_path)?;
 
-    maybe_create_script(&script_path, style, status_out)?;
+    maybe_create_script(&script_path, style, status_out, &chezmoi.version()?)?;
     Ok(())
 }
 
@@ -135,16 +159,21 @@ fn maybe_create_script(
     script_path: &Utf8Path,
     style: Style,
     status_out: &mut impl Write,
+    version: &ChezmoiVersion,
 ) -> anyhow::Result<()> {
     if script_path.exists() {
         return Ok(());
     }
     let mut file = File::create(script_path)?;
     file.write_all(
-        template(match style {
-            Style::InPath => IN_PATH,
-            Style::InSrc => IN_SRC,
-        })
+        template(
+            match style {
+                Style::InPath => IN_PATH,
+                Style::InPathTmpl => IN_PATH,
+                Style::InSrc => IN_SRC,
+            },
+            version,
+        )
         .as_bytes(),
     )?;
     _ = writeln!(status_out, "New script at {script_path}");
@@ -174,7 +203,7 @@ pub(crate) fn add(
     status_out: &mut impl Write,
 ) -> anyhow::Result<()> {
     // Start with a sanity check on the input file and environment
-    sanity_check(path, chezmoi)?;
+    sanity_check(path, style, chezmoi)?;
 
     // Lets check if the managed path exists
     let src_path = chezmoi.source_path(path)?;
@@ -274,9 +303,18 @@ fn classify_chezmoi_state(src_path: Option<Utf8PathBuf>) -> Result<ChezmoiState,
 }
 
 /// Perform preliminary environment sanity checks
-fn sanity_check(path: &Utf8Path, chezmoi: &impl Chezmoi) -> Result<(), anyhow::Error> {
+fn sanity_check(
+    path: &Utf8Path,
+    style: Style,
+    chezmoi: &impl Chezmoi,
+) -> Result<(), anyhow::Error> {
     if !path.is_file() {
         return Err(anyhow!("{} is not a regular file", path));
+    }
+    if Style::InPath == style && chezmoi.version()? < CHEZMOI_AUTO_SOURCE_VERSION {
+        return Err(anyhow!(
+            "To use \"--style path\" you need chezmoi {CHEZMOI_AUTO_SOURCE_VERSION} or newer"
+        ));
     }
     match crate::doctor::hook_paths(chezmoi)?.as_slice() {
         [] => Ok(()),

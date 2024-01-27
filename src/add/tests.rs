@@ -22,7 +22,10 @@ use pathdiff::diff_utf8_paths;
 use pretty_assertions::assert_eq;
 use tempfile::{tempdir, TempDir};
 
-use crate::utils::{Chezmoi, ChezmoiVersion, CHEZMOI_AUTO_SOURCE_VERSION};
+use crate::{
+    utils::{Chezmoi, ChezmoiVersion, CHEZMOI_AUTO_SOURCE_VERSION},
+    Style,
+};
 
 use super::internal_filter;
 
@@ -141,15 +144,28 @@ impl DummyChezmoi {
         let rel_path = diff_utf8_paths(path, self.input_dir.as_path()).unwrap();
         self.src_dir.join(rel_path)
     }
+
+    fn make_script_path(&self, file_name: &str, style: Style) -> Utf8PathBuf {
+        match style {
+            Style::InPath => self.src_dir.join(format!("modify_{file_name}")),
+            Style::InPathTmpl | Style::InSrc => {
+                self.src_dir.join(format!("modify_{file_name}.tmpl"))
+            }
+        }
+    }
 }
 
 impl Chezmoi for DummyChezmoi {
     fn source_path(&self, path: &Utf8Path) -> anyhow::Result<Option<Utf8PathBuf>> {
         let normal_path = self.basic_source_path(path);
-        let script_path =
+        let script_path_tmpl =
             normal_path.with_file_name(format!("modify_{}.tmpl", normal_path.file_name().unwrap()));
-        if script_path.exists() {
-            Ok(Some(script_path))
+        let script_path_plain =
+            normal_path.with_file_name(format!("modify_{}", normal_path.file_name().unwrap()));
+        if script_path_tmpl.exists() {
+            Ok(Some(script_path_tmpl))
+        } else if script_path_plain.exists() {
+            Ok(Some(script_path_plain))
         } else if normal_path.exists() {
             Ok(Some(normal_path))
         } else {
@@ -168,15 +184,15 @@ impl Chezmoi for DummyChezmoi {
     }
 
     fn version(&self) -> anyhow::Result<ChezmoiVersion> {
-        Ok(self.version.clone())
+        Ok(self.version)
     }
 }
 
-fn assert_default_script(chezmoi: &DummyChezmoi) {
+fn assert_default_script(chezmoi: &DummyChezmoi, style: Style) {
     let file_data = std::fs::read(chezmoi.src_dir.join("dummy_file.src.ini")).unwrap();
     assert_eq!(file_data.strip_suffix(b"\n").unwrap(), b"[a]\nb=c");
 
-    let file_data = std::fs::read(chezmoi.src_dir.join("modify_dummy_file.tmpl")).unwrap();
+    let file_data = std::fs::read(chezmoi.make_script_path("dummy_file", style)).unwrap();
     let file_data = String::from_utf8(file_data).unwrap();
     assert!(file_data.starts_with("#!/usr/bin/env chezmoi_modify_manager\n"));
 
@@ -184,11 +200,11 @@ fn assert_default_script(chezmoi: &DummyChezmoi) {
     assert!(!chezmoi.src_dir.join("dummy_file").try_exists().unwrap());
 }
 
-fn assert_unchanged_script(chezmoi: &DummyChezmoi) {
+fn assert_unchanged_script(chezmoi: &DummyChezmoi, style: Style) {
     let file_data = std::fs::read(chezmoi.src_dir.join("dummy_file.src.ini")).unwrap();
     assert_eq!(file_data.strip_suffix(b"\n").unwrap(), b"[a]\nb=c");
 
-    let file_data = std::fs::read(chezmoi.src_dir.join("modify_dummy_file.tmpl")).unwrap();
+    let file_data = std::fs::read(chezmoi.make_script_path("dummy_file", style)).unwrap();
     let file_data = String::from_utf8(file_data).unwrap();
     assert!(file_data.starts_with("#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto"));
 
@@ -208,127 +224,326 @@ fn assert_default_basic(chezmoi: &DummyChezmoi) {
         .unwrap());
     assert!(!chezmoi
         .src_dir
+        .join("modify_dummy_file")
+        .try_exists()
+        .unwrap());
+    assert!(!chezmoi
+        .src_dir
         .join("modify_dummy_file.tmpl")
         .try_exists()
         .unwrap());
 }
 
-#[test]
-fn check_add_normal_missing() {
-    let chezmoi = DummyChezmoi::new();
-    let mut stdout: Vec<u8> = vec![];
-
-    super::add(
-        &chezmoi,
-        super::Mode::Normal,
-        super::Style::InPath,
-        chezmoi.dummy_file.as_path(),
-        &mut stdout,
-    )
-    .unwrap();
-
-    assert_default_script(&chezmoi);
+fn assert_nothing_added(chezmoi: &DummyChezmoi) {
+    // No files added
+    assert!(!chezmoi.src_dir.join("dummy_file").try_exists().unwrap());
+    assert!(!chezmoi
+        .src_dir
+        .join("dummy_file.src.ini")
+        .try_exists()
+        .unwrap());
+    assert!(!chezmoi
+        .src_dir
+        .join("modify_dummy_file")
+        .try_exists()
+        .unwrap());
+    assert!(!chezmoi
+        .src_dir
+        .join("modify_dummy_file.tmpl")
+        .try_exists()
+        .unwrap());
 }
 
-#[test]
-fn check_add_smart_missing() {
-    let chezmoi = DummyChezmoi::new();
-    let mut stdout: Vec<u8> = vec![];
+mod versions {
+    use crate::{
+        add::{add, Mode},
+        Style,
+    };
 
-    super::add(
-        &chezmoi,
-        super::Mode::Smart,
-        super::Style::InPath,
-        chezmoi.dummy_file.as_path(),
-        &mut stdout,
-    )
-    .unwrap();
+    use super::{assert_nothing_added, DummyChezmoi};
 
-    assert_default_basic(&chezmoi);
+    #[test]
+    fn check_error_on_old_chezmoi() {
+        // Check that --style path errors on old chezmoi
+        let mut chezmoi = DummyChezmoi::new();
+        chezmoi.version.1 -= 1;
+        let chezmoi = chezmoi;
+
+        let mut stdout: Vec<u8> = vec![];
+
+        let error = add(
+            &chezmoi,
+            Mode::Normal,
+            Style::InPath,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        );
+        assert!(error.is_err());
+
+        assert_nothing_added(&chezmoi);
+    }
 }
 
-#[test]
-fn check_add_normal_basic() {
-    let chezmoi = DummyChezmoi::new();
-    let mut stdout: Vec<u8> = vec![];
+mod path_tmpl {
+    use crate::{
+        add::{add, Mode},
+        Style,
+    };
 
-    std::fs::write(chezmoi.src_dir.join("dummy_file"), "old_contents").unwrap();
+    use super::{
+        assert_default_basic, assert_default_script, assert_unchanged_script, DummyChezmoi,
+    };
 
-    super::add(
-        &chezmoi,
-        super::Mode::Normal,
-        super::Style::InPath,
-        chezmoi.dummy_file.as_path(),
-        &mut stdout,
-    )
-    .unwrap();
+    #[test]
+    fn check_add_normal_missing() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
 
-    assert_default_script(&chezmoi);
+        add(
+            &chezmoi,
+            Mode::Normal,
+            Style::InPathTmpl,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
+
+        assert_default_script(&chezmoi, Style::InPathTmpl);
+    }
+
+    #[test]
+    fn check_add_smart_missing() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
+
+        add(
+            &chezmoi,
+            Mode::Smart,
+            Style::InPathTmpl,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
+
+        assert_default_basic(&chezmoi);
+    }
+
+    #[test]
+    fn check_add_normal_basic() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
+
+        std::fs::write(chezmoi.src_dir.join("dummy_file"), "old_contents").unwrap();
+
+        add(
+            &chezmoi,
+            Mode::Normal,
+            Style::InPathTmpl,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
+
+        assert_default_script(&chezmoi, Style::InPathTmpl);
+    }
+
+    #[test]
+    fn check_add_smart_basic() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
+
+        std::fs::write(chezmoi.src_dir.join("dummy_file"), "old_contents").unwrap();
+
+        add(
+            &chezmoi,
+            Mode::Smart,
+            Style::InPathTmpl,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
+
+        assert_default_basic(&chezmoi);
+    }
+
+    #[test]
+    fn check_add_normal_script() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
+
+        std::fs::write(chezmoi.src_dir.join("dummy_file.src.ini"), "old_contents").unwrap();
+        std::fs::write(
+            chezmoi.src_dir.join("modify_dummy_file.tmpl"),
+            "#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto",
+        )
+        .unwrap();
+
+        add(
+            &chezmoi,
+            Mode::Normal,
+            Style::InPathTmpl,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
+
+        assert_unchanged_script(&chezmoi, Style::InPathTmpl);
+    }
+
+    #[test]
+    fn check_add_smart_script() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
+
+        std::fs::write(chezmoi.src_dir.join("dummy_file.src.ini"), "old_contents").unwrap();
+        std::fs::write(
+            chezmoi.src_dir.join("modify_dummy_file.tmpl"),
+            "#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto",
+        )
+        .unwrap();
+
+        add(
+            &chezmoi,
+            Mode::Smart,
+            Style::InPathTmpl,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
+
+        assert_unchanged_script(&chezmoi, Style::InPathTmpl);
+    }
 }
 
-#[test]
-fn check_add_smart_basic() {
-    let chezmoi = DummyChezmoi::new();
-    let mut stdout: Vec<u8> = vec![];
+mod path {
+    use crate::{
+        add::{add, Mode},
+        Style,
+    };
 
-    std::fs::write(chezmoi.src_dir.join("dummy_file"), "old_contents").unwrap();
+    use super::{
+        assert_default_basic, assert_default_script, assert_unchanged_script, DummyChezmoi,
+    };
 
-    super::add(
-        &chezmoi,
-        super::Mode::Smart,
-        super::Style::InPath,
-        chezmoi.dummy_file.as_path(),
-        &mut stdout,
-    )
-    .unwrap();
+    #[test]
+    fn check_add_normal_missing() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
 
-    assert_default_basic(&chezmoi);
-}
+        add(
+            &chezmoi,
+            Mode::Normal,
+            Style::InPath,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
 
-#[test]
-fn check_add_normal_script() {
-    let chezmoi = DummyChezmoi::new();
-    let mut stdout: Vec<u8> = vec![];
+        assert_default_script(&chezmoi, Style::InPath);
+    }
 
-    std::fs::write(chezmoi.src_dir.join("dummy_file.src.ini"), "old_contents").unwrap();
-    std::fs::write(
-        chezmoi.src_dir.join("modify_dummy_file.tmpl"),
-        "#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto",
-    )
-    .unwrap();
+    #[test]
+    fn check_add_smart_missing() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
 
-    super::add(
-        &chezmoi,
-        super::Mode::Normal,
-        super::Style::InPath,
-        chezmoi.dummy_file.as_path(),
-        &mut stdout,
-    )
-    .unwrap();
+        add(
+            &chezmoi,
+            Mode::Smart,
+            Style::InPath,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
 
-    assert_unchanged_script(&chezmoi);
-}
+        assert_default_basic(&chezmoi);
+    }
 
-#[test]
-fn check_add_smart_script() {
-    let chezmoi = DummyChezmoi::new();
-    let mut stdout: Vec<u8> = vec![];
+    #[test]
+    fn check_add_normal_basic() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
 
-    std::fs::write(chezmoi.src_dir.join("dummy_file.src.ini"), "old_contents").unwrap();
-    std::fs::write(
-        chezmoi.src_dir.join("modify_dummy_file.tmpl"),
-        "#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto",
-    )
-    .unwrap();
+        std::fs::write(chezmoi.src_dir.join("dummy_file"), "old_contents").unwrap();
 
-    super::add(
-        &chezmoi,
-        super::Mode::Smart,
-        super::Style::InPath,
-        chezmoi.dummy_file.as_path(),
-        &mut stdout,
-    )
-    .unwrap();
+        add(
+            &chezmoi,
+            Mode::Normal,
+            Style::InPath,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
 
-    assert_unchanged_script(&chezmoi);
+        assert_default_script(&chezmoi, Style::InPath);
+    }
+
+    #[test]
+    fn check_add_smart_basic() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
+
+        std::fs::write(chezmoi.src_dir.join("dummy_file"), "old_contents").unwrap();
+
+        add(
+            &chezmoi,
+            Mode::Smart,
+            Style::InPath,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
+
+        assert_default_basic(&chezmoi);
+    }
+
+    #[test]
+    fn check_add_normal_script() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
+
+        std::fs::write(chezmoi.src_dir.join("dummy_file.src.ini"), "old_contents").unwrap();
+        std::fs::write(
+            chezmoi.src_dir.join("modify_dummy_file"),
+            "#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto",
+        )
+        .unwrap();
+
+        add(
+            &chezmoi,
+            Mode::Normal,
+            Style::InPath,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
+
+        assert_unchanged_script(&chezmoi, Style::InPath);
+    }
+
+    #[test]
+    fn check_add_smart_script() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
+
+        std::fs::write(chezmoi.src_dir.join("dummy_file.src.ini"), "old_contents").unwrap();
+        std::fs::write(
+            chezmoi.src_dir.join("modify_dummy_file"),
+            "#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto",
+        )
+        .unwrap();
+
+        add(
+            &chezmoi,
+            Mode::Smart,
+            Style::InPath,
+            chezmoi.dummy_file.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
+
+        dbg!(String::from_utf8_lossy(&stdout));
+
+        assert_unchanged_script(&chezmoi, Style::InPath);
+    }
 }
