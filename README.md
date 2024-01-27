@@ -26,7 +26,7 @@ INI files when managing the configuration files with chezmoi.
 For each settings file you want to manage with `chezmoi_modify_manager` there
 will be two files in your chezmoi source directory:
 
-* `modify_<config file>.tmpl`, eg. `modify_private_kdeglobals.tmpl` \
+* `modify_<config file>` or `modify_<config file>.tmpl`, eg. `modify_private_kdeglobals.tmpl` \
   This is the modify script/configuration file that calls `chezmoi_modify_manager`.
   It contains the directives describing what to ignore.
 * `<config file>.src.ini`, eg. `private_kdeglobals.src.ini`\
@@ -53,6 +53,13 @@ will tell it to ignore the key `Show Inline Previews` in the section
 
 **Note!** If a key appears before the first section, use `<NO_SECTION>` as the
 section.
+
+**Note!** The modify script can itself be a chezmoi template (if it ends with
+`.tmpl`), which can be useful if you want to do host specific configuration using
+the `set` directive for [example](doc/examples.md#examples---setremove).
+This however will slow things down every so slightly as chezmoi has to run its
+templating engine on the file. Typically this will be an overhead of about half
+a millisecond per templated modify script (measured on an AMD Ryzen 5 5600X).
 
 ### Supported features
 
@@ -199,8 +206,8 @@ not considered a breaking change and as such may change even in a patch version.
 
 ## Troubleshooting
 
-The first step should be to run `chezmoi_modify_manager --doctor` and correct any issues reported.
-This will help identify the two common issues:
+The first step should be to run `chezmoi_modify_manager --doctor` and correct
+any issues reported. This will help identify the two common issues:
 
 * chezmoi_modify_manager needs to be in `PATH`
 * `**/*.src.ini` needs to be ignored in the root `.chezmoiignore` file
