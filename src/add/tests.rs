@@ -22,7 +22,7 @@ use pathdiff::diff_utf8_paths;
 use pretty_assertions::assert_eq;
 use tempfile::{tempdir, TempDir};
 
-use crate::utils::Chezmoi;
+use crate::utils::{Chezmoi, ChezmoiVersion, CHEZMOI_AUTO_SOURCE_VERSION};
 
 use super::internal_filter;
 
@@ -116,6 +116,7 @@ struct DummyChezmoi {
     input_dir: Utf8PathBuf,
     src_dir: Utf8PathBuf,
     dummy_file: Utf8PathBuf,
+    version: ChezmoiVersion,
 }
 
 impl DummyChezmoi {
@@ -132,6 +133,7 @@ impl DummyChezmoi {
             input_dir,
             src_dir,
             dummy_file,
+            version: CHEZMOI_AUTO_SOURCE_VERSION,
         }
     }
 
@@ -163,6 +165,10 @@ impl Chezmoi for DummyChezmoi {
         let expected_path = self.basic_source_path(path);
         std::fs::copy(path, expected_path).unwrap();
         Ok(())
+    }
+
+    fn version(&self) -> anyhow::Result<ChezmoiVersion> {
+        Ok(self.version.clone())
     }
 }
 
