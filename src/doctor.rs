@@ -11,7 +11,7 @@ use strum::IntoStaticStr;
 
 use anyhow::{anyhow, Context};
 
-use crate::utils::{Chezmoi, RealChezmoi};
+use crate::utils::{Chezmoi, ChezmoiVersion, RealChezmoi, CHEZMOI_AUTO_SOURCE_VERSION};
 
 /// Perform environment sanity check
 pub(crate) fn doctor() -> anyhow::Result<()> {
@@ -247,10 +247,20 @@ fn chezmoi_check() -> anyhow::Result<(CheckResult, String)> {
                 Ok(out) => match std::str::from_utf8(&out.stdout) {
                     Ok(version) => {
                         let version = version.trim_end();
-                        Ok((
-                            CheckResult::Ok,
-                            format!("Chezmoi found. Version: {version}"),
-                        ))
+                        let parsed_version: ChezmoiVersion = version
+                            .parse()
+                            .context("Failed to parse chezmoi --version")?;
+                        if parsed_version < CHEZMOI_AUTO_SOURCE_VERSION {
+                            Ok((
+                                CheckResult::Warning,
+                                format!("Chezmoi found. Version is old and doesn't support \"source auto\" directive: {version}"),
+                            ))
+                        } else {
+                            Ok((
+                                CheckResult::Ok,
+                                format!("Chezmoi found. Version: {version}"),
+                            ))
+                        }
                     }
                     Err(err) => Ok((
                         CheckResult::Error,
