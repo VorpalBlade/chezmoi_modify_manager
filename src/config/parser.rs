@@ -21,8 +21,14 @@ pub(super) enum Directive {
     WS,
     /// A source path
     Source(String),
-    /// Automatic source localisation
-    SourceAuto,
+    /// Automatic source localisation (via environment variable)
+    SourceAutoEnv,
+    #[doc(hidden)]
+    /// Automatic source localisation (via relative path)
+    ///
+    /// This is used internally by the integration tests, but doesn't actually
+    /// work with real chezmoi
+    SourceAutoPath,
     /// An ignore directive
     Ignore(Matcher),
     /// A transform directive
@@ -103,7 +109,8 @@ fn source(i: &mut &str) -> PResult<Directive> {
         "source",
         space1,
         alt((
-            "auto".map(|_| Directive::SourceAuto),
+            "auto-path".map(|_| Directive::SourceAutoPath),
+            "auto".map(|_| Directive::SourceAutoEnv),
             quoted_string_nl.map(Directive::Source),
         )),
     )
@@ -399,7 +406,7 @@ mod tests {
         assert_eq!(
             out,
             vec![
-                Directive::SourceAuto,
+                Directive::SourceAutoEnv,
                 Directive::Ignore(Matcher::Section("c".into())),
                 Directive::Ignore(Matcher::Literal("a".into(), "b".into())),
                 Directive::Transform(
@@ -444,7 +451,7 @@ mod tests {
         assert_eq!(
             out,
             vec![
-                Directive::SourceAuto,
+                Directive::SourceAutoEnv,
                 Directive::Source("foo".into()),
                 Directive::Ignore(Matcher::Section("bar".into())),
                 Directive::Ignore(Matcher::Section("quux".into()))
