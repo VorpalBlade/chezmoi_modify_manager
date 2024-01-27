@@ -442,6 +442,7 @@ dependencies = [
  "os_info",
  "pathdiff",
  "pretty_assertions",
+ "regex",
  "rustc_version_runtime",
  "self_update",
  "strum",
