@@ -22,3 +22,10 @@ would take on the order of 95 ms. Per managed file. As I was getting up to
 around 20 managed INI files, this started to add up. The rewrite in Rust
 takes (on the same computer) 2 ms. This is a 46x speedup. On another (faster)
 computer I got a 63x speedup (54 ms vs 0.9 ms).
+
+## Fast path
+
+The most time critical operation is to compute the new system state when chezmoi
+invokes us. This is the "fast path" in the code. All other operations such as
+`--add`, `--update` etc are less important from a performance perspective. This
+should be kept in mind when adding new features.
