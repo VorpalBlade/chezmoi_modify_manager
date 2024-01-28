@@ -12,7 +12,7 @@ use strum::IntoEnumIterator;
 
 /// Parser for `--style`
 fn style() -> impl Parser<Style> {
-    const DEFAULT: Style = Style::InPathTmpl;
+    const DEFAULT: Style = Style::Auto;
     let iter = Style::iter().map(|x| -> String {
         if x == DEFAULT {
             format!("{x} (default)")
@@ -21,7 +21,7 @@ fn style() -> impl Parser<Style> {
         }
     });
     let help_msg = format!(
-        "Style of generated modify script [{}]",
+        "Style of newly generated modify script [{}]",
         Itertools::intersperse(iter, ", ".to_string()).collect::<String>()
     );
 
@@ -100,8 +100,12 @@ fn footer() -> bpaf::Doc {
     // Leading spaces forces newlines to be inserted in bpaf documentation
     let mut doc = bpaf::Doc::default();
     doc.text("The --style flag controls how the script that --add generates looks:\n \n");
-    for s in Style::iter() {
-        doc.text(&format!(" * {}: {}", s, s.get_documentation().unwrap()));
+    for style in Style::iter() {
+        let mut text = format!(" * {}: {}", style, style.get_documentation().unwrap());
+        if !text.ends_with('\n') {
+            text.push('\n');
+        }
+        doc.text(&text);
     }
     doc
 }
