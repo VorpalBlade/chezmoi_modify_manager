@@ -79,13 +79,13 @@ where
                 )?;
             }
         }
-        ChmmArgs::Smart { _a, files, style } => {
+        ChmmArgs::Smart { _a, files } => {
             let mut stdout = stdout();
             for file in files {
                 add::add(
                     &RealChezmoi::default(),
                     add::Mode::Smart,
-                    style,
+                    Style::Auto, // Style unused for the smart case, so doesn't matter
                     &file,
                     &mut stdout,
                 )?;
