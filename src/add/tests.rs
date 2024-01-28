@@ -147,6 +147,7 @@ impl DummyChezmoi {
 
     fn make_script_path(&self, file_name: &str, style: Style) -> Utf8PathBuf {
         match style {
+            Style::Auto => todo!("Not implemented in test yet"),
             Style::InPath => self.src_dir.join(format!("modify_{file_name}")),
             Style::InPathTmpl | Style::InSrc => {
                 self.src_dir.join(format!("modify_{file_name}.tmpl"))

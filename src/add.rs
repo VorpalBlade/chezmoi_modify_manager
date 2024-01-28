@@ -19,6 +19,9 @@ use strum::{Display, EnumIter, EnumMessage, EnumString, IntoStaticStr};
     Debug, Eq, PartialEq, EnumString, Clone, Copy, EnumIter, EnumMessage, Display, IntoStaticStr,
 )]
 pub enum Style {
+    /// Selects between path and path-tmpl based on detected chezmoi version
+    #[strum(serialize = "auto")]
+    Auto,
     /// chezmoi_modify_manager is searched for in PATH
     ///    (modify_ script is not templated for best performance)
     #[strum(serialize = "path")]
@@ -94,6 +97,7 @@ fn add_with_script(
     let src_name = src_path.file_name().context("File has no filename")?;
     let data_path = src_path.with_file_name(format!("{src_name}.src.ini"));
     let script_path = match style {
+        Style::Auto => panic!("Impossible: Auto should already have been mapped"),
         Style::InPath => src_path.with_file_name(format!("modify_{src_name}")),
         Style::InPathTmpl | Style::InSrc => {
             src_path.with_file_name(format!("modify_{src_name}.tmpl"))
@@ -168,6 +172,7 @@ fn maybe_create_script(
     file.write_all(
         template(
             match style {
+                Style::Auto => panic!("Impossible: Auto should already have been mapped"),
                 Style::InPath => IN_PATH,
                 Style::InPathTmpl => IN_PATH,
                 Style::InSrc => IN_SRC,
@@ -198,10 +203,18 @@ enum ChezmoiState {
 pub(crate) fn add(
     chezmoi: &impl Chezmoi,
     mode: Mode,
-    style: Style,
+    mut style: Style,
     path: &Utf8Path,
     status_out: &mut impl Write,
 ) -> anyhow::Result<()> {
+    // Check for auto style
+    if style == Style::Auto {
+        style = if chezmoi.version()? < CHEZMOI_AUTO_SOURCE_VERSION {
+            Style::InPathTmpl
+        } else {
+            Style::InPath
+        }
+    }
     // Start with a sanity check on the input file and environment
     sanity_check(path, style, chezmoi)?;
 
