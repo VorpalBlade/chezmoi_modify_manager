@@ -3,6 +3,7 @@ authors = ["Arvid Norlander"]
 categories = ["config"]
 description = "Chezmoi addon to patch ini files with mixed settings and state (experimental rust branch)"
 edition = "2021"
+exclude = ["/.github/", "/.ci/", "/.chglog/"]
 keywords = ["ini", "config", "configuration", "chezmoi"]
 license = "GPL-3.0-only"
 name = "chezmoi_modify_manager"
