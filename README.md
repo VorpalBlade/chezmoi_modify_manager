@@ -102,7 +102,8 @@ See the section on `add:hide` & `add:remove` in `--help-syntax` for more details
 Finally, the command has a built-in updater (similar to `chezmoi upgrade`).
 
 Note! This can (and should) be configured out using cargo features if you are
-building a distro package.
+building a distro package. If you want to package this for your distro or OS
+of choice: [please read these notes](doc/for-packagers.md).
 
 ## Installation
 
@@ -131,7 +132,7 @@ Optionally you can install tab completion. The tab completion can be generated
 using the hidden command line flag `--bpaf-complete-style-SHELL_NAME`, (e.g.
 `--bpaf-complete-style-zsh`, `--bpaf-complete-style-bash`, ...). As this is
 handled internally by the command line parsing library we use, please see
-[their documentation](https://docs.rs/bpaf/0.9.8/bpaf/_documentation/_2_howto/_1_completion/index.html)
+[their documentation](https://docs.rs/bpaf/0.9.9/bpaf/_documentation/_2_howto/_1_completion/index.html)
 for detailed instructions.
 
 ## Updating
