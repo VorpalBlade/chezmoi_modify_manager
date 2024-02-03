@@ -126,10 +126,28 @@ struct Check {
     func: fn() -> anyhow::Result<(CheckResult, String)>,
 }
 
-const CHECKS: [Check; 7] = [
+const CHECKS: [Check; 8] = [
     Check {
         name: "version",
-        func: || Ok((CheckResult::Info, env!("CARGO_PKG_VERSION").to_owned())),
+        func: || Ok((CheckResult::Info, env!("CARGO_PKG_VERSION").to_string())),
+    },
+    Check {
+        name: "build",
+        func: || match option_env!("CHEZMOI_MODIFY_MANAGER_BUILDER") {
+            Some("github-release") => Ok((CheckResult::Ok, "Official release build".to_string())),
+            Some("github-ci") => Ok((
+                CheckResult::Warning,
+                "Github CI build (not official release)".to_string(),
+            )),
+            Some(s) => Ok((
+                CheckResult::Info,
+                format!("Other builder, identifies as: {s}"),
+            )),
+            None => Ok((
+                CheckResult::Warning,
+                "Unknown builder, no identity set".to_string(),
+            )),
+        },
     },
     Check {
         name: "rustc-version",
