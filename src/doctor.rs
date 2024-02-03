@@ -13,20 +13,20 @@ use crate::utils::{Chezmoi, RealChezmoi};
 
 /// Perform environment sanity check
 pub(crate) fn doctor() -> anyhow::Result<()> {
-    let mut issues_found = false;
+    let mut worst_issues_found = CheckResult::Ok;
     println!("RESULT    CHECK                MESSAGE");
     for Check { name, func } in &CHECKS {
         match func() {
             Ok((result, text)) => {
                 let text = text.replace('\n', "\n                               ");
                 println!("{result: <9} {name: <20} {text}");
-                if result >= CheckResult::Warning {
-                    issues_found = true;
+                if result >= worst_issues_found {
+                    worst_issues_found = result;
                 }
             }
             Err(err) => {
                 println!("FATAL     {name: <20} {err}");
-                issues_found = true;
+                worst_issues_found = CheckResult::Fatal;
             }
         }
     }
@@ -45,10 +45,15 @@ pub(crate) fn doctor() -> anyhow::Result<()> {
         println!("\nchezmoi doctor output not included since binary wasn't found");
     }
 
-    if issues_found {
+    if worst_issues_found >= CheckResult::Error {
         println!();
         return Err(anyhow!(
-            "Issues found, please rectify these for proper operation"
+            "Errors found, you need to rectify these for proper operation"
+        ));
+    } else if worst_issues_found >= CheckResult::Warning {
+        println!();
+        return Err(anyhow!(
+            "Warnings found, consider investigating if you have issues"
         ));
     }
     Ok(())
@@ -61,6 +66,7 @@ enum CheckResult {
     Info,
     Warning,
     Error,
+    Fatal,
 }
 
 /// A check with a name
