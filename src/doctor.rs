@@ -1,11 +1,13 @@
 //! Sanity checking of environment
 
+use anstream::println;
+use anstyle::{AnsiColor, Effects, Reset};
 use itertools::Itertools;
 use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::process::Command;
-use strum::Display;
+use strum::IntoStaticStr;
 
 use anyhow::{anyhow, Context};
 
@@ -14,7 +16,11 @@ use crate::utils::{Chezmoi, RealChezmoi};
 /// Perform environment sanity check
 pub(crate) fn doctor() -> anyhow::Result<()> {
     let mut worst_issues_found = CheckResult::Ok;
-    println!("RESULT    CHECK                MESSAGE");
+    println!(
+        "{}RESULT    CHECK                MESSAGE{}",
+        Effects::BOLD.render(),
+        Reset.render()
+    );
     for Check { name, func } in &CHECKS {
         match func() {
             Ok((result, text)) => {
@@ -25,13 +31,17 @@ pub(crate) fn doctor() -> anyhow::Result<()> {
                 }
             }
             Err(err) => {
-                println!("FATAL     {name: <20} {err}");
+                println!("{:<9} {name: <20} {err}", CheckResult::Fatal);
                 worst_issues_found = CheckResult::Fatal;
             }
         }
     }
     if let Ok(p) = which::which("chezmoi") {
-        println!("\nOutput of chezmoi doctor:");
+        println!(
+            "\n{}Output of chezmoi doctor:{}",
+            Effects::BOLD.render(),
+            Reset.render()
+        );
         _ = std::io::stdout().flush();
         match Command::new(p).arg("doctor").spawn().as_mut() {
             Ok(child) => {
@@ -46,27 +56,67 @@ pub(crate) fn doctor() -> anyhow::Result<()> {
     }
 
     if worst_issues_found >= CheckResult::Error {
-        println!();
-        return Err(anyhow!(
-            "Errors found, you need to rectify these for proper operation"
-        ));
+        println!(
+            "\n{}Error{}: Error(s) found, you should rectify these for proper operation",
+            AnsiColor::Red.render_fg(),
+            Reset.render()
+        );
+        // There isn't a good way to get a non-zero exit code without also
+        // getting an anyhow error printed from here.
+        std::process::exit(1);
     } else if worst_issues_found >= CheckResult::Warning {
-        println!();
-        return Err(anyhow!(
-            "Warnings found, consider investigating if you have issues"
-        ));
+        println!(
+            "\n{}Warning{}: Warning(s) found, consider investigating (especially if you have issues)",
+            AnsiColor::Yellow.render_fg(),
+            Reset.render()
+        );
+        // There isn't a good way to get a non-zero exit code without also
+        // getting an anyhow error printed from here.
+        std::process::exit(1);
     }
     Ok(())
 }
 
 /// Result of a check
-#[derive(Debug, Display, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, IntoStaticStr)]
 enum CheckResult {
     Ok,
     Info,
     Warning,
     Error,
     Fatal,
+}
+
+impl CheckResult {
+    /// Get style for this severity level
+    fn style(&self) -> anstyle::Style {
+        match self {
+            CheckResult::Ok => anstyle::AnsiColor::Green.on_default(),
+            CheckResult::Info => anstyle::AnsiColor::Green.on_default(),
+            CheckResult::Warning => anstyle::AnsiColor::Yellow.on_default(),
+            CheckResult::Error => anstyle::AnsiColor::Red.on_default(),
+            CheckResult::Fatal => anstyle::AnsiColor::Red.on_default(),
+        }
+    }
+}
+
+/// Coloured formatting of check result
+impl std::fmt::Display for CheckResult {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let style = self.style();
+        let rendered = style.render();
+        let reset = style.render_reset();
+        let stringified: &'static str = self.into();
+
+        // This may seem strange, but ensures that the formatting settings of f
+        // (in particular field width) gets passed on to `stringified`, but not
+        // to the format string.
+        // See also https://github.com/rust-cli/anstyle/issues/167
+        write!(f, "{rendered}")?;
+        stringified.fmt(f)?;
+        write!(f, "{reset}")?;
+        Ok(())
+    }
 }
 
 /// A check with a name
