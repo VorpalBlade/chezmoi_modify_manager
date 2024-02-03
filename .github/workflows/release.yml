@@ -73,6 +73,7 @@ jobs:
           CARGO_PROFILE_RELEASE_CODEGEN_UNITS: 1
           CARGO_PROFILE_RELEASE_LTO: true
           CARGO_PROFILE_RELEASE_OPT_LEVEL: "s"
+          CHEZMOI_MODIFY_MANAGER_BUILDER: github-release
           RUSTFLAGS: ${{ matrix.rustflags }}
 
   upload-crates-io:
