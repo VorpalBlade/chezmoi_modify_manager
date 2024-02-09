@@ -35,7 +35,7 @@ anstream = { version = "0.6.11", default-features = false, features = [
     "auto",
     "wincon",
 ] }
-anstyle = { version = "1.0.5", default-features = false }
+anstyle = { version = "1.0.6", default-features = false }
 anyhow = { version = "1.0.79", features = [
     "std",
     "backtrace",
@@ -59,7 +59,7 @@ strum = { version = "0.26.1", features = [
     "std",
 ], default-features = false }
 which = { version = "6.0.0", default-features = false }
-winnow = { version = "0.5.37", default-features = false, features = [
+winnow = { version = "0.5.39", default-features = false, features = [
     "simd",
     "std",
 ] }
@@ -71,4 +71,4 @@ pathdiff = { version = "0.2.1", features = [
 pretty_assertions = { version = "1.4.0", default-features = false, features = [
     "std",
 ] }
-tempfile = { version = "3.9.0", default-features = false }
+tempfile = { version = "3.10.0", default-features = false }
