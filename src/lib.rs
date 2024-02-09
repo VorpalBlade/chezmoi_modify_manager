@@ -35,7 +35,7 @@ use crate::utils::RealChezmoi;
 ///
 /// In order to support integration tests we need to be able to provide stdin
 /// and capture stdout. It would be very nice if the non-test case could simply
-/// call us with stdin.lock() and stdout.lock(). However, that breaks the
+/// call us with `stdin.lock()` and `stdout.lock()`. However, that breaks the
 /// self-updater case, which uses stdio directly. Instead call with functions
 /// that return stdio streams. Note! stderr is not captured, it is used for
 /// logging.
