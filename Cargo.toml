@@ -8,7 +8,7 @@ keywords = ["ini", "config", "configuration", "chezmoi"]
 license = "GPL-3.0-only"
 name = "chezmoi_modify_manager"
 repository = "https://github.com/VorpalBlade/chezmoi_modify_manager"
-rust-version = "1.71.0"
+rust-version = "1.74.0"
 version = "3.0.0"
 
 [features]
@@ -51,7 +51,7 @@ duct = { version = "0.13.7", default-features = false }
 env_logger = { version = "0.11.1", default-features = false }
 glob = { version = "0.3.1", default-features = false }
 indoc = { version = "2.0.4", default-features = false }
-ini-merge = { version = "0.4.0", default-features = false }
+ini-merge = { version = "0.4.1", default-features = false }
 itertools = { version = "0.12.1", default-features = false }
 log = { version = "0.4.20", default-features = false }
 os_info = { version = "3.7.0", default-features = false }
@@ -62,7 +62,7 @@ strum = { version = "0.26.1", features = [
     "std",
 ], default-features = false }
 which = { version = "6.0.0", default-features = false }
-winnow = { version = "0.5.39", default-features = false, features = [
+winnow = { version = "0.5.40", default-features = false, features = [
     "simd",
     "std",
 ] }
