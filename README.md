@@ -180,7 +180,7 @@ from the platform provided basic libraries (typically libc & libm on Linux).
 
 Requirements to build (if there is no native binary for your platform):
 
-* Rust 1.71 or newer
+* Rust 1.74.0 or newer
 * A C compiler and associated toolchain (linker, headers, libraries, etc).\
   This is needed as some dependencies may include some C code.
 
