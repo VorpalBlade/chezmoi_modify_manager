@@ -3,7 +3,7 @@
 use anstream::println;
 use anstyle::{AnsiColor, Effects, Reset};
 use itertools::Itertools;
-use std::env;
+use std::env::VarError;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::process::Command;
@@ -126,7 +126,7 @@ struct Check {
     func: fn() -> anyhow::Result<(CheckResult, String)>,
 }
 
-const CHECKS: [Check; 8] = [
+const CHECKS: [Check; 9] = [
     Check {
         name: "version",
         func: || Ok((CheckResult::Info, env!("CARGO_PKG_VERSION").to_string())),
@@ -176,6 +176,10 @@ const CHECKS: [Check; 8] = [
     Check {
         name: "has-chezmoi",
         func: chezmoi_check,
+    },
+    Check {
+        name: "chezmoi-override",
+        func: chezmoi_version_override_check,
     },
     Check {
         name: "in-path",
@@ -247,9 +251,9 @@ fn chezmoi_check() -> anyhow::Result<(CheckResult, String)> {
                 Ok(out) => match std::str::from_utf8(&out.stdout) {
                     Ok(version) => {
                         let version = version.trim_end();
-                        let parsed_version: ChezmoiVersion = version
-                            .parse()
-                            .context("Failed to parse chezmoi --version")?;
+                        let parsed_version: ChezmoiVersion =
+                            ChezmoiVersion::from_version_output(version)
+                                .context("Failed to parse chezmoi --version")?;
                         if parsed_version < CHEZMOI_AUTO_SOURCE_VERSION {
                             Ok((
                                 CheckResult::Warning,
@@ -277,6 +281,22 @@ fn chezmoi_check() -> anyhow::Result<(CheckResult, String)> {
             CheckResult::Error,
             format!("chezmoi not found in PATH: {err}"),
         )),
+    }
+}
+
+fn chezmoi_version_override_check() -> anyhow::Result<(CheckResult, String)> {
+    match std::env::var("CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION") {
+        Ok(value) => Ok((
+            CheckResult::Warning,
+            format!("CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION is set: {value}"),
+        )),
+        Err(VarError::NotPresent) => Ok((
+            CheckResult::Ok,
+            "CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION is not set".to_string(),
+        )),
+        Err(err) => {
+            Err(err).context("Failed to decode CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION")
+        }
     }
 }
 

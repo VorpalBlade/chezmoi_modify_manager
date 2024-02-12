@@ -1,6 +1,6 @@
 //! Some shared utility functions
 
-use std::str::FromStr;
+use std::env::VarError;
 
 use anyhow::{anyhow, Context};
 use camino::{Utf8Path, Utf8PathBuf};
@@ -11,14 +11,25 @@ use regex::Regex;
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct ChezmoiVersion(pub(crate) i32, pub(crate) i32, pub(crate) i32);
 
-impl FromStr for ChezmoiVersion {
-    type Err = anyhow::Error;
+impl ChezmoiVersion {
+    /// Construct version from format in environment variable
+    pub(crate) fn from_env_var(s: &str) -> anyhow::Result<Self> {
+        let re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$")?;
+        let caps = re
+            .captures(s)
+            .context("Failed to parse chezmoi version string")?;
+        Ok(Self(
+            caps.get(1).unwrap().as_str().parse()?,
+            caps.get(2).unwrap().as_str().parse()?,
+            caps.get(3).unwrap().as_str().parse()?,
+        ))
+    }
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    pub(crate) fn from_version_output(s: &str) -> anyhow::Result<Self> {
         let re = Regex::new(r"v([0-9]+)\.([0-9]+)\.([0-9]+)")?;
         let caps = re
             .captures(s)
-            .context("Failed to find chezmoi version string")?;
+            .context("Failed to parse chezmoi version string")?;
         Ok(Self(
             caps.get(1).unwrap().as_str().parse()?,
             caps.get(2).unwrap().as_str().parse()?,
@@ -34,7 +45,7 @@ impl std::fmt::Display for ChezmoiVersion {
 }
 
 /// Minimum version of chezmoi to support "source auto" directive
-pub(crate) const CHEZMOI_AUTO_SOURCE_VERSION: ChezmoiVersion = ChezmoiVersion(2, 47, 0);
+pub(crate) const CHEZMOI_AUTO_SOURCE_VERSION: ChezmoiVersion = ChezmoiVersion(2, 46, 1);
 
 /// Trait for interacting with chezmoi.
 ///
@@ -93,20 +104,30 @@ impl Chezmoi for RealChezmoi {
 
     fn version(&self) -> anyhow::Result<ChezmoiVersion> {
         match self.version.get() {
-            None => {
-                let output = cmd!("chezmoi", "--version")
-                    .stdout_capture()
-                    .stderr_null()
-                    .unchecked()
-                    .run()?;
-                if !output.status.success() {
-                    anyhow::bail!("Failed to run chezmoi --version");
+            None => match std::env::var("CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION") {
+                Ok(version_str) => {
+                    let version = ChezmoiVersion::from_env_var(&version_str)?;
+                    self.version.set(Some(version));
+                    Ok(version)
                 }
-                let version: ChezmoiVersion =
-                    String::from_utf8(output.stdout)?.trim_end().parse()?;
-                self.version.set(Some(version));
-                Ok(version)
-            }
+                Err(VarError::NotPresent) => {
+                    let output = cmd!("chezmoi", "--version")
+                        .stdout_capture()
+                        .stderr_null()
+                        .unchecked()
+                        .run()?;
+                    if !output.status.success() {
+                        anyhow::bail!("Failed to run chezmoi --version");
+                    }
+                    let version = ChezmoiVersion::from_version_output(
+                        String::from_utf8(output.stdout)?.trim_end(),
+                    )?;
+                    self.version.set(Some(version));
+                    Ok(version)
+                }
+                Err(err) => Err(err)
+                    .context("Failed to decode CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION"),
+            },
             Some(version) => Ok(version),
         }
     }
@@ -114,18 +135,17 @@ impl Chezmoi for RealChezmoi {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
     use super::ChezmoiVersion;
 
     #[test]
     fn test_chezmoi_version() {
-        let version1 = ChezmoiVersion::from_str("v2.46.0").unwrap();
+        let version1 = ChezmoiVersion::from_env_var("2.46.0").unwrap();
         assert_eq!(version1, ChezmoiVersion(2, 46, 0));
-        let version2 =
-            ChezmoiVersion::from_str("chezmoi version v2.47.0, built at 2024-01-26T07:31:10Z")
-                .unwrap();
-        assert_eq!(version2, ChezmoiVersion(2, 47, 0));
+        let version2 = ChezmoiVersion::from_version_output(
+            "chezmoi version v2.46.1, built at 2024-01-26T07:31:10Z",
+        )
+        .unwrap();
+        assert_eq!(version2, ChezmoiVersion(2, 46, 1));
         assert!(version1 < version2);
     }
 }
