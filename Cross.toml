@@ -1,0 +1,2 @@
+[build.env]
+passthrough = ["CHEZMOI_MODIFY_MANAGER_BUILDER"]

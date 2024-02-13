@@ -8,6 +8,17 @@ on:
     tags:
       - v[0-9]+.*
 
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: 1
+  CARGO_PROFILE_RELEASE_LTO: true
+  CARGO_PROFILE_RELEASE_OPT_LEVEL: "s"
+  CARGO_TERM_COLOR: always
+  CHEZMOI_MODIFY_MANAGER_BUILDER: github-release
+  RUST_BACKTRACE: 1
+  RUSTFLAGS: "-D warnings"
+  RUSTUP_MAX_RETRIES: 10
+
 jobs:
   create-release:
     runs-on: ubuntu-latest
@@ -69,11 +80,6 @@ jobs:
           # (required) GitHub token for uploading assets to GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
-          CARGO_INCREMENTAL: 0
-          CARGO_PROFILE_RELEASE_CODEGEN_UNITS: 1
-          CARGO_PROFILE_RELEASE_LTO: true
-          CARGO_PROFILE_RELEASE_OPT_LEVEL: "s"
-          CHEZMOI_MODIFY_MANAGER_BUILDER: github-release
           RUSTFLAGS: ${{ matrix.rustflags }}
 
   upload-crates-io:
