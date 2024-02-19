@@ -12,7 +12,6 @@ use winnow::error::StrContext;
 use winnow::prelude::*;
 use winnow::token::take_till;
 use winnow::token::take_until;
-use winnow::Parser;
 
 /// A directive in the config file
 #[derive(Debug, PartialEq, Eq)]
