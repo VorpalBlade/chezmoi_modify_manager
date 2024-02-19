@@ -33,7 +33,7 @@ self_update = { version = "0.39.0", optional = true, default-features = false, f
 ] }
 
 [dependencies]
-anstream = { version = "0.6.11", default-features = false, features = [
+anstream = { version = "0.6.12", default-features = false, features = [
     "auto",
     "wincon",
 ] }
