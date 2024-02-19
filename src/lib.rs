@@ -91,11 +91,11 @@ where
                 )?;
             }
         }
-        #[cfg(feature = "self_update")]
+        #[cfg(feature = "updater-tls-rusttls")]
         ChmmArgs::Update { _a, no_confirm } => {
             update::update(no_confirm)?;
         }
-        #[cfg(not(feature = "self_update"))]
+        #[cfg(not(feature = "updater-tls-rusttls"))]
         ChmmArgs::Update { .. } => {
             println!("Support for the updater was not included in this build.");
             println!("Please refer to the way you installed this software to determine how to update it.");

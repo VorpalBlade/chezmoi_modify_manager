@@ -1,5 +1,5 @@
 //! Perform update check and auto update.
-#![cfg(feature = "self_update")]
+#![cfg(feature = "updater-tls-rusttls")]
 
 use self_update::cargo_crate_version;
 
