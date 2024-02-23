@@ -119,6 +119,15 @@ jobs:
         run: cargo test --locked ${{ matrix.features }} --verbose --no-run
       - name: Test
         run: cargo test --locked ${{ matrix.features }} --verbose
+      - name: Test updater
+        if: matrix.features == '--no-default-features --features=updater-tls-rusttls'
+        run: |
+          echo n | cargo run --locked ${{ matrix.features }} -- --upgrade
+      - name: Test no updater exit code
+        if: matrix.features != '--no-default-features --features=updater-tls-rusttls'
+        run: |
+          # Because GitHub Actions exits on failure we need to do this
+          bash -c "cargo run --locked ${{ matrix.features }} -- --upgrade; if [[ \$? -eq 0 ]]; then exit 1; fi"
 
   exotic-os:
     # Test native builds on non-Linux platforms

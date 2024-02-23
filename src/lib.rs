@@ -99,6 +99,7 @@ where
         ChmmArgs::Update { .. } => {
             println!("Support for the updater was not included in this build.");
             println!("Please refer to the way you installed this software to determine how to update it.");
+            std::process::exit(1);
         }
         ChmmArgs::Doctor { _a } => doctor::doctor()?,
         ChmmArgs::HelpSyntax { _a } => help_syntax(),
