@@ -1,13 +1,14 @@
 //! Sanity checking of environment
 
-use anstream::println;
-use anstyle::{AnsiColor, Effects, Reset};
+use anstream::{println, stdout};
+use anstyle::{Effects, Reset};
 use itertools::Itertools;
 use std::env::VarError;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::process::Command;
-use strum::IntoStaticStr;
+
+use medic::{Check, CheckResult};
 
 use anyhow::{anyhow, Context};
 
@@ -15,27 +16,20 @@ use crate::utils::{Chezmoi, ChezmoiVersion, RealChezmoi, CHEZMOI_AUTO_SOURCE_VER
 
 /// Perform environment sanity check
 pub(crate) fn doctor() -> anyhow::Result<()> {
-    let mut worst_issues_found = CheckResult::Ok;
-    println!(
-        "{}RESULT    CHECK                MESSAGE{}",
-        Effects::BOLD.render(),
-        Reset.render()
-    );
-    for Check { name, func } in &CHECKS {
-        match func() {
-            Ok((result, text)) => {
-                let text = text.replace('\n', "\n                               ");
-                println!("{result: <9} {name: <20} {text}");
-                if result >= worst_issues_found {
-                    worst_issues_found = result;
-                }
-            }
-            Err(err) => {
-                println!("{:<9} {name: <20} {err}", CheckResult::Fatal);
-                worst_issues_found = CheckResult::Fatal;
-            }
-        }
+    let worst_issues_found = medic::medic(&mut stdout(), CHECKS.iter())?;
+
+    run_chezmoi_doctor();
+
+    medic::summary(&mut stdout(), worst_issues_found)?;
+    if worst_issues_found >= CheckResult::Warning {
+        // There isn't a good way to get a non-zero exit code without also
+        // getting an anyhow error printed from here.
+        std::process::exit(1);
     }
+    Ok(())
+}
+
+fn run_chezmoi_doctor() {
     if let Ok(p) = which::which("chezmoi") {
         println!(
             "\n{}Output of chezmoi doctor:{}",
@@ -54,86 +48,12 @@ pub(crate) fn doctor() -> anyhow::Result<()> {
     } else {
         println!("\nchezmoi doctor output not included since binary wasn't found");
     }
-
-    if worst_issues_found >= CheckResult::Error {
-        println!(
-            "\n{}Error{}: Error(s) found, you should rectify these for proper operation",
-            AnsiColor::Red.render_fg(),
-            Reset.render()
-        );
-        // There isn't a good way to get a non-zero exit code without also
-        // getting an anyhow error printed from here.
-        std::process::exit(1);
-    } else if worst_issues_found >= CheckResult::Warning {
-        println!(
-            "\n{}Warning{}: Warning(s) found, consider investigating (especially if you have issues)",
-            AnsiColor::Yellow.render_fg(),
-            Reset.render()
-        );
-        // There isn't a good way to get a non-zero exit code without also
-        // getting an anyhow error printed from here.
-        std::process::exit(1);
-    }
-    Ok(())
-}
-
-/// Result of a check
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, IntoStaticStr)]
-enum CheckResult {
-    Ok,
-    Info,
-    Warning,
-    Error,
-    Fatal,
-}
-
-impl CheckResult {
-    /// Get style for this severity level
-    fn style(&self) -> anstyle::Style {
-        match self {
-            CheckResult::Ok => anstyle::AnsiColor::Green.on_default(),
-            CheckResult::Info => anstyle::AnsiColor::Green.on_default(),
-            CheckResult::Warning => anstyle::AnsiColor::Yellow.on_default(),
-            CheckResult::Error => anstyle::AnsiColor::Red.on_default(),
-            CheckResult::Fatal => anstyle::AnsiColor::Red.on_default(),
-        }
-    }
-}
-
-/// Coloured formatting of check result
-impl std::fmt::Display for CheckResult {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let style = self.style();
-        let rendered = style.render();
-        let reset = style.render_reset();
-        let stringified: &'static str = self.into();
-
-        // This may seem strange, but ensures that the formatting settings of f
-        // (in particular field width) gets passed on to `stringified`, but not
-        // to the format string.
-        // See also https://github.com/rust-cli/anstyle/issues/167
-        write!(f, "{rendered}")?;
-        stringified.fmt(f)?;
-        write!(f, "{reset}")?;
-        Ok(())
-    }
-}
-
-/// A check with a name
-#[derive(Debug)]
-struct Check {
-    name: &'static str,
-    func: fn() -> anyhow::Result<(CheckResult, String)>,
 }
 
 const CHECKS: [Check; 9] = [
-    Check {
-        name: "version",
-        func: || Ok((CheckResult::Info, env!("CARGO_PKG_VERSION").to_string())),
-    },
-    Check {
-        name: "build",
-        func: || match option_env!("CHEZMOI_MODIFY_MANAGER_BUILDER") {
+    medic::checks::crate_version_check!(),
+    Check::new("build", || {
+        match option_env!("CHEZMOI_MODIFY_MANAGER_BUILDER") {
             Some("github-release") => Ok((CheckResult::Ok, "Official release build".to_string())),
             Some("github-ci") => Ok((
                 CheckResult::Warning,
@@ -147,63 +67,28 @@ const CHECKS: [Check; 9] = [
                 CheckResult::Warning,
                 "Unknown builder, no identity set".to_string(),
             )),
-        },
-    },
-    Check {
-        name: "rustc-version",
-        func: || {
+        }
+    }),
+    medic::checks::CHECK_RUSTC_VERSION,
+    medic::checks::CHECK_HOST,
+    Check::new("has-chezmoi", chezmoi_check),
+    Check::new("chezmoi-override", chezmoi_version_override_check),
+    Check::new("in-path", || match which::which("chezmoi_modify_manager") {
+        Ok(p) => {
+            let p = p.to_string_lossy();
             Ok((
-                CheckResult::Info,
-                format!("{}", rustc_version_runtime::version()),
+                CheckResult::Ok,
+                format!("chezmoi_modify_manager is in PATH at {p}"),
             ))
-        },
-    },
-    Check {
-        name: "host",
-        func: || {
-            let info = os_info::get();
-            Ok((
-                CheckResult::Info,
-                format!(
-                    "os={}, arch={}, info={}",
-                    std::env::consts::OS,
-                    std::env::consts::ARCH,
-                    info
-                ),
-            ))
-        },
-    },
-    Check {
-        name: "has-chezmoi",
-        func: chezmoi_check,
-    },
-    Check {
-        name: "chezmoi-override",
-        func: chezmoi_version_override_check,
-    },
-    Check {
-        name: "in-path",
-        func: || match which::which("chezmoi_modify_manager") {
-            Ok(p) => {
-                let p = p.to_string_lossy();
-                Ok((
-                    CheckResult::Ok,
-                    format!("chezmoi_modify_manager is in PATH at {p}"),
-                ))
-            }
-            Err(err) => Ok((
-                CheckResult::Error,
-                format!("chezmoi_modify_manager is NOT in PATH: {err}"),
-            )),
-        },
-    },
-    Check {
-        name: "has-ignore",
-        func: check_has_ignore,
-    },
-    Check {
-        name: "no-hook-script",
-        func: || match hook_paths(&RealChezmoi::default())?.as_slice() {
+        }
+        Err(err) => Ok((
+            CheckResult::Error,
+            format!("chezmoi_modify_manager is NOT in PATH: {err}"),
+        )),
+    }),
+    Check::new("has-ignore", check_has_ignore),
+    Check::new("no-hook-script", || {
+        match hook_paths(&RealChezmoi::default())?.as_slice() {
             [] => Ok((CheckResult::Ok, "No legacy hook script found".to_string())),
             values => {
                 let values: String =
@@ -213,8 +98,8 @@ const CHECKS: [Check; 9] = [
                     format!("Legacy hook script(s) found:\n* {values}\nPlease read https://github.com/VorpalBlade/chezmoi_modify_manager/blob/main/doc/migration_3.md"),
                 ))
             }
-        },
-    },
+        }
+    }),
 ];
 
 // Find any legacy hook paths that might exist
@@ -243,7 +128,7 @@ pub(crate) fn hook_paths(chezmoi: &impl Chezmoi) -> anyhow::Result<Vec<camino::U
 }
 
 /// Find chezmoi and check it's version
-fn chezmoi_check() -> anyhow::Result<(CheckResult, String)> {
+fn chezmoi_check() -> Result<(CheckResult, String), Box<dyn std::error::Error + Send + Sync>> {
     match which::which("chezmoi") {
         Ok(p) => {
             let res = Command::new(p).arg("--version").output();
@@ -284,23 +169,33 @@ fn chezmoi_check() -> anyhow::Result<(CheckResult, String)> {
     }
 }
 
-fn chezmoi_version_override_check() -> anyhow::Result<(CheckResult, String)> {
+#[derive(Debug, thiserror::Error)]
+enum ChezmoiVersionOverrideCheckError {
+    #[error("Failed to extract CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION: {0}")]
+    DecodeError(#[from] VarError),
+    #[error("Failed to parse CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION: {0}")]
+    ParseError(#[from] anyhow::Error),
+}
+
+fn chezmoi_version_override_check(
+) -> Result<(CheckResult, String), Box<dyn std::error::Error + Send + Sync>> {
     match std::env::var("CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION") {
-        Ok(value) => Ok((
-            CheckResult::Warning,
-            format!("CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION is set: {value}"),
-        )),
+        Ok(value) => match ChezmoiVersion::from_env_var(&value) {
+            Ok(parsed) => Ok((
+                CheckResult::Warning,
+                format!("CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION is set: {parsed}"),
+            )),
+            Err(err) => Err(Box::new(ChezmoiVersionOverrideCheckError::from(err))),
+        },
         Err(VarError::NotPresent) => Ok((
             CheckResult::Ok,
             "CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION is not set".to_string(),
         )),
-        Err(err) => {
-            Err(err).context("Failed to decode CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION")
-        }
+        Err(err) => Err(Box::new(ChezmoiVersionOverrideCheckError::from(err))),
     }
 }
 
-fn check_has_ignore() -> anyhow::Result<(CheckResult, String)> {
+fn check_has_ignore() -> Result<(CheckResult, String), Box<dyn std::error::Error + Send + Sync>> {
     if which::which("chezmoi").is_ok() {
         let src_path = RealChezmoi::default().source_root()?;
         let mut src_path = src_path.ok_or(anyhow!("No chezmoi source root found"))?;
