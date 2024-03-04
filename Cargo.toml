@@ -53,7 +53,7 @@ glob = { version = "0.3.1", default-features = false }
 indoc = { version = "2.0.4", default-features = false }
 ini-merge = { version = "0.4.1", default-features = false }
 itertools = { version = "0.12.1", default-features = false }
-log = { version = "0.4.20", default-features = false }
+log = { version = "0.4.21", default-features = false }
 os_info = { version = "3.7.0", default-features = false }
 regex = "1.10.3"
 rustc_version_runtime = { version = "0.3.0", default-features = false }
