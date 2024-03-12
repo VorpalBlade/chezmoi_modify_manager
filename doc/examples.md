@@ -41,7 +41,7 @@ In summary, the following seems to work well:
 
 ```bash
 ignore regex "ActivityManager" "switch-to-activity-.*"
-transform regex ".*" ".*" kde_shortcut
+transform regex ".*" ".*" kde-shortcut
 ```
 
 ### konversationrc
@@ -52,7 +52,7 @@ Konversation has two relevant quirks:
 
 ```bash
 ignore "ServerListDialog" "Size"
-transform "Aliases" "AliasList" unsorted_list separator=","
+transform "Aliases" "AliasList" unsorted-list separator=","
 transform "Identity 0" "Password" keyring service="konversation" user="konversation_id0"
 # Make sure the password isn't added back into the config file on re-add
 add:hide "Identity 0" "Password"
