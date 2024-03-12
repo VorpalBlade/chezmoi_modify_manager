@@ -209,12 +209,3 @@ jobs:
         # I cannot get this cleanup to work on Windows. The cache just gets to include uneeded things
         run: |
           rm -rf chezmoi_modify_manager chezmoi_modify_manager.tar chezmoi_modify_manager.tar.zst
-
-  rustfmt:
-    name: Rustfmt
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Install Rust
-      run: rustup install --profile minimal stable && rustup default stable && rustup component add rustfmt
-    - run: cargo fmt -- --check
