@@ -60,6 +60,10 @@ jobs:
             debug_info: off
     steps:
       - uses: actions/checkout@v4
+      - name: Environment info
+        run: |
+          echo "rustup --version:"; rustup --version
+          echo "rustup show:"; rustup show
       - name: Install Rust
         run: rustup install --profile minimal ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
       - name: Install cross
@@ -172,8 +176,12 @@ jobs:
             rust: nightly
     steps:
       - uses: actions/checkout@v4
+      - name: Environment info
+        run: |
+          echo "rustup --version:"; rustup --version
+          echo "rustup show:"; rustup show
       - name: Install Rust
-        run: rustup install --profile minimal ${{ matrix.rust }} && rustup default ${{ matrix.rust }} && rustup target add ${{ matrix.target }}
+        run: rustup install --no-self-update --profile minimal ${{ matrix.rust }} && rustup default ${{ matrix.rust }} && rustup target add ${{ matrix.target }}
       - name: Cache builds
         uses: Swatinem/rust-cache@v2.7.3
         with:
