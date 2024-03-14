@@ -114,6 +114,7 @@ ignore "presets" "printer"
 ignore "presets" "sla_material"
 ignore "presets" "sla_print"
 ignore regex "<NO_SECTION>" "desktop_integration_.*"
+ignore regex "<NO_SECTION>" "print_host_queue_dialog_.*"
 ignore regex "font:.*" ".*"
 ignore regex "presets" "filament_.*"
 ignore section "recent_projects"
@@ -126,6 +127,33 @@ ignore section "recent"
 ignore "<NO_SECTION>" "version"
 ignore "<NO_SECTION>" "window_mainframe"
 ignore section "recent_projects"
+```
+
+### PrusaSlicer physical printer settings
+
+PrusaSlicer allows you to configure "physical printers" (with connection details
+to e.g. OctoPrint or PrusaLink). There will be one such config per physical printer
+you configured, located at `.config/PrusaSlicer/physical_printer/<my_printer_name>.ini`
+
+As these contain login details you probably want to put that in your keyring instead of
+in git. This works similarly to [konversation](#konversationrc).
+
+For example, you might use the following if you have a Prusa Mk3.9:
+
+```bash
+transform "<NO_SECTION>" "printhost_password" keyring service="ini_processor" user="prusa_mk39_password" separator=" = "
+transform "<NO_SECTION>" "printhost_apikey" keyring service="ini_processor" user="prusa_mk39_apikey" separator=" = "
+add:hide "<NO_SECTION>" "printhost_password"
+add:hide "<NO_SECTION>" "printhost_apikey"
+```
+
+To add your password and API key you would then use:
+
+```console
+$ secret-tool store --label="Prusa Mk3.9 password" service ini_processor username prusa_mk39_password
+Password: [Enter password]
+$ secret-tool store --label="Prusa Mk3.9 API key" service ini_processor username prusa_mk39_apikey
+Password: [Enter the API key]
 ```
 
 ## KeePassXC
