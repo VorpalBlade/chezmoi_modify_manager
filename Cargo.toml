@@ -51,7 +51,7 @@ duct = { version = "0.13.7", default-features = false }
 env_logger = { version = "0.11.3", default-features = false }
 glob = { version = "0.3.1", default-features = false }
 indoc = { version = "2.0.4", default-features = false }
-ini-merge = { version = "0.4.2", default-features = false }
+ini-merge = { version = "0.4.3", default-features = false }
 itertools = { version = "0.12.1", default-features = false }
 log = { version = "0.4.21", default-features = false }
 medic = { version = "0.2.0" }
