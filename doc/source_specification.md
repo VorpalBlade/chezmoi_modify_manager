@@ -18,7 +18,7 @@ The obvious solution would be a path relative to the modify script. However,
 chezmoi always copies the modify script to a temporary directory before executing
 it, even if the modify script isn't templated. So this doesn't work. (It is however
 used internally in the test suite of chezmoi_modify_manager using
-`source auto-path`, which might be relevant if you are working on the 
+`source auto-path`, which might be relevant if you are working on the
 chezmoi_modify_manager codebase itself.)
 
 Prior to chezmoi 2.46.1, we had to rely on making the modify script a template,
@@ -51,7 +51,7 @@ Since chezmoi_modify_manager 3.1, it will auto detect the version of chezmoi
   the simpler `source auto`.
 * Interpreting the meaning of `--style=auto` (default value for style) to either
   create a templated modify script or a non-templated modify script.
-  
+
 The main benefit of the simpler `source auto` is that if your modify script
 *doesn't need* to be a template for any other reason, it will speed up execution,
 as chezmoi no longer needs to run its template engine.
