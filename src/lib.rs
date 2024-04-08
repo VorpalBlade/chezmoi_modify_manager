@@ -238,6 +238,12 @@ fn help_syntax() {
     add:hide regex  "section-regex.*" "key-regex.*"
 
     (Matching works identically to ignore, see above for more details.)
+
+    no-warn-multiple-key-matches
+    ----------------------------
+    This directive quitens warnings on multiple regular expressions matching the
+    same section+key. While the warning is generally useful, sometimes you might
+    actually "know what you are doing" and want to suppress it.
     "#,
     CHEZMOI_AUTO_SOURCE_VERSION,
     r#"source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini""#,
