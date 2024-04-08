@@ -107,7 +107,7 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.ref }}
       - name: Publish AUR package
-        uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
+        uses: KSXGitHub/github-actions-deploy-aur@v2.7.1
         with:
           pkgname: chezmoi_modify_manager
           pkgbuild: aur/PKGBUILD
