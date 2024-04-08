@@ -28,6 +28,8 @@ pub(super) enum Directive {
     /// This is used internally by the integration tests, but doesn't actually
     /// work with real chezmoi
     SourceAutoPath,
+    /// We shouldn't warn on multiple regular expressions matching the same section + key.
+    NoWarnMultipleKeyMatches,
     /// An ignore directive
     Ignore(Matcher),
     /// A transform directive
@@ -64,6 +66,7 @@ pub(super) fn parse_config(i: &mut &str) -> PResult<Vec<Directive>> {
         comment.context(StrContext::Label("comment")),
         chezmoi_template.context(StrContext::Label("chezmoi template")),
         source.context(StrContext::Label("source")),
+        no_warn_multiple_key_matches.context(StrContext::Label("no-warn-multiple-key-matches")),
         ignore.context(StrContext::Label("ignore")),
         transform.context(StrContext::Label("transform")),
         set.context(StrContext::Label("set")),
@@ -114,6 +117,12 @@ fn source(i: &mut &str) -> PResult<Directive> {
         )),
     )
         .map(|(_, _, result)| result)
+        .parse_next(i)
+}
+
+fn no_warn_multiple_key_matches(i: &mut &str) -> PResult<Directive> {
+    "no-warn-multiple-key-matches"
+        .map(|_| Directive::NoWarnMultipleKeyMatches)
         .parse_next(i)
 }
 

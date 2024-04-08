@@ -40,6 +40,10 @@ you will see diffs like the following:
 In summary, the following seems to work well:
 
 ```bash
+# The two regex below have overlapping matches, this is OK in this case so
+# turn off the warning for this file.
+no-warn-multiple-key-matches
+
 ignore regex "ActivityManager" "switch-to-activity-.*"
 transform regex ".*" ".*" kde-shortcut
 ```
