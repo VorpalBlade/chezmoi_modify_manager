@@ -160,6 +160,9 @@ pub(crate) fn parse_for_merge(src: &str) -> anyhow::Result<Config<Mutations>> {
             Directive::Remove(matcher) => {
                 add_merge_action(&mut builder, matcher, Action::Delete);
             }
+            Directive::NoWarnMultipleKeyMatches => {
+                builder.warn_on_multiple_matches(false);
+            }
         }
     }
 
@@ -211,6 +214,9 @@ pub(crate) fn parse_for_add(src: &str) -> Result<Config<FilterActions>, anyhow::
             Directive::Set { .. } => (),
             Directive::Transform(_, _, _) => (),
             Directive::Remove(_) => (),
+            Directive::NoWarnMultipleKeyMatches => {
+                builder.warn_on_multiple_matches(false);
+            }
         }
     }
 
