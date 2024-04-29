@@ -19,14 +19,14 @@ keyring = ["ini-merge/keyring"]
 updater-tls-rusttls = ["dep:self_update"]
 
 [target.'cfg(windows)'.dependencies]
-self_update = { version = "0.39.0", optional = true, default-features = false, features = [
+self_update = { version = "0.40.0", optional = true, default-features = false, features = [
     "archive-zip",
     "compression-zip-deflate",
     "rustls",
 ] }
 
 [target.'cfg(unix)'.dependencies]
-self_update = { version = "0.39.0", optional = true, default-features = false, features = [
+self_update = { version = "0.40.0", optional = true, default-features = false, features = [
     "archive-tar",
     "compression-flate2",
     "rustls",
