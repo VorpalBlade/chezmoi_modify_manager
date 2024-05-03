@@ -1,5 +1,8 @@
 //! Support for adding files
 
+// Doc comments are used to generate --help, not to for rustdoc.
+#![allow(clippy::doc_markdown)]
+
 #[cfg(test)]
 mod tests;
 
