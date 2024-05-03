@@ -1,5 +1,8 @@
 //! Command line argument parser
 
+// Doc comments are used to generate --help, not to for rustdoc.
+#![allow(clippy::doc_markdown)]
+
 use crate::add::Style;
 use bpaf::short;
 use bpaf::Bpaf;
@@ -53,7 +56,7 @@ pub enum ChmmArgs {
     /// Process a single file (containing settings).
     Process(#[bpaf(positional("FILE"), complete_shell(ShellComp::File{mask: None}))] Utf8PathBuf),
     Add {
-        /// Add a file to be tracked by chezmoi_mm
+        /// Add a file to be tracked by chezmoi_modify_manager
         #[bpaf(short('a'), long("add"))]
         _a: (),
         #[bpaf(external)]

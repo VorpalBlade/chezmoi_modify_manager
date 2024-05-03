@@ -29,7 +29,7 @@ mod parser;
 pub(crate) enum Source {
     /// Specific path for the source file.
     Path(Utf8PathBuf),
-    /// Auto locate the source file based on CHEZMOI_SOURCE_FILE
+    /// Auto locate the source file based on `CHEZMOI_SOURCE_FILE`
     ///
     /// Requires chezmoi ??? or newer.
     AutoEnv,
