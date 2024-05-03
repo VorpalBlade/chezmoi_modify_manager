@@ -173,6 +173,11 @@ jobs:
             suffix:
             debug-suffix: .dSYM
             rust: stable
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            suffix:
+            debug-suffix: .dSYM
+            rust: stable
           - target: x86_64-apple-darwin
             os: macos-latest
             suffix:
