@@ -11,6 +11,9 @@ boxes. Other programs (such as PrusaSlicer) also do the same thing.
 `chezmoi_modify_manager` allows you to ignore certain sections of those
 INI files when managing the configuration files with chezmoi.
 
+> Note! This documentation reflects the latest release and may not match older
+versions or newer in-development versions.
+
 ## Features
 
 * Ignore entire sections or specific keys in an INI style file.
