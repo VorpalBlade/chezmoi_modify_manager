@@ -1,4 +1,4 @@
-# Design descisions
+# Design decisions
 
 This file documents motives some design descisions.
 

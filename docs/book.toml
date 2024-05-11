@@ -1,0 +1,11 @@
+[book]
+authors = ["Arvid Norlander"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Chezmoi Modify Manager"
+
+[output.html]
+site-url = "/chezmoi_modify_manager/"
+git-repository-url = "https://github.com/VorpalBlade/chezmoi_modify_manager/tree/main"
+edit-url-template = "https://github.com/VorpalBlade/chezmoi_modify_manager/edit/main/docs/{path}"

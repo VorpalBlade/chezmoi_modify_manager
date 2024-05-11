@@ -27,7 +27,7 @@ as chezmoi didn't expose enough information to us (see
 historical details). Basically we can make chezmoi find the source file for us
 using the following line:
 
-```
+```bash
 source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini"
 ```
 
@@ -38,7 +38,7 @@ Since chezmoi 2.46.1, chezmoi now provides us with two environment variables:
 
 With these two together we no longer need templating, and the following works:
 
-```
+```bash
 source auto
 ```
 
@@ -67,7 +67,7 @@ The workaround is to export an environment
 variable `CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION` set to the oldest
 version that you use. E.g:
 
-```
+```bash
 CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION=2.46.0
 ```
 This could be set in your `.bashrc`/`.zshrc`/`.profile` or similar file (the
