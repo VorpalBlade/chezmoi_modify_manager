@@ -1,4 +1,4 @@
-# Notes for packagers
+# Packaging for Linux distros etc
 
 Do you want to package chezmoi_modify_manager in your favourite package manager?
 Awesome! Here are some helpful notes for you.

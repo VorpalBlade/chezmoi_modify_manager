@@ -1,4 +1,4 @@
-# Migrating from chezmoi_modify_manager 2.x to 3.x
+# Migration from version 2.x to 3.x
 
 ## Migrating from hook scripts
 

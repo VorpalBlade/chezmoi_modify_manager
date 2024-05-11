@@ -1,4 +1,4 @@
-# Migrating from chezmoi_modify_manager 1.x to 2.x
+# Migration from version 1.x to 2.x
 
 The new Rust code base has a superset of the features of the 1.x version, and it
 is also about 50x faster (in release builds, about 25x in debug builds).
@@ -49,19 +49,19 @@ The first line should now be used to invoke chezmoi_modify_manager. It should
 be one of:
 
 Use this if chezmoi_modify_manager is installed in PATH (recommended):
-```
+```bash
 #!/usr/bin/env chezmoi_modify_manager
 ```
 
 Use this if you keep chezmoi_modify_manager in your chezmoi source directory:
-```
+```bash
 #!{{ .chezmoi.sourceDir }}/.utils/chezmoi_modify_manager-{{ .chezmoi.os }}-{{ .chezmoi.arch }}
 ```
 
 In addition, the way to specify the source file has changed. The line to specify
 the source file would now typically look like:
 
-```
+```bash
 source "{{ .chezmoi.sourceDir }}/{{ .chezmoi.sourceFile | trimSuffix ".tmpl" | replace "modify_" "" }}.src.ini"
 ```
 
