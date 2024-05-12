@@ -29,12 +29,12 @@ In addition, the following differences are good to know about:
 
 The methods of installation is different. No longer do you need (or should)
 add this repo as a submodule in your dotfiles repo. Remove that and instead
-see the [installation section](../README.md#installation) in the README.
+see the [installation section](../installation.md) in the README.
 
 ## Modify scripts: Automatic conversion
 
-There is a [script](../utils/conversion.sh) that can help if you have standard
-shaped files (i.e. as created by the old `chezmoi_ini_add`).
+There is a [script](https://raw.githubusercontent.com/VorpalBlade/chezmoi_modify_manager/main/utils/conversion.sh)
+that can help if you have standard shaped files (i.e. as created by the old `chezmoi_ini_add`).
 
 It will not handle 100% of the conversion for transforms however. The argument
 list format has changed, as have some of the argument names. See
@@ -107,7 +107,7 @@ is different, there can be other incompatibilities. Known ones include:
 * On Linux, KDE KWallet is no longer supported. Only secret stores over
   DBus SecretService are supported. This means it will likely end up using
   GNOME's secret store (Seahorse) instead. See
-  [the example for konversationrc](examples.md#konversationrc) for how to
+  [the example for konversationrc](../examples/basics.md#konversationrc) for how to
   add the password, if you need to migrate.
 
 Other platforms are untested (since I don't have any of those), but I
