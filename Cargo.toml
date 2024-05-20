@@ -46,7 +46,7 @@ bpaf = { version = "0.9", features = [
     "autocomplete",
     "derive",
 ], default-features = false }
-camino = { version = "1.1.6", default-features = false }
+camino = { version = "1.1.7", default-features = false }
 duct = { version = "0.13.7", default-features = false }
 env_logger = { version = "0.11.3", default-features = false }
 glob = { version = "0.3.1", default-features = false }
