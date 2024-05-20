@@ -3,7 +3,6 @@
 use std::collections::HashMap;
 
 use ini_merge::mutations::transforms as ini_transforms;
-use itertools::Itertools;
 use strum::{EnumIter, EnumMessage, EnumString, IntoStaticStr};
 
 /// Supported transforms
@@ -56,6 +55,8 @@ impl Transform {
         });
         println!("Supported transforms:");
         println!("====================\n");
+        // Workaround for https://github.com/rust-itertools/itertools/issues/942
+        use itertools::Itertools;
         println!(
             "{}",
             Itertools::intersperse(docs, "\n\n".to_string()).collect::<String>()
