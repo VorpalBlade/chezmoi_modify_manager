@@ -38,7 +38,7 @@ anstream = { version = "0.6.14", default-features = false, features = [
     "wincon",
 ] }
 anstyle = { version = "1.0.7", default-features = false }
-anyhow = { version = "1.0.83", features = [
+anyhow = { version = "1.0.86", features = [
     "std",
     "backtrace",
 ], default-features = false }
@@ -46,7 +46,7 @@ bpaf = { version = "0.9", features = [
     "autocomplete",
     "derive",
 ], default-features = false }
-camino = { version = "1.1.6", default-features = false }
+camino = { version = "1.1.7", default-features = false }
 duct = { version = "0.13.7", default-features = false }
 env_logger = { version = "0.11.3", default-features = false }
 glob = { version = "0.3.1", default-features = false }
@@ -60,7 +60,7 @@ strum = { version = "0.26.2", features = [
     "derive",
     "std",
 ], default-features = false }
-thiserror = "1.0.60"
+thiserror = "1.0.61"
 which = { version = "6.0.1", default-features = false }
 winnow = { version = "0.6.8", default-features = false, features = [
     "simd",
