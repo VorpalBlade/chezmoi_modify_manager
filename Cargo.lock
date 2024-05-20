@@ -438,7 +438,7 @@ dependencies = [
  "glob",
  "indoc",
  "ini-merge",
- "itertools",
+ "itertools 0.13.0",
  "log",
  "medic",
  "pathdiff",
@@ -1187,7 +1187,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e3be1c1ae2bc22acaa30c4c978d5415479bca6b4846512131e889bacbc6d2e72"
 dependencies = [
  "ini-roundtrip",
- "itertools",
+ "itertools 0.12.1",
  "keyring",
  "lending-iterator",
  "log",
@@ -1242,6 +1242,15 @@ name = "itertools"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
 dependencies = [
  "either",
 ]
@@ -1612,7 +1621,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b645dcde5f119c2c454a92d0dfa271a2a3b205da92e4292a68ead4bdbfde1f33"
 dependencies = [
  "heck",
- "itertools",
+ "itertools 0.12.1",
  "proc-macro2",
  "proc-macro2-diagnostics",
  "quote",
