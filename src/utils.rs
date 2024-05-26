@@ -19,9 +19,18 @@ impl ChezmoiVersion {
             .captures(s)
             .context("Failed to parse chezmoi version string")?;
         Ok(Self(
-            caps.get(1).unwrap().as_str().parse()?,
-            caps.get(2).unwrap().as_str().parse()?,
-            caps.get(3).unwrap().as_str().parse()?,
+            caps.get(1)
+                .expect("Group failed when regex matched")
+                .as_str()
+                .parse()?,
+            caps.get(2)
+                .expect("Group failed when regex matched")
+                .as_str()
+                .parse()?,
+            caps.get(3)
+                .expect("Group failed when regex matched")
+                .as_str()
+                .parse()?,
         ))
     }
 
@@ -31,9 +40,18 @@ impl ChezmoiVersion {
             .captures(s)
             .context("Failed to parse chezmoi version string")?;
         Ok(Self(
-            caps.get(1).unwrap().as_str().parse()?,
-            caps.get(2).unwrap().as_str().parse()?,
-            caps.get(3).unwrap().as_str().parse()?,
+            caps.get(1)
+                .expect("Group failed when regex matched")
+                .as_str()
+                .parse()?,
+            caps.get(2)
+                .expect("Group failed when regex matched")
+                .as_str()
+                .parse()?,
+            caps.get(3)
+                .expect("Group failed when regex matched")
+                .as_str()
+                .parse()?,
         ))
     }
 }

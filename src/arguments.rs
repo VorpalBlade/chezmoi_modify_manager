@@ -102,7 +102,11 @@ fn footer() -> bpaf::Doc {
     let mut doc = bpaf::Doc::default();
     doc.text("The --style flag controls how the script that --add generates looks:\n \n");
     for style in Style::iter() {
-        let mut text = format!(" * {}: {}", style, style.get_documentation().unwrap());
+        let mut text = format!(
+            " * {}: {}",
+            style,
+            style.get_documentation().expect("Cannot happen")
+        );
         if !text.ends_with('\n') {
             text.push('\n');
         }
