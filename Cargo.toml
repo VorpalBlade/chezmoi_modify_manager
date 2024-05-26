@@ -75,3 +75,15 @@ pretty_assertions = { version = "1.4.0", default-features = false, features = [
     "std",
 ] }
 tempfile = { version = "3.10.1", default-features = false }
+
+[lints.rust]
+rust-2018-idioms = "warn"
+unreachable_pub = "warn"
+
+[lints.clippy]
+doc_markdown = "warn"
+needless_pass_by_value = "warn"
+redundant_closure_for_method_calls = "warn"
+semicolon_if_nothing_returned = "warn"
+unwrap_used = "warn"
+wildcard_imports = "warn"

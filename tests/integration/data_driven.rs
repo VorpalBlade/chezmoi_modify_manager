@@ -20,7 +20,7 @@ fn find_test_cases() -> anyhow::Result<Vec<Utf8PathBuf>> {
     let mut results = vec![];
     for entry in std::fs::read_dir(path)? {
         let entry = entry?;
-        let path: Utf8PathBuf = entry.path().try_into().unwrap();
+        let path: Utf8PathBuf = entry.path().try_into().expect("Path isn't valid UTF-8");
         if !path.is_file() {
             continue;
         }
