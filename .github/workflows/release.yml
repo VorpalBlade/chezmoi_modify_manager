@@ -1,7 +1,9 @@
 name: Release
 
 permissions:
+  attestations: write
   contents: write
+  id-token: write
 
 on:
   push:
@@ -76,6 +78,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: taiki-e/upload-rust-binary-action@v1.21.0
+        id: upload-rust-binary-action
         with:
           # (required) Comma-separated list of binary names (non-extension portion of filename) to build and upload.
           # Note that glob pattern is not supported yet.
@@ -88,6 +91,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
           RUSTFLAGS: ${{ matrix.rustflags }}
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: "${{ steps.upload-rust-binary-action.outputs.archive }}.*"
 
   upload-crates-io:
     runs-on: ubuntu-latest
