@@ -17,7 +17,7 @@ ignore "Open-with settings" "History"
 ignore "General" "ColorSchemeHash"
 ignore "KFileDialog Settings" "Show hidden files"
 ignore "KFileDialog Settings" "Show Inline Previews"
-ignore section ""DirSelect Dialog""
+ignore section "DirSelect Dialog"
 ```
 
 ### kglobalshortcutsrc
