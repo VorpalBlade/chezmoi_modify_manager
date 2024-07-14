@@ -36,7 +36,10 @@ Awesome! Here are some helpful notes for you.
   just asking for potential issues.
 * You likely want to exclude the built in self updater (that downloads from
   Github releases), as your package manager should be used instead. This is easy:
-  pass `--no-default-features --features=keyring` to cargo build.
+  pass `--no-default-features --features=keyring` to cargo build. This will also
+  avoid vendoring C dependencies (in particular `libdbus`) and instead link them
+  dynamically. If you don't want that, add the `vendored` feature as well
+  (i.e. `--features=keyring,vendored`).
 
 And so we arrive at the final (reliable regardless of what environment the
 user might have) build command:
