@@ -6,7 +6,8 @@ use std::str::FromStr;
 
 use anyhow::anyhow;
 use anyhow::Context;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8Path;
+use camino::Utf8PathBuf;
 use ini_merge::filter::FilterAction;
 use ini_merge::filter::FilterActions;
 use ini_merge::filter::FilterActionsBuilder;
@@ -62,8 +63,14 @@ where
                 let mut script_path: Utf8PathBuf = std::env::var("CHEZMOI_SOURCE_DIR")
                     .context("CHEZMOI_SOURCE_DIR not set")?
                     .into();
-                script_path.push(std::env::var("CHEZMOI_SOURCE_FILE")
-                    .context("Environment variable CHEZMOI_SOURCE_FILE not set, \"source auto\" not supported (upgrade chezmoi)")?.as_str());
+                script_path.push(
+                    std::env::var("CHEZMOI_SOURCE_FILE")
+                        .context(
+                            "Environment variable CHEZMOI_SOURCE_FILE not set, \"source auto\" \
+                             not supported (upgrade chezmoi)",
+                        )?
+                        .as_str(),
+                );
                 Ok(Cow::Owned(resolve_relative_path(&script_path)?))
             }
             Source::AutoPath => Ok(Cow::Owned(resolve_relative_path(script_path)?)),

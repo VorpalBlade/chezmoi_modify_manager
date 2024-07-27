@@ -1,10 +1,9 @@
 //! This is not a stable API, and is to be used internally by the binary and
 //! the integration tests only.
 
-use std::{
-    fs::File,
-    io::{Read, Write},
-};
+use std::fs::File;
+use std::io::Read;
+use std::io::Write;
 
 pub use add::Style;
 use anyhow::Context;
@@ -22,7 +21,8 @@ mod utils;
 use indoc::printdoc;
 use ini_merge::merge::merge_ini;
 
-use crate::utils::{RealChezmoi, CHEZMOI_AUTO_SOURCE_VERSION};
+use crate::utils::RealChezmoi;
+use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 
 /// Main function, amenable to integration tests.
 ///
@@ -91,7 +91,10 @@ where
         #[cfg(not(feature = "updater-tls-rusttls"))]
         ChmmArgs::Update { .. } => {
             println!("Support for the updater was not included in this build.");
-            println!("Please refer to the way you installed this software to determine how to update it.");
+            println!(
+                "Please refer to the way you installed this software to determine how to update \
+                 it."
+            );
             std::process::exit(1);
         }
         ChmmArgs::Doctor { _a } => doctor::doctor()?,

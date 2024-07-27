@@ -451,7 +451,12 @@ mod tests {
 
     #[test]
     fn test_parse_newlines() {
-        let out = parse_config.parse("source auto\rsource \"foo\"\r\nignore section \"bar\"\nignore section \"quux\"\r\n").unwrap();
+        let out = parse_config
+            .parse(
+                "source auto\rsource \"foo\"\r\nignore section \"bar\"\nignore section \
+                 \"quux\"\r\n",
+            )
+            .unwrap();
 
         // Get rid of whitespace, we don't care about those
         let out: Vec<_> = out.into_iter().filter(|v| *v != Directive::WS).collect();

@@ -6,11 +6,15 @@
 #![warn(clippy::wildcard_imports)]
 
 use anstyle::AnsiColor;
-use chezmoi_modify_manager::{inner_main, parse_args};
-use env_logger::{Builder, Env};
+use chezmoi_modify_manager::inner_main;
+use chezmoi_modify_manager::parse_args;
+use env_logger::Builder;
+use env_logger::Env;
 use log::Level;
-use std::io::{stdin, stdout};
-use std::io::{BufWriter, Write};
+use std::io::stdin;
+use std::io::stdout;
+use std::io::BufWriter;
+use std::io::Write;
 
 fn main() -> anyhow::Result<()> {
     // Set up logging

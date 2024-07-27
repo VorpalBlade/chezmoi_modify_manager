@@ -1,15 +1,15 @@
 //! Data & config driven tests.
 
-use std::{
-    fs::File,
-    io::{BufReader, Read},
-};
+use std::fs::File;
+use std::io::BufReader;
+use std::io::Read;
 
 use camino::Utf8PathBuf;
 
 use pretty_assertions::assert_eq;
 
-use chezmoi_modify_manager::{inner_main, ChmmArgs};
+use chezmoi_modify_manager::inner_main;
+use chezmoi_modify_manager::ChmmArgs;
 
 /// Find all the test cases
 fn find_test_cases() -> anyhow::Result<Vec<Utf8PathBuf>> {

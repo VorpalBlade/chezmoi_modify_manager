@@ -1,18 +1,27 @@
 //! Sanity checking of environment
 
-use anstream::{println, stdout};
-use anstyle::{Effects, Reset};
+use anstream::println;
+use anstream::stdout;
+use anstyle::Effects;
+use anstyle::Reset;
 use itertools::Itertools;
 use std::env::VarError;
 use std::fs::File;
-use std::io::{BufRead, BufReader, Write};
+use std::io::BufRead;
+use std::io::BufReader;
+use std::io::Write;
 use std::process::Command;
 
-use medic::{Check, CheckResult};
+use medic::Check;
+use medic::CheckResult;
 
-use anyhow::{anyhow, Context};
+use anyhow::anyhow;
+use anyhow::Context;
 
-use crate::utils::{Chezmoi, ChezmoiVersion, RealChezmoi, CHEZMOI_AUTO_SOURCE_VERSION};
+use crate::utils::Chezmoi;
+use crate::utils::ChezmoiVersion;
+use crate::utils::RealChezmoi;
+use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 
 /// Perform environment sanity check
 pub(crate) fn doctor() -> anyhow::Result<()> {
@@ -142,7 +151,10 @@ fn chezmoi_check() -> Result<(CheckResult, String), Box<dyn std::error::Error + 
                         if parsed_version < CHEZMOI_AUTO_SOURCE_VERSION {
                             Ok((
                                 CheckResult::Warning,
-                                format!("Chezmoi found. Version is old and doesn't support \"source auto\" directive: {version}"),
+                                format!(
+                                    "Chezmoi found. Version is old and doesn't support \"source \
+                                     auto\" directive: {version}"
+                                ),
                             ))
                         } else {
                             Ok((

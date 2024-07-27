@@ -2,8 +2,10 @@
 
 use std::env::VarError;
 
-use anyhow::{anyhow, Context};
-use camino::{Utf8Path, Utf8PathBuf};
+use anyhow::anyhow;
+use anyhow::Context;
+use camino::Utf8Path;
+use camino::Utf8PathBuf;
 use duct::cmd;
 use regex::Regex;
 

@@ -3,7 +3,10 @@
 use std::collections::HashMap;
 
 use ini_merge::mutations::transforms as ini_transforms;
-use strum::{EnumIter, EnumMessage, EnumString, IntoStaticStr};
+use strum::EnumIter;
+use strum::EnumMessage;
+use strum::EnumString;
+use strum::IntoStaticStr;
 
 /// Supported transforms
 ///
