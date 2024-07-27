@@ -3,7 +3,6 @@
 // Doc comments are used to generate --help, not to for rustdoc.
 #![allow(clippy::doc_markdown)]
 
-use crate::add::Style;
 use bpaf::short;
 use bpaf::Bpaf;
 use bpaf::Parser;
@@ -12,6 +11,8 @@ use camino::Utf8PathBuf;
 use itertools::Itertools;
 use strum::EnumMessage;
 use strum::IntoEnumIterator;
+
+use crate::add::Style;
 
 /// Parser for `--style`
 fn style() -> impl Parser<Style> {

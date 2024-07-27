@@ -2,11 +2,12 @@
 
 use std::collections::HashMap;
 
-use ini_merge::mutations::transforms as ini_transforms;
 use strum::EnumIter;
 use strum::EnumMessage;
 use strum::EnumString;
 use strum::IntoStaticStr;
+
+use ini_merge::mutations::transforms as ini_transforms;
 
 /// Supported transforms
 ///

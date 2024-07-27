@@ -268,9 +268,9 @@ fn quoted_string_nl(i: &mut &str) -> PResult<String> {
 #[cfg(test)]
 mod tests {
     use indoc::indoc;
+    use pretty_assertions::assert_eq;
 
     use super::*;
-    use pretty_assertions::assert_eq;
 
     #[test]
     fn check_quoted_string() {

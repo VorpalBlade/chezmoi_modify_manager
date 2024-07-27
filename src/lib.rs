@@ -5,10 +5,16 @@ use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 
-pub use add::Style;
 use anyhow::Context;
+use indoc::printdoc;
+
+pub use add::Style;
 pub use arguments::parse_args;
 pub use arguments::ChmmArgs;
+use ini_merge::merge::merge_ini;
+
+use crate::utils::RealChezmoi;
+use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 
 mod add;
 mod arguments;
@@ -17,12 +23,6 @@ mod doctor;
 mod transforms;
 mod update;
 mod utils;
-
-use indoc::printdoc;
-use ini_merge::merge::merge_ini;
-
-use crate::utils::RealChezmoi;
-use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 
 /// Main function, amenable to integration tests.
 ///

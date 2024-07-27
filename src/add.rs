@@ -3,26 +3,29 @@
 // Doc comments are used to generate --help, not to for rustdoc.
 #![allow(clippy::doc_markdown)]
 
-#[cfg(test)]
-mod tests;
+use std::fs::File;
+use std::io::Write;
 
-use crate::config;
-use crate::utils::Chezmoi;
-use crate::utils::ChezmoiVersion;
-use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 use anyhow::anyhow;
 use anyhow::Context;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
 use indoc::formatdoc;
-use ini_merge::filter::filter_ini;
-use std::fs::File;
-use std::io::Write;
 use strum::Display;
 use strum::EnumIter;
 use strum::EnumMessage;
 use strum::EnumString;
 use strum::IntoStaticStr;
+
+use ini_merge::filter::filter_ini;
+
+use crate::config;
+use crate::utils::Chezmoi;
+use crate::utils::ChezmoiVersion;
+use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
+
+#[cfg(test)]
+mod tests;
 
 /// The style of calls to the executable
 #[derive(
