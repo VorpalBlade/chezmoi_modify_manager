@@ -44,7 +44,7 @@ source auto
 
 ## What the code does
 
-Since chezmoi_modify_manager 3.1, it will auto detect the version of chezmoi
+Since chezmoi_modify_manager 3.1, it will auto-detect the version of chezmoi
 (based on executing `chezmoi --version`). This is used for:
 
 * The template that `--add` creates to either use the templated source string or
@@ -58,7 +58,7 @@ as chezmoi no longer needs to run its template engine.
 
 ### Overriding auto detection
 
-Auto detection has one downside though: What if you use multiple versions of
+Auto-detection has one downside though: What if you use multiple versions of
 chezmoi (such as an old version from Debian stable on some server but an up-to-date
 version on your personal computer). In that case you don't want to use the newer
 syntax for compatibility reasons.

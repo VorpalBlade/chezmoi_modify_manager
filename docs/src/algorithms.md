@@ -27,7 +27,7 @@ Relevant directives from your config for this algorithm:
 (The reason there are two directives with the same effect is that they do
 different things when merging.)
 
-When a user passes `-s` or `-a` a whole bunch of things happen:
+When a user passes `-s` or `-a` a bunch of things happen:
 
 1. We figure out if the file is already managed or not. Depending on `-a` or `-s`
    we will then do different things. This is not the focus of this page though.

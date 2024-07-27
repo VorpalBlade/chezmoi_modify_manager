@@ -73,7 +73,7 @@ pub enum ChmmArgs {
         files: Vec<Utf8PathBuf>,
     },
     HelpSyntax {
-        /// Print help about about the config file syntax
+        /// Print help about the config file syntax
         #[bpaf(long("help-syntax"))]
         _a: (),
     },

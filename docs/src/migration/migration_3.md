@@ -28,7 +28,7 @@ set "Default Applications" "x-scheme-handler/jetbrains" "jetbrains-toolbox.deskt
 add:remove "Default Applications" "x-scheme-handler/jetbrains"
 ```
 
-This example for mimeapps.list would add an entry only when .is_work is true,
+This example for `mimeapps.list` would add an entry only when .is_work is true,
 but also make sure that the value isn't added back to the config file and thus
 prevents transferring it to other computers by mistake.
 

@@ -34,7 +34,7 @@ pub(super) enum Directive {
     Ignore(Matcher),
     /// A transform directive
     Transform(Matcher, String, HashMap<String, String>),
-    /// Set an section, key to a specific value
+    /// Set a key in a section to a specific value
     Set {
         section: String,
         key: String,

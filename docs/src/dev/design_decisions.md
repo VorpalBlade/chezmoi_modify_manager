@@ -1,6 +1,6 @@
 # Design decisions
 
-This file documents motives some design descisions.
+This file documents motives some design decisions.
 
 ## Why did you implement a custom INI parser?
 
