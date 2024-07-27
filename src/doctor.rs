@@ -1,10 +1,5 @@
 //! Sanity checking of environment
 
-use anstream::println;
-use anstream::stdout;
-use anstyle::Effects;
-use anstyle::Reset;
-use itertools::Itertools;
 use std::env::VarError;
 use std::fs::File;
 use std::io::BufRead;
@@ -12,11 +7,16 @@ use std::io::BufReader;
 use std::io::Write;
 use std::process::Command;
 
-use medic::Check;
-use medic::CheckResult;
-
+use anstream::println;
+use anstream::stdout;
+use anstyle::Effects;
+use anstyle::Reset;
 use anyhow::anyhow;
 use anyhow::Context;
+use itertools::Itertools;
+
+use medic::Check;
+use medic::CheckResult;
 
 use crate::utils::Chezmoi;
 use crate::utils::ChezmoiVersion;

@@ -5,7 +5,6 @@ use std::io::BufReader;
 use std::io::Read;
 
 use camino::Utf8PathBuf;
-
 use pretty_assertions::assert_eq;
 
 use chezmoi_modify_manager::inner_main;

@@ -8,6 +8,8 @@ use anyhow::anyhow;
 use anyhow::Context;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
+use winnow::Parser;
+
 use ini_merge::filter::FilterAction;
 use ini_merge::filter::FilterActions;
 use ini_merge::filter::FilterActionsBuilder;
@@ -16,7 +18,6 @@ use ini_merge::mutations::Action;
 use ini_merge::mutations::Mutations;
 use ini_merge::mutations::MutationsBuilder;
 use ini_merge::mutations::SectionAction;
-use winnow::Parser;
 
 use crate::transforms::Transform;
 
