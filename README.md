@@ -79,12 +79,12 @@ Requirements to build (if there is no native binary for your platform):
 
 Platforms:
 
-| Platform         | Architecture | Continuous Integration | Tested manually           |
-|------------------|--------------|------------------------|---------------------------|
-| Linux with Glibc | All major    | Yes                    | Yes (x86-64, i686, ARMv7) |
-| Linux with Musl  | All major    | Yes                    | Yes (x86-64)              |
-| Windows          | x86-64       | Yes                    | No                        |
-| MacOS            | x86-64       | Yes                    | No                        |
+| Platform         | Architecture | Continuous Integration | Tested manually     |
+|------------------|--------------|------------------------|---------------------|
+| Linux with Glibc | All major    | Yes                    | Yes (x86-64, ARM64) |
+| Linux with Musl  | All major    | Yes                    | Yes (x86-64)        |
+| Windows          | x86-64       | Yes                    | No                  |
+| MacOS            | x86-64       | Yes                    | No                  |
 
 The above table is limited to what I myself have access to (and use) as well as
 what works in GitHub CI. Other Unixes are likely to work, if
