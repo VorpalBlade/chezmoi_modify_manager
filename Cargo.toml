@@ -35,11 +35,11 @@ self_update = { version = "0.41.0", optional = true, default-features = false, f
 ] }
 
 [dependencies]
-anstream = { version = "0.6.14", default-features = false, features = [
+anstream = { version = "0.6.15", default-features = false, features = [
     "auto",
     "wincon",
 ] }
-anstyle = { version = "1.0.7", default-features = false }
+anstyle = { version = "1.0.8", default-features = false }
 anyhow = { version = "1.0.86", features = [
     "std",
     "backtrace",
@@ -50,7 +50,7 @@ bpaf = { version = "0.9", features = [
 ], default-features = false }
 camino = { version = "1.1.7", default-features = false }
 duct = { version = "0.13.7", default-features = false }
-env_logger = { version = "0.11.3", default-features = false }
+env_logger = { version = "0.11.5", default-features = false }
 glob = { version = "0.3.1", default-features = false }
 indoc = { version = "2.0.5", default-features = false }
 ini-merge = { version = "0.5.1", default-features = false }
@@ -64,7 +64,7 @@ strum = { version = "0.26.3", features = [
 ], default-features = false }
 thiserror = "1.0.63"
 which = { version = "6.0.1", default-features = false }
-winnow = { version = "0.6.14", default-features = false, features = [
+winnow = { version = "0.6.16", default-features = false, features = [
     "simd",
     "std",
 ] }
