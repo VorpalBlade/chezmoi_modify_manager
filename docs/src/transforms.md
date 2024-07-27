@@ -47,7 +47,7 @@ etc that you do not want in your dotfiles repo.
 Arguments:
 
 * `service="service-name"`: Service name to find entry in the keyring.
-* `user="user-name"`: User name to find entry in the keyring.
+* `user="user-name"`: Username to find entry in the keyring.
 
 On Linux you can add an entry to the keyring using:
 

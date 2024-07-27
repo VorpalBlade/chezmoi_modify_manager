@@ -231,10 +231,10 @@ pub(crate) fn add(
     // Start with a sanity check on the input file and environment
     sanity_check(path, style, chezmoi)?;
 
-    // Lets check if the managed path exists
+    // Let's check if the managed path exists
     let src_path = chezmoi.source_path(path)?;
 
-    // Then lets classifiy the situation we are in
+    // Then lets classify the situation we are in
     let situation = classify_chezmoi_state(src_path)?;
 
     // Inform user of what we found
@@ -256,7 +256,7 @@ pub(crate) fn add(
         }
     }
 
-    // Finaly decide on an action based on source state and the user selected mode.
+    // Finally decide on an action based on source state and the user selected mode.
     match (situation, mode) {
         (ChezmoiState::NotInChezmoi, Mode::Smart)
         | (ChezmoiState::ExistingNormal { .. }, Mode::Smart) => {

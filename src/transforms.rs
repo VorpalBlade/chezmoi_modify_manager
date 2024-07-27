@@ -36,7 +36,7 @@ pub(crate) enum Transform {
     ///
     /// Arguments:
     /// * service="service-name"  (service name to find entry in the keyring)
-    /// * user="user-name"        (user name to find entry in the keyring)
+    /// * user="user-name"        (username to find entry in the keyring)
     ///
     /// On Linux you can add an entry to the keyring using:
     /// secret-tool store --label="Descriptive name" service "service-name" username "user-name"

@@ -76,7 +76,7 @@ set "section" "key" "value"
 set "section" "key" "value" separator="="
 ```
 
-By default separator is `" = "`, which might not match what the program that
+By default, separator is `" = "`, which might not match what the program that
 the ini files belongs to uses.
 
 Notes:

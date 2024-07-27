@@ -13,7 +13,7 @@ However, there is some work involved in migrating:
 In addition, the following differences are good to know about:
 * The separate shell script to help with adding files is gone, the functionality
   is now built into the main program (see `--help` output).
-* For binary installs from GitHub, you can now use a built in self updater
+* For binary installs from GitHub, you can now use a built-in self updater
   (`--upgrade`).
 * The regex syntax is different. Previously Python re module was used, now the
   [regex crate](https://docs.rs/regex/latest/regex/) for Rust is used. For most
@@ -27,7 +27,7 @@ In addition, the following differences are good to know about:
 
 ## Installation
 
-The methods of installation is different. No longer do you need (or should)
+The methods of installation are different. No longer do you need (or should)
 add this repo as a submodule in your dotfiles repo. Remove that and instead
 see the [installation section](../installation.md) in the README.
 
@@ -36,7 +36,7 @@ see the [installation section](../installation.md) in the README.
 There is a [script](https://raw.githubusercontent.com/VorpalBlade/chezmoi_modify_manager/main/utils/conversion.sh)
 that can help if you have standard shaped files (i.e. as created by the old `chezmoi_ini_add`).
 
-It will not handle 100% of the conversion for transforms however. The argument
+However, it will not handle 100% of the conversion for transforms. The argument
 list format has changed, as have some of the argument names. See
 [below](#transforms) for more details.
 
@@ -94,7 +94,7 @@ Apart from that, transform names have changed:
 * kde_shortcut -> kde-shortcut
 * unsorted_list -> unsorted-list
 
-Finally the argument name has changed for keyring: `username` is now just `user`.
+Finally, the argument name has changed for keyring: `username` is now just `user`.
 
 ## Keyring
 

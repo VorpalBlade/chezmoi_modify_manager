@@ -33,12 +33,12 @@ pub(crate) enum Source {
     Path(Utf8PathBuf),
     /// Auto locate the source file based on `CHEZMOI_SOURCE_FILE`
     ///
-    /// Requires chezmoi ??? or newer.
+    /// Requires chezmoi 2.46.1 or newer.
     AutoEnv,
     /// Auto locate the source file based on relative path.
     ///
     /// This is currently broken with chezmoi, but needed for integration
-    /// tests however.
+    /// tests.
     AutoPath,
 }
 

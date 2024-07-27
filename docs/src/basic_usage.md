@@ -5,10 +5,10 @@
 For each settings file you want to manage with `chezmoi_modify_manager` there
 will be two files in your chezmoi source directory:
 
-* `modify_<config file>` or `modify_<config file>.tmpl`, eg. `modify_private_kdeglobals.tmpl` \
+* `modify_<config file>` or `modify_<config file>.tmpl`, e.g. `modify_private_kdeglobals.tmpl` \
   This is the modify script/configuration file that calls `chezmoi_modify_manager`.
   It contains the directives describing what to ignore.
-* `<config file>.src.ini`, eg. `private_kdeglobals.src.ini`\
+* `<config file>.src.ini`, e.g. `private_kdeglobals.src.ini`\
   This is the source state of the INI file.
 
 The `modify_` script is responsible for generating the new state of the file
@@ -40,7 +40,7 @@ There are two modes to add files in:
 
 * `-s`/`--smart-add`: Smart re-add mode that re-adds files as managed `.src.ini`
   if they are already managed, otherwise adds with plain chezmoi.
-* `-a`/`--add`: This adds or converts from plain plain chezmoi to managed `.src.ini`.
+* `-a`/`--add`: This adds or converts from plain chezmoi to managed `.src.ini`.
 
 Here are some examples:
 
@@ -113,6 +113,6 @@ is a short summary:
 * `add:hide` & `add:remove`: Useful together with certain transforms to control
   re-adding behaviour.
 * `no-warn-multiple-key-matches`: If there are multiple regex rules that overlap
-  a warning will be issued. You can use this directive to quiten those warnings
+  a warning will be issued. You can use this directive to quieten those warnings
   if this is intentional. See [action evaluation order](actions.md#order-of-action-matching)
   for more information on this.
