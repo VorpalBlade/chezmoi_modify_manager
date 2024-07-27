@@ -6,16 +6,23 @@
 #[cfg(test)]
 mod tests;
 
-use crate::{
-    config,
-    utils::{Chezmoi, ChezmoiVersion, CHEZMOI_AUTO_SOURCE_VERSION},
-};
-use anyhow::{anyhow, Context};
-use camino::{Utf8Path, Utf8PathBuf};
+use crate::config;
+use crate::utils::Chezmoi;
+use crate::utils::ChezmoiVersion;
+use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
+use anyhow::anyhow;
+use anyhow::Context;
+use camino::Utf8Path;
+use camino::Utf8PathBuf;
 use indoc::formatdoc;
 use ini_merge::filter::filter_ini;
-use std::{fs::File, io::Write};
-use strum::{Display, EnumIter, EnumMessage, EnumString, IntoStaticStr};
+use std::fs::File;
+use std::io::Write;
+use strum::Display;
+use strum::EnumIter;
+use strum::EnumMessage;
+use strum::EnumString;
+use strum::IntoStaticStr;
 
 /// The style of calls to the executable
 #[derive(

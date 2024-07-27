@@ -16,16 +16,18 @@
 //! | Existing (modify_)    | Normal  | Update data file               |
 //! | Existing (modify_)    | Smart   | Update data file               |
 
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8Path;
+use camino::Utf8PathBuf;
 use indoc::indoc;
 use pathdiff::diff_utf8_paths;
 use pretty_assertions::assert_eq;
-use tempfile::{tempdir, TempDir};
+use tempfile::tempdir;
+use tempfile::TempDir;
 
-use crate::{
-    utils::{Chezmoi, ChezmoiVersion, CHEZMOI_AUTO_SOURCE_VERSION},
-    Style,
-};
+use crate::utils::Chezmoi;
+use crate::utils::ChezmoiVersion;
+use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
+use crate::Style;
 
 use super::internal_filter;
 
@@ -256,12 +258,12 @@ fn assert_nothing_added(chezmoi: &DummyChezmoi) {
 }
 
 mod versions {
-    use crate::{
-        add::{add, Mode},
-        Style,
-    };
+    use crate::add::add;
+    use crate::add::Mode;
+    use crate::Style;
 
-    use super::{assert_nothing_added, DummyChezmoi};
+    use super::assert_nothing_added;
+    use super::DummyChezmoi;
 
     #[test]
     fn check_error_on_old_chezmoi() {
@@ -286,14 +288,14 @@ mod versions {
 }
 
 mod path_tmpl {
-    use crate::{
-        add::{add, Mode},
-        Style,
-    };
+    use crate::add::add;
+    use crate::add::Mode;
+    use crate::Style;
 
-    use super::{
-        assert_default_basic, assert_default_script, assert_unchanged_script, DummyChezmoi,
-    };
+    use super::assert_default_basic;
+    use super::assert_default_script;
+    use super::assert_unchanged_script;
+    use super::DummyChezmoi;
 
     #[test]
     fn check_add_normal_missing() {
@@ -417,14 +419,14 @@ mod path_tmpl {
 }
 
 mod path {
-    use crate::{
-        add::{add, Mode},
-        Style,
-    };
+    use crate::add::add;
+    use crate::add::Mode;
+    use crate::Style;
 
-    use super::{
-        assert_default_basic, assert_default_script, assert_unchanged_script, DummyChezmoi,
-    };
+    use super::assert_default_basic;
+    use super::assert_default_script;
+    use super::assert_unchanged_script;
+    use super::DummyChezmoi;
 
     #[test]
     fn check_add_normal_missing() {
