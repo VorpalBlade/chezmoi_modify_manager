@@ -66,7 +66,8 @@ pub enum ChmmArgs {
         files: Vec<Utf8PathBuf>,
     },
     Smart {
-        /// Smartly add a file to be tracked by either chezmoi or chezmoi_modify_manager
+        /// Smartly add a file to be tracked by either chezmoi or
+        /// chezmoi_modify_manager
         #[bpaf(short('s'), long("smart-add"))]
         _a: (),
         #[bpaf(positional("FILE"), complete_shell(ShellComp::File{mask: None}))]
