@@ -28,7 +28,8 @@ pub(super) enum Directive {
     /// This is used internally by the integration tests, but doesn't actually
     /// work with real chezmoi
     SourceAutoPath,
-    /// We shouldn't warn on multiple regular expressions matching the same section + key.
+    /// We shouldn't warn on multiple regular expressions matching the same
+    /// section + key.
     NoWarnMultipleKeyMatches,
     /// An ignore directive
     Ignore(Matcher),
