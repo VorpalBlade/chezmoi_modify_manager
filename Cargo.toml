@@ -76,7 +76,7 @@ pathdiff = { version = "0.2.1", features = [
 pretty_assertions = { version = "1.4.0", default-features = false, features = [
     "std",
 ] }
-tempfile = { version = "3.10.1", default-features = false }
+tempfile = { version = "3.11.0", default-features = false }
 
 [lints.rust]
 rust-2018-idioms = "warn"
