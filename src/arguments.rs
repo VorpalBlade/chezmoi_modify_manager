@@ -96,6 +96,30 @@ pub enum ChmmArgs {
         #[bpaf(long("no-confirm"))]
         no_confirm: bool,
     },
+    #[cfg(feature = "keyring")]
+    KeyringSet {
+        /// Store a password in the system keyring (password is read from stdin)
+        #[bpaf(long("keyring-set"))]
+        _a: (),
+        /// Service for keyring command
+        #[bpaf(positional("SERVICE"))]
+        service: String,
+        /// User name for keyring command
+        #[bpaf(positional("USERNAME"))]
+        username: String,
+    },
+    #[cfg(feature = "keyring")]
+    KeyringRemove {
+        /// Remove a password from the system keyring
+        #[bpaf(long("keyring-remove"))]
+        _a: (),
+        /// Service for keyring command
+        #[bpaf(positional("SERVICE"))]
+        service: String,
+        /// User name for keyring command
+        #[bpaf(positional("USERNAME"))]
+        username: String,
+    },
 }
 
 /// Construct bpaf --help footer

@@ -100,6 +100,25 @@ where
         ChmmArgs::Doctor { _a } => doctor::doctor()?,
         ChmmArgs::HelpSyntax { _a } => help_syntax(),
         ChmmArgs::HelpTransforms { _a } => transforms::Transform::help(),
+        #[cfg(feature = "keyring")]
+        ChmmArgs::KeyringSet {
+            _a,
+            service,
+            username,
+        } => {
+            let password = rpassword::prompt_password("Password: ")?;
+            let entry = ini_merge::keyring::Entry::new(&service, &username)?;
+            entry.set_password(&password)?;
+        }
+        #[cfg(feature = "keyring")]
+        ChmmArgs::KeyringRemove {
+            _a,
+            service,
+            username,
+        } => {
+            let entry = ini_merge::keyring::Entry::new(&service, &username)?;
+            entry.delete_credential()?;
+        }
     }
     Ok(())
 }
