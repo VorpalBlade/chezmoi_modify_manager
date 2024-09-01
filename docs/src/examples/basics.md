@@ -62,11 +62,10 @@ transform "Identity 0" "Password" keyring service="konversation" user="konversat
 add:hide "Identity 0" "Password"
 ```
 
-To store the password for Identity 0 in your keyring of choice you can use the
-`secret-tool` program from `libsecret` (`libsecret-tools` on Debian/Ubuntu):
+To store the password for Identity 0 in your keyring of choice you can use:
 
 ```console
-$ secret-tool store --label="Konversation password" service konversation username konversation_id0
+$ chezmoi_modify_manager --keyring-set konversation konversation_id0
 [Enter your password at the prompt]
 ```
 
@@ -145,8 +144,8 @@ in git. This works similarly to [konversation](#konversationrc).
 For example, you might use the following if you have a Prusa Mk3.9:
 
 ```bash
-transform "<NO_SECTION>" "printhost_password" keyring service="ini_processor" user="prusa_mk39_password" separator=" = "
-transform "<NO_SECTION>" "printhost_apikey" keyring service="ini_processor" user="prusa_mk39_apikey" separator=" = "
+transform "<NO_SECTION>" "printhost_password" keyring service="chezmoi_modify_manager" user="prusa_mk39_password" separator=" = "
+transform "<NO_SECTION>" "printhost_apikey" keyring service="chezmoi_modify_manager" user="prusa_mk39_apikey" separator=" = "
 add:hide "<NO_SECTION>" "printhost_password"
 add:hide "<NO_SECTION>" "printhost_apikey"
 ```
@@ -154,9 +153,9 @@ add:hide "<NO_SECTION>" "printhost_apikey"
 To add your password and API key you would then use:
 
 ```console
-$ secret-tool store --label="Prusa Mk3.9 password" service ini_processor username prusa_mk39_password
+chezmoi_modify_manager --keyring-set chezmoi_modify_manager prusa_mk39_password
 Password: [Enter password]
-$ secret-tool store --label="Prusa Mk3.9 API key" service ini_processor username prusa_mk39_apikey
+chezmoi_modify_manager --keyring-set chezmoi_modify_manager prusa_mk39_apikey
 Password: [Enter the API key]
 ```
 

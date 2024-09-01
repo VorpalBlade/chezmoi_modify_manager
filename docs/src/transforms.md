@@ -49,8 +49,8 @@ Arguments:
 * `service="service-name"`: Service name to find entry in the keyring.
 * `user="user-name"`: Username to find entry in the keyring.
 
-On Linux you can add an entry to the keyring using:
+You can add an entry to the secret store for your platform with:
 
 ```bash
-secret-tool store --label="Descriptive name" service "service-name" username "user-name"
+chezmoi_modify_manager --keyring-set service-name user-name
 ```
