@@ -9,6 +9,7 @@ use strum::IntoStaticStr;
 
 use ini_merge::mutations::transforms as ini_transforms;
 
+#[allow(clippy::doc_markdown)]
 /// Supported transforms
 ///
 /// This serves as a central point for documentation, parsing, generating
