@@ -50,7 +50,7 @@ jobs:
       run: cargo binstall --no-confirm --no-symlinks cargo-about
     - run: mkdir target && cargo about generate  about.hbs > target/licenses.html
     - name: Upload licenses.html
-      run: GITHUB_TOKEN="${token}" gh release upload "${1#refs/tags/}"  target/licenses.html
+      run: GITHUB_TOKEN="${token}" gh release upload "${tag#refs/tags/}"  target/licenses.html
       env:
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ github.ref }}
