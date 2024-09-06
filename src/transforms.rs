@@ -1,13 +1,11 @@
 //! Defines supported transforms.
 
+use ini_merge::mutations::transforms as ini_transforms;
 use std::collections::HashMap;
-
 use strum::EnumIter;
 use strum::EnumMessage;
 use strum::EnumString;
 use strum::IntoStaticStr;
-
-use ini_merge::mutations::transforms as ini_transforms;
 
 #[allow(clippy::doc_markdown)]
 /// Supported transforms

@@ -1,15 +1,11 @@
 //! Describes configuration file format
-use std::borrow::Cow;
-use std::collections::HashMap;
-use std::fmt::Debug;
-use std::str::FromStr;
-
+use self::parser::Directive;
+use self::parser::Matcher;
+use crate::transforms::Transform;
 use anyhow::anyhow;
 use anyhow::Context;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
-use winnow::Parser;
-
 use ini_merge::filter::FilterAction;
 use ini_merge::filter::FilterActions;
 use ini_merge::filter::FilterActionsBuilder;
@@ -18,11 +14,11 @@ use ini_merge::mutations::Action;
 use ini_merge::mutations::Mutations;
 use ini_merge::mutations::MutationsBuilder;
 use ini_merge::mutations::SectionAction;
-
-use crate::transforms::Transform;
-
-use self::parser::Directive;
-use self::parser::Matcher;
+use std::borrow::Cow;
+use std::collections::HashMap;
+use std::fmt::Debug;
+use std::str::FromStr;
+use winnow::Parser;
 
 mod parser;
 

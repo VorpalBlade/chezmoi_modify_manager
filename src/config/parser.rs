@@ -1,6 +1,5 @@
 //! Defines the winnow parser for the config file format.
 use std::collections::HashMap;
-
 use winnow::ascii::escaped_transform;
 use winnow::ascii::space1;
 use winnow::combinator::alt;
@@ -268,10 +267,9 @@ fn quoted_string_nl(i: &mut &str) -> PResult<String> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use indoc::indoc;
     use pretty_assertions::assert_eq;
-
-    use super::*;
 
     #[test]
     fn check_quoted_string() {

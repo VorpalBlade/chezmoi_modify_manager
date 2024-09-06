@@ -82,11 +82,20 @@ tempfile = { version = "3.12.0", default-features = false }
 [lints.rust]
 rust-2018-idioms = "warn"
 unreachable_pub = "warn"
+unused_qualifications = "warn"
 
 [lints.clippy]
+assigning_clones = "warn"
 doc_markdown = "warn"
+format_push_string = "warn"
 needless_pass_by_value = "warn"
+ptr_as_ptr = "warn"
+redundant_clone = "warn"
 redundant_closure_for_method_calls = "warn"
 semicolon_if_nothing_returned = "warn"
+undocumented_unsafe_blocks = "warn"
+uninlined_format_args = "warn"
+unnecessary_box_returns = "warn"
+unnecessary_safety_doc = "warn"
 unwrap_used = "warn"
 wildcard_imports = "warn"

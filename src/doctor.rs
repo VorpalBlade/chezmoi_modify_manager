@@ -1,12 +1,9 @@
 //! Sanity checking of environment
 
-use std::env::VarError;
-use std::fs::File;
-use std::io::BufRead;
-use std::io::BufReader;
-use std::io::Write;
-use std::process::Command;
-
+use crate::utils::Chezmoi;
+use crate::utils::ChezmoiVersion;
+use crate::utils::RealChezmoi;
+use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 use anstream::println;
 use anstream::stdout;
 use anstyle::Effects;
@@ -14,14 +11,14 @@ use anstyle::Reset;
 use anyhow::anyhow;
 use anyhow::Context;
 use itertools::Itertools;
-
 use medic::Check;
 use medic::CheckResult;
-
-use crate::utils::Chezmoi;
-use crate::utils::ChezmoiVersion;
-use crate::utils::RealChezmoi;
-use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
+use std::env::VarError;
+use std::fs::File;
+use std::io::BufRead;
+use std::io::BufReader;
+use std::io::Write;
+use std::process::Command;
 
 /// Perform environment sanity check
 pub(crate) fn doctor() -> anyhow::Result<()> {
