@@ -48,7 +48,7 @@ const FILTER_TESTS: &[FilterTest] = &[
             "#
         ),
         input: indoc!(
-            r#"
+            r"
             [a]
             b=foo
             c=bar
@@ -57,17 +57,17 @@ const FILTER_TESTS: &[FilterTest] = &[
             [quux]
             e=f
             g=h
-            "#
+            "
         ),
         expected: indoc!(
-            r#"
+            r"
             [a]
             b=HIDDEN
             d=quux
 
             [quux]
             g=h
-            "#
+            "
         ),
     },
     FilterTest {
@@ -82,17 +82,17 @@ const FILTER_TESTS: &[FilterTest] = &[
             "#
         ),
         input: indoc!(
-            r#"
+            r"
             [a]
             b=c
             d=e
-            "#
+            "
         ),
         expected: indoc!(
-            r#"
+            r"
             [a]
             d=e
-            "#
+            "
         ),
     },
 ];

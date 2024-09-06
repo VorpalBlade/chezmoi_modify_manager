@@ -141,6 +141,7 @@ fn footer() -> bpaf::Doc {
 }
 
 /// Apply arg parser to standard arguments
+#[must_use]
 pub fn parse_args() -> ChmmArgs {
     chmm_args().footer(footer()).run()
 }

@@ -73,16 +73,14 @@ impl Transform {
     ) -> anyhow::Result<ini_transforms::TransformerDispatch> {
         use ini_transforms::Transformer;
         match self {
-            Transform::UnsortedLists => {
+            Self::UnsortedLists => {
                 Ok(ini_transforms::TransformUnsortedLists::from_user_input(args)?.into())
             }
-            Transform::KdeShortcut => {
+            Self::KdeShortcut => {
                 Ok(ini_transforms::TransformKdeShortcut::from_user_input(args)?.into())
             }
             #[cfg(feature = "keyring")]
-            Transform::Keyring => {
-                Ok(ini_transforms::TransformKeyring::from_user_input(args)?.into())
-            }
+            Self::Keyring => Ok(ini_transforms::TransformKeyring::from_user_input(args)?.into()),
             #[cfg(not(feature = "keyring"))]
             Transform::Keyring => Err(anyhow::anyhow!(
                 "This build of chezmoi_modify_manager does not support the keyring transform"
