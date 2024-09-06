@@ -1,20 +1,17 @@
 //! This is not a stable API, and is to be used internally by the binary and
 //! the integration tests only.
 
+use crate::utils::RealChezmoi;
+use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
+pub use add::Style;
+use anyhow::Context;
+pub use arguments::parse_args;
+pub use arguments::ChmmArgs;
+use indoc::printdoc;
+use ini_merge::merge::merge_ini;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
-
-use anyhow::Context;
-use indoc::printdoc;
-
-pub use add::Style;
-pub use arguments::parse_args;
-pub use arguments::ChmmArgs;
-use ini_merge::merge::merge_ini;
-
-use crate::utils::RealChezmoi;
-use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 
 mod add;
 mod arguments;

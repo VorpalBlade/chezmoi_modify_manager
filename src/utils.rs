@@ -1,13 +1,12 @@
 //! Some shared utility functions
 
-use std::env::VarError;
-
 use anyhow::anyhow;
 use anyhow::Context;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
 use duct::cmd;
 use regex::Regex;
+use std::env::VarError;
 
 /// Represents the version number of chezmoi
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
