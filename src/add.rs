@@ -255,8 +255,7 @@ pub(crate) fn add(
 
     // Finally decide on an action based on source state and the user selected mode.
     match (situation, mode) {
-        (ChezmoiState::NotInChezmoi, Mode::Smart)
-        | (ChezmoiState::ExistingNormal { .. }, Mode::Smart) => {
+        (ChezmoiState::NotInChezmoi | ChezmoiState::ExistingNormal { .. }, Mode::Smart) => {
             _ = writeln!(
                 status_out,
                 "Action: Adding as plain chezmoi (since we are in smart mode)."
