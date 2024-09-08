@@ -171,7 +171,7 @@ pub(crate) fn parse_for_merge(src: &str) -> anyhow::Result<Config<Mutations>> {
     }
 
     Ok(Config {
-        source: source.ok_or(anyhow!("No source directive found"))?,
+        source: source.ok_or_else(|| anyhow!("No source directive found"))?,
         mutations: builder.build()?,
     })
 }
@@ -225,7 +225,7 @@ pub(crate) fn parse_for_add(src: &str) -> Result<Config<FilterActions>, anyhow::
     }
 
     Ok(Config {
-        source: source.ok_or(anyhow!("No source directive found"))?,
+        source: source.ok_or_else(|| anyhow!("No source directive found"))?,
         mutations: builder.build()?,
     })
 }
