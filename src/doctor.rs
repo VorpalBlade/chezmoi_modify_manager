@@ -207,7 +207,7 @@ fn chezmoi_version_override_check(
 fn check_has_ignore() -> Result<(CheckResult, String), Box<dyn std::error::Error + Send + Sync>> {
     if which::which("chezmoi").is_ok() {
         let src_path = RealChezmoi::default().source_root()?;
-        let mut src_path = src_path.ok_or(anyhow!("No chezmoi source root found"))?;
+        let mut src_path = src_path.ok_or_else(|| anyhow!("No chezmoi source root found"))?;
         src_path.push(".chezmoiignore");
         let file = File::open(src_path)?;
         let mut reader = BufReader::new(file);
