@@ -71,7 +71,7 @@ winnow = { version = "0.6.20", default-features = false, features = [
 ] }
 
 [dev-dependencies]
-pathdiff = { version = "0.2.1", features = [
+pathdiff = { version = "0.2.2", features = [
     "camino",
 ], default-features = false }
 pretty_assertions = { version = "1.4.1", default-features = false, features = [
