@@ -62,10 +62,6 @@ jobs:
           - target: riscv64gc-unknown-linux-gnu
             rust: nightly
             debug_info: off
-        exclude:
-          # https://github.com/rust-lang/rust/issues/128401
-          - target: aarch64-unknown-linux-musl
-            rust: nightly
     steps:
       - uses: actions/checkout@v4
       - name: Environment info
