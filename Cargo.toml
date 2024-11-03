@@ -39,8 +39,8 @@ anstream = { version = "0.6.17", default-features = false, features = [
     "auto",
     "wincon",
 ] }
-anstyle = { version = "1.0.9", default-features = false }
-anyhow = { version = "1.0.91", features = [
+anstyle = { version = "1.0.10", default-features = false }
+anyhow = { version = "1.0.92", features = [
     "std",
     "backtrace",
 ], default-features = false }
@@ -63,8 +63,8 @@ strum = { version = "0.26.3", features = [
     "derive",
     "std",
 ], default-features = false }
-thiserror = "1.0.65"
-which = { version = "6.0.3", default-features = false }
+thiserror = "1.0.66"
+which = { version = "7.0.0", default-features = false }
 winnow = { version = "0.6.20", default-features = false, features = [
     "simd",
     "std",
