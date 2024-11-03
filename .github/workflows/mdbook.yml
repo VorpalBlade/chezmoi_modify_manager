@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+      with:
+        persist-credentials: false
     - name: Install Rust
       run: |
         rustup set profile minimal

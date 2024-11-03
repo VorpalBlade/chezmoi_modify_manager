@@ -1,10 +1,5 @@
 name: Release
 
-permissions:
-  attestations: write
-  contents: write
-  id-token: write
-
 on:
   push:
     tags:
@@ -28,8 +23,13 @@ env:
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: taiki-e/create-gh-release-action@v1.8.2
         with:
           draft: true
@@ -39,8 +39,13 @@ jobs:
   cargo-about:
     needs: create-release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
     - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: Setup Rust
       run: rustup update stable && rustup default stable && rustup component add clippy
     - name: Get cargo-binstall
@@ -57,6 +62,10 @@ jobs:
         
   upload-assets:
     needs: create-release
+    permissions:
+      attestations: write
+      contents: write
+      id-token: write # Needed for attestations
     strategy:
       matrix:
         include:
@@ -96,6 +105,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: taiki-e/upload-rust-binary-action@v1.22.1
         id: upload-rust-binary-action
         with:
@@ -119,6 +130,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - run: cargo publish --token ${CRATES_TOKEN}
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
@@ -129,6 +142,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Get AUR repo
         run: git clone https://aur.archlinux.org/chezmoi_modify_manager.git aur
       - name: Update PKGBUILD

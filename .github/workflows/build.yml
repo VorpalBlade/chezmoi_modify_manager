@@ -64,6 +64,8 @@ jobs:
             debug_info: off
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Environment info
         run: |
           echo "rustup --version:"; rustup --version
@@ -117,6 +119,8 @@ jobs:
           - stable
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Install Rust
         run: rustup install --profile minimal  ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
       - name: Install libdbus
@@ -188,6 +192,8 @@ jobs:
             rust: nightly
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Environment info
         run: |
           echo "rustup --version:"; rustup --version
