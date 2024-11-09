@@ -5,9 +5,9 @@ permissions:
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -225,5 +225,5 @@ jobs:
       - name: Clean up temporary items
         if: matrix.os != 'windows-latest'
         # I cannot get this cleanup to work on Windows. The cache just gets to include uneeded things
-        run: |
+        run: |-
           rm -rf chezmoi_modify_manager chezmoi_modify_manager.tar chezmoi_modify_manager.tar.zst
