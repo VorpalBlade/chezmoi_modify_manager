@@ -1289,9 +1289,9 @@ checksum = "b248f5224d1d606005e02c97f5aa4e88eeb230488bcc03bc9ca4d7991399f2b5"
 
 [[package]]
 name = "ini-merge"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2afa754a559c2956e626d246d871872746505f9ecadec8c04807b14965d8760"
+checksum = "2bcd2be06d565f1504ebbe888c480a78faf62fe1991a188b9e2f172c3f8bfe74"
 dependencies = [
  "ini-roundtrip",
  "itertools 0.13.0",
@@ -1300,7 +1300,7 @@ dependencies = [
  "log",
  "ouroboros",
  "regex",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
 ]
 
 [[package]]
@@ -1492,16 +1492,16 @@ checksum = "58093314a45e00c77d5c508f76e77c3396afbbc0d01506e7fae47b018bac2b1d"
 
 [[package]]
 name = "medic"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "515d378d0154e94445893d2eb9af4db9fb186c1b61dc0d9720c534b51229de3e"
+checksum = "c1b3ed9d5348e7c226674c6753fa2202675f0a699e9dee393842c8bee4c9978a"
 dependencies = [
  "anstream",
  "anstyle",
  "os_info",
  "rustc_version_runtime",
  "strum",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
 ]
 
 [[package]]
