@@ -403,7 +403,7 @@ dependencies = [
  "self_update",
  "strum",
  "tempfile",
- "thiserror 2.0.1",
+ "thiserror 2.0.3",
  "which",
  "winnow",
 ]
@@ -1300,7 +1300,7 @@ dependencies = [
  "log",
  "ouroboros",
  "regex",
- "thiserror 1.0.68",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -1501,7 +1501,7 @@ dependencies = [
  "os_info",
  "rustc_version_runtime",
  "strum",
- "thiserror 1.0.68",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -1960,7 +1960,7 @@ dependencies = [
  "rustc-hash",
  "rustls",
  "socket2",
- "thiserror 1.0.68",
+ "thiserror 1.0.69",
  "tokio",
  "tracing",
 ]
@@ -1977,7 +1977,7 @@ dependencies = [
  "rustc-hash",
  "rustls",
  "slab",
- "thiserror 1.0.68",
+ "thiserror 1.0.69",
  "tinyvec",
  "tracing",
 ]
@@ -2185,9 +2185,9 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "0.38.39"
+version = "0.38.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "375116bee2be9ed569afe2154ea6a99dfdffd257f533f187498c2a8f5feaf4ee"
+checksum = "99e4ea3e1cdc4b559b8e5650f9c8e5998e3e5c1343b4eaf034565f32318d63c0"
 dependencies = [
  "bitflags",
  "errno",
@@ -2611,27 +2611,27 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.68"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02dd99dc800bbb97186339685293e1cc5d9df1f8fae2d0aecd9ff1c77efea892"
+checksum = "b6aaf5339b578ea85b50e080feb250a3e8ae8cfcdff9a461c9ec2904bc923f52"
 dependencies = [
- "thiserror-impl 1.0.68",
+ "thiserror-impl 1.0.69",
 ]
 
 [[package]]
 name = "thiserror"
-version = "2.0.1"
+version = "2.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07c1e40dd48a282ae8edc36c732cbc219144b87fb6a4c7316d611c6b1f06ec0c"
+checksum = "c006c85c7651b3cf2ada4584faa36773bd07bac24acfb39f3c431b36d7e667aa"
 dependencies = [
- "thiserror-impl 2.0.1",
+ "thiserror-impl 2.0.3",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.68"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7c61ec9a6f64d2793d8a45faba21efbe3ced62a886d44c36a009b2b519b4c7e"
+checksum = "4fee6c4efc90059e10f81e6d42c60a18f76588c3d74cb83a0b242a2b6c7504c1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2640,9 +2640,9 @@ dependencies = [
 
 [[package]]
 name = "thiserror-impl"
-version = "2.0.1"
+version = "2.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "874aa7e446f1da8d9c3a5c95b1c5eb41d800045252121dc7f8e0ba370cee55f5"
+checksum = "f077553d607adc1caf65430528a576c757a71ed73944b66ebb58ef2bbd243568"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3391,7 +3391,7 @@ dependencies = [
  "flate2",
  "indexmap",
  "memchr",
- "thiserror 1.0.68",
+ "thiserror 1.0.69",
  "time",
  "zopfli",
 ]
@@ -3404,7 +3404,7 @@ checksum = "6413a546ada9dbcd0b9a3e0b0880581279e35047bce9797e523b3408e1df607c"
 dependencies = [
  "base64",
  "ed25519-dalek",
- "thiserror 1.0.68",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
