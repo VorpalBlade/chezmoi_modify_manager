@@ -42,13 +42,16 @@ fn test_data() {
             .unwrap();
 
         let mut stdout: Vec<u8> = vec![];
+        let mut status: Vec<u8> = vec![];
 
         inner_main(
             ChmmArgs::Process(test_case),
             || BufReader::new(File::open(&sys).unwrap()),
             || &mut stdout,
+            || &mut status,
         )
         .unwrap();
         assert_eq!(String::from_utf8(stdout), String::from_utf8(expected_data));
+        assert_eq!(status, b"");
     }
 }
