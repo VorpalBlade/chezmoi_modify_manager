@@ -111,10 +111,7 @@ impl Chezmoi for RealChezmoi {
     }
 
     fn add(&self, path: &Utf8Path) -> anyhow::Result<()> {
-        let out = cmd!("chezmoi", "add", path)
-            .stdout_null()
-            .unchecked()
-            .run()?;
+        let out = cmd!("chezmoi", "add", path).unchecked().run()?;
         if !out.status.success() {
             return Err(anyhow!("chezmoi add failed with error code {}", out.status));
         }
