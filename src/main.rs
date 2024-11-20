@@ -43,5 +43,10 @@ fn main() -> anyhow::Result<()> {
     // Run the program proper
     let opts = parse_args();
     // Use BufWriter, we don't need to flush on every newline
-    inner_main(opts, || stdin().lock(), || BufWriter::new(stdout().lock()))
+    inner_main(
+        opts,
+        || stdin().lock(),
+        || BufWriter::new(stdout().lock()),
+        || stdout().lock(),
+    )
 }

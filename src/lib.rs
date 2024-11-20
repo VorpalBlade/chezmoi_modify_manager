@@ -29,14 +29,16 @@ mod utils;
 /// self-updater case, which uses stdio directly. Instead, call with functions
 /// that return stdio streams. Note! stderr is not captured, it is used for
 /// logging.
-pub fn inner_main<R: Read, W: Write, FR, FW>(
+pub fn inner_main<R: Read, W: Write, WS: Write, FR, FW, FS>(
     opts: ChmmArgs,
     stdin: FR,
     stdout: FW,
+    status: FS,
 ) -> anyhow::Result<()>
 where
     FR: FnOnce() -> R,
     FW: FnOnce() -> W,
+    FS: FnOnce() -> WS,
 {
     match opts {
         ChmmArgs::Process(file_name) => {
@@ -58,7 +60,7 @@ where
             }
         }
         ChmmArgs::Add { _a, files, style } => {
-            let mut stdout = stdout();
+            let mut stdout = status();
             for file in files {
                 add::add(
                     &RealChezmoi::default(),
@@ -70,7 +72,7 @@ where
             }
         }
         ChmmArgs::Smart { _a, files } => {
-            let mut stdout = stdout();
+            let mut stdout = status();
             for file in files {
                 add::add(
                     &RealChezmoi::default(),
