@@ -77,7 +77,7 @@ pathdiff = { version = "0.2.3", features = [
 pretty_assertions = { version = "1.4.1", default-features = false, features = [
     "std",
 ] }
-tempfile = { version = "3.14.0", default-features = false }
+tempfile = { version = "3.15.0", default-features = false }
 
 [lints.rust]
 elided_lifetimes_in_paths = "warn"
