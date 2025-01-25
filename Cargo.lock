@@ -394,7 +394,7 @@ dependencies = [
  "glob",
  "indoc",
  "ini-merge",
- "itertools 0.14.0",
+ "itertools",
  "log",
  "medic",
  "pathdiff",
@@ -1303,12 +1303,12 @@ checksum = "b248f5224d1d606005e02c97f5aa4e88eeb230488bcc03bc9ca4d7991399f2b5"
 
 [[package]]
 name = "ini-merge"
-version = "0.6.1"
+version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2bcd2be06d565f1504ebbe888c480a78faf62fe1991a188b9e2f172c3f8bfe74"
+checksum = "45a06a91bd94101690fb75e70f74c4b49e886a4b37c367b3f4b7ab43a6fb1cae"
 dependencies = [
  "ini-roundtrip",
- "itertools 0.13.0",
+ "itertools",
  "keyring",
  "lending-iterator",
  "log",
@@ -1347,15 +1347,6 @@ name = "is_terminal_polyfill"
 version = "1.70.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7943c866cc5cd64cbc25b2e01621d07fa8eb2a1a23160ee81ce38704e97b8ecf"
-
-[[package]]
-name = "itertools"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
-dependencies = [
- "either",
-]
 
 [[package]]
 name = "itertools"
