@@ -2,13 +2,13 @@
 authors = ["Arvid Norlander"]
 categories = ["command-line-utilities", "config"]
 description = "Chezmoi addon to patch ini files with mixed settings and state (experimental rust branch)"
-edition = "2021"
+edition = "2024"
 exclude = ["/.chglog/", "/.ci/", "/.github/"]
 keywords = ["chezmoi", "config", "configuration", "ini"]
 license = "GPL-3.0-only"
 name = "chezmoi_modify_manager"
 repository = "https://github.com/VorpalBlade/chezmoi_modify_manager"
-rust-version = "1.82.0"
+rust-version = "1.85.0"
 version = "3.5.3"
 
 [features]
