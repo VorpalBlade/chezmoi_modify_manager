@@ -1,6 +1,6 @@
 //! Defines the winnow parser for the config file format.
 use std::collections::HashMap;
-use winnow::ascii::escaped_transform;
+use winnow::ascii::escaped;
 use winnow::ascii::space1;
 use winnow::combinator::alt;
 use winnow::combinator::delimited;
@@ -61,7 +61,7 @@ pub(super) enum Matcher {
 }
 
 /// Top level parser for the config file
-pub(super) fn parse_config(i: &mut &str) -> PResult<Vec<Directive>> {
+pub(super) fn parse_config(i: &mut &str) -> ModalResult<Vec<Directive>> {
     let alternatives = (
         comment.context(StrContext::Label("comment")),
         chezmoi_template.context(StrContext::Label("chezmoi template")),
@@ -82,12 +82,12 @@ pub(super) fn parse_config(i: &mut &str) -> PResult<Vec<Directive>> {
 }
 
 /// A newline (LF, CR or CRLF)
-fn newline(i: &mut &str) -> PResult<()> {
+fn newline(i: &mut &str) -> ModalResult<()> {
     alt(("\r\n", "\n", "\r")).void().parse_next(i)
 }
 
 /// A comment
-fn comment(i: &mut &str) -> PResult<Directive> {
+fn comment(i: &mut &str) -> ModalResult<Directive> {
     ('#', take_till(0.., ['\n', '\r']))
         .void()
         .map(|()| Directive::WS)
@@ -95,7 +95,7 @@ fn comment(i: &mut &str) -> PResult<Directive> {
 }
 
 /// A chezmoi template. Ignored when re-adding
-fn chezmoi_template(i: &mut &str) -> PResult<Directive> {
+fn chezmoi_template(i: &mut &str) -> ModalResult<Directive> {
     delimited("{{", take_until(0.., "}}"), "}}")
         .void()
         .map(|()| Directive::WS)
@@ -103,7 +103,7 @@ fn chezmoi_template(i: &mut &str) -> PResult<Directive> {
 }
 
 /// A source statement
-fn source(i: &mut &str) -> PResult<Directive> {
+fn source(i: &mut &str) -> ModalResult<Directive> {
     // To support working on the raw templated files before chezmoi processes
     // them we parse to the end of the line, instead of end of the quotation
     // mark.
@@ -120,20 +120,20 @@ fn source(i: &mut &str) -> PResult<Directive> {
         .parse_next(i)
 }
 
-fn no_warn_multiple_key_matches(i: &mut &str) -> PResult<Directive> {
+fn no_warn_multiple_key_matches(i: &mut &str) -> ModalResult<Directive> {
     "no-warn-multiple-key-matches"
         .map(|_| Directive::NoWarnMultipleKeyMatches)
         .parse_next(i)
 }
 
 /// An ignore statement
-fn ignore(i: &mut &str) -> PResult<Directive> {
+fn ignore(i: &mut &str) -> ModalResult<Directive> {
     ("ignore", space1, matcher)
         .map(|(_, _, pattern)| Directive::Ignore(pattern))
         .parse_next(i)
 }
 
-fn set(i: &mut &str) -> PResult<Directive> {
+fn set(i: &mut &str) -> ModalResult<Directive> {
     (
         "set",
         space1,
@@ -155,26 +155,26 @@ fn set(i: &mut &str) -> PResult<Directive> {
         .parse_next(i)
 }
 
-fn remove(i: &mut &str) -> PResult<Directive> {
+fn remove(i: &mut &str) -> ModalResult<Directive> {
     ("remove", space1, matcher)
         .map(|(_, _, matcher)| Directive::Remove(matcher))
         .parse_next(i)
 }
 
-fn add_remove(i: &mut &str) -> PResult<Directive> {
+fn add_remove(i: &mut &str) -> ModalResult<Directive> {
     ("add:remove", space1, matcher)
         .map(|(_, _, matcher)| Directive::AddRemove(matcher))
         .parse_next(i)
 }
 
-fn add_hide(i: &mut &str) -> PResult<Directive> {
+fn add_hide(i: &mut &str) -> ModalResult<Directive> {
     ("add:hide", space1, matcher)
         .map(|(_, _, matcher)| Directive::AddHide(matcher))
         .parse_next(i)
 }
 
 /// A transform statement
-fn transform(i: &mut &str) -> PResult<Directive> {
+fn transform(i: &mut &str) -> ModalResult<Directive> {
     (
         "transform",
         space1,
@@ -190,48 +190,48 @@ fn transform(i: &mut &str) -> PResult<Directive> {
 }
 
 /// One argument to a transformer on the form `arg="value"`
-fn transform_arg(i: &mut &str) -> PResult<(String, String)> {
+fn transform_arg(i: &mut &str) -> ModalResult<(String, String)> {
     (take_till(1.., [' ', '=']), '=', quoted_string)
         .map(|(key, _, value)| (key.to_owned(), value))
         .parse_next(i)
 }
 
 /// Matcher for a section
-fn match_section(i: &mut &str) -> PResult<Matcher> {
+fn match_section(i: &mut &str) -> ModalResult<Matcher> {
     ("section", space1, quoted_string)
         .map(|(_, _, section)| Matcher::Section(section))
         .parse_next(i)
 }
 
 /// Matcher for a regex
-fn match_regex(i: &mut &str) -> PResult<Matcher> {
+fn match_regex(i: &mut &str) -> ModalResult<Matcher> {
     ("regex", space1, quoted_string, space1, quoted_string)
         .map(|(_, _, section, _, key)| Matcher::Regex(section, key))
         .parse_next(i)
 }
 
 /// Literal matcher
-fn match_literal(i: &mut &str) -> PResult<Matcher> {
+fn match_literal(i: &mut &str) -> ModalResult<Matcher> {
     (quoted_string, space1, quoted_string)
         .map(|(section, _, key)| Matcher::Literal(section, key))
         .parse_next(i)
 }
 
 /// All valid matchers
-fn matcher(i: &mut &str) -> PResult<Matcher> {
+fn matcher(i: &mut &str) -> ModalResult<Matcher> {
     alt((match_section, match_regex, match_literal)).parse_next(i)
 }
 
 /// The valid matchers for a transformer
-fn matcher_transform(i: &mut &str) -> PResult<Matcher> {
+fn matcher_transform(i: &mut &str) -> ModalResult<Matcher> {
     alt((match_regex, match_literal)).parse_next(i)
 }
 
 /// Quoted string value
-fn quoted_string(i: &mut &str) -> PResult<String> {
+fn quoted_string(i: &mut &str) -> ModalResult<String> {
     delimited(
         '"',
-        escaped_transform(
+        escaped(
             take_till(1.., ['"', '\\']),
             '\\',
             alt(("\\".value("\\"), "\"".value("\""), "n".value("\n"))),
@@ -242,10 +242,10 @@ fn quoted_string(i: &mut &str) -> PResult<String> {
 }
 
 /// Quoted string ending in newline value
-fn quoted_string_nl(i: &mut &str) -> PResult<String> {
+fn quoted_string_nl(i: &mut &str) -> ModalResult<String> {
     delimited(
         '"',
-        escaped_transform(
+        escaped(
             take_till(1.., ['\n', '\r', '\\']),
             '\\',
             alt(("\\".value("\\"), "\"".value("\""), "n".value("\n"))),
