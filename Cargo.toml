@@ -59,7 +59,7 @@ log = { version = "0.4.25", default-features = false }
 medic = { version = "0.3.2" }
 regex = "1.11.1"
 rpassword = "7.3.1"
-strum = { version = "0.27.0", features = [
+strum = { version = "0.27.1", features = [
     "derive",
     "std",
 ], default-features = false }
