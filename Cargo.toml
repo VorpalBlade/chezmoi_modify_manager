@@ -40,7 +40,7 @@ anstream = { version = "0.6.18", default-features = false, features = [
     "wincon",
 ] }
 anstyle = { version = "1.0.10", default-features = false }
-anyhow = { version = "1.0.95", features = [
+anyhow = { version = "1.0.96", features = [
     "std",
     "backtrace",
 ], default-features = false }
