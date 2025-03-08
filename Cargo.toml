@@ -8,7 +8,7 @@ keywords = ["ini", "config", "configuration", "chezmoi"]
 license = "GPL-3.0-only"
 name = "chezmoi_modify_manager"
 repository = "https://github.com/VorpalBlade/chezmoi_modify_manager"
-rust-version = "1.75.0"
+rust-version = "1.81.0"
 version = "3.5.2"
 
 [features]
@@ -52,7 +52,7 @@ camino = { version = "1.1.9", default-features = false }
 duct = { version = "0.13.7", default-features = false }
 env_logger = { version = "0.11.6", default-features = false }
 glob = { version = "0.3.2", default-features = false }
-indoc = { version = "2.0.5", default-features = false }
+indoc = { version = "2.0.6", default-features = false }
 ini-merge = { version = "0.6.2", default-features = false }
 itertools = { version = "0.14.0", default-features = false }
 log = { version = "0.4.26", default-features = false }
@@ -77,7 +77,7 @@ pathdiff = { version = "0.2.3", features = [
 pretty_assertions = { version = "1.4.1", default-features = false, features = [
     "std",
 ] }
-tempfile = { version = "3.17.1", default-features = false }
+tempfile = { version = "3.18.0", default-features = false }
 
 [lints.rust]
 elided_lifetimes_in_paths = "warn"
