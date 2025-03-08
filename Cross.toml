@@ -1,2 +1,6 @@
 [build.env]
 passthrough = ["CHEZMOI_MODIFY_MANAGER_BUILDER"]
+
+[target.x86_64-unknown-linux-gnu]
+# Make it possible to compile ring
+image = "ghcr.io/cross-rs/x86_64-unknown-linux-gnu:main"
