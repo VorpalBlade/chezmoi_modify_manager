@@ -38,7 +38,7 @@ jobs:
         run: cargo binstall --no-confirm --no-symlinks clippy-sarif sarif-fmt
 
       - name: Cache builds
-        uses: Swatinem/rust-cache@v2.7.7
+        uses: Swatinem/rust-cache@v2.7.8
 
       - name: Run rust-clippy
         run: cargo clippy --all-features --all-targets --message-format=json -- -D warnings | clippy-sarif | tee rust-clippy-results.sarif | sarif-fmt
