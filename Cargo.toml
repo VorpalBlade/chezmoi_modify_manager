@@ -50,13 +50,13 @@ bpaf = { version = "0.9", features = [
 ], default-features = false }
 camino = { version = "1.1.9", default-features = false }
 duct = { version = "0.13.7", default-features = false }
-env_logger = { version = "0.11.7", default-features = false }
+env_logger = { version = "0.11.8", default-features = false }
 glob = { version = "0.3.2", default-features = false }
 indoc = { version = "2.0.6", default-features = false }
 ini-merge = { version = "0.6.2", default-features = false }
 itertools = { version = "0.14.0", default-features = false }
 log = { version = "0.4.27", default-features = false }
-medic = { version = "0.3.2" }
+medic = { version = "0.3.3" }
 regex = "1.11.1"
 rpassword = "7.3.1"
 strum = { version = "0.27.1", features = [
