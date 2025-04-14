@@ -64,7 +64,7 @@ strum = { version = "0.27.1", features = [
     "std",
 ], default-features = false }
 thiserror = { version = "2.0.12", default-features = false }
-which = { version = "7.0.2", default-features = false }
+which = { version = "7.0.3", default-features = false }
 winnow = { version = "0.7.4", default-features = false, features = [
     "simd",
     "std",
