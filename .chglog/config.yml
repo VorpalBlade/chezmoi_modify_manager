@@ -5,14 +5,14 @@ info:
   repository_url: https://github.com/VorpalBlade/chezmoi_modify_manager
 options:
   commits:
-     filters:
-       Type:
-         - docs
-         - feat
-         - fix
-         - perf
-         - refactor
-         - tests
+    filters:
+      Type:
+        - docs
+        - feat
+        - fix
+        - perf
+        - refactor
+        - tests
   commit_groups:
     sort_by: Custom
     title_order:
