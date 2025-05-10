@@ -4,17 +4,16 @@ accepted = [
     "BSD-3-Clause",
     "BSL-1.0",
     "CC0-1.0",
+    "CDLA-Permissive-2.0",
     "GPL-3.0",
     "ISC",
     "LGPL-3.0",
     "MIT",
     "MPL-2.0",
     "OpenSSL",
-    "Unicode-DFS-2016",
     "Unicode-3.0",
+    "Unicode-DFS-2016",
 ]
 ignore-dev-dependencies = true
 private.ignore = true
-workarounds = [
-    "ring",
-]
+workarounds = ["ring"]
