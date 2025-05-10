@@ -49,7 +49,7 @@ bpaf = { version = "0.9", features = [
     "derive",
 ], default-features = false }
 camino = { version = "1.1.9", default-features = false }
-duct = { version = "0.13.7", default-features = false }
+duct = { version = "1.0.0", default-features = false }
 env_logger = { version = "0.11.8", default-features = false }
 glob = { version = "0.3.2", default-features = false }
 indoc = { version = "2.0.6", default-features = false }
@@ -65,7 +65,7 @@ strum = { version = "0.27.1", features = [
 ], default-features = false }
 thiserror = { version = "2.0.12", default-features = false }
 which = { version = "7.0.3", default-features = false }
-winnow = { version = "0.7.9", default-features = false, features = [
+winnow = { version = "0.7.10", default-features = false, features = [
     "simd",
     "std",
 ] }
