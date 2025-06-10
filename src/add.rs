@@ -340,9 +340,9 @@ fn sanity_check(
     }
     match crate::doctor::hook_paths(chezmoi)?.as_slice() {
         [] => Ok(()),
-        _ => {
-            Err(anyhow!("Legacy hook script found, see chezmoi_modify_manager --doctor and please read https://github.com/VorpalBlade/chezmoi_modify_manager/blob/main/doc/migration_3.md"))
-        }
+        _ => Err(anyhow!(
+            "Legacy hook script found, see chezmoi_modify_manager --doctor and please read https://github.com/VorpalBlade/chezmoi_modify_manager/blob/main/doc/migration_3.md"
+        )),
     }
 }
 
