@@ -2,7 +2,6 @@
 
 [ [User Manual] ] [ [lib.rs] ] [ [crates.io] ] [ [AUR] ]
 
-
 ## News
 
 * If you are upgrading across major releases see the [migration guides]
@@ -27,7 +26,7 @@ See the [user manual] for the full documentation on how to use
 
 ## Supported features
 
-#### Feature: Merging & filtering INI files
+### Feature: Merging & filtering INI files
 
 This is the main mode and reason for the existance of this tool.
 
@@ -46,7 +45,7 @@ This is the main mode and reason for the existance of this tool.
 
 For detailed usage instructions see the [user manual].
 
-#### Feature: Assisted adding to the chezmoi source state
+### Feature: Assisted adding to the chezmoi source state
 
 The command can also be used to add files (see `chezmoi_modify_manager --help` for details):
 
