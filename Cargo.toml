@@ -1,10 +1,10 @@
 [package]
 authors = ["Arvid Norlander"]
-categories = ["config", "command-line-utilities"]
+categories = ["command-line-utilities", "config"]
 description = "Chezmoi addon to patch ini files with mixed settings and state (experimental rust branch)"
 edition = "2021"
-exclude = ["/.github/", "/.ci/", "/.chglog/"]
-keywords = ["ini", "config", "configuration", "chezmoi"]
+exclude = ["/.chglog/", "/.ci/", "/.github/"]
+keywords = ["chezmoi", "config", "configuration", "ini"]
 license = "GPL-3.0-only"
 name = "chezmoi_modify_manager"
 repository = "https://github.com/VorpalBlade/chezmoi_modify_manager"
@@ -12,7 +12,7 @@ rust-version = "1.82.0"
 version = "3.5.3"
 
 [features]
-default = ["updater-tls-rusttls", "keyring", "vendored"]
+default = ["keyring", "updater-tls-rusttls", "vendored"]
 # Support for keyring transform
 keyring = ["ini-merge/keyring"]
 # Built in updater, distro packages probably wants to disable this. Uses rustls for encryption.
@@ -41,8 +41,8 @@ anstream = { version = "0.6.19", default-features = false, features = [
 ] }
 anstyle = { version = "1.0.11", default-features = false }
 anyhow = { version = "1.0.98", features = [
-    "std",
     "backtrace",
+    "std",
 ], default-features = false }
 bpaf = { version = "0.9", features = [
     "autocomplete",
@@ -64,8 +64,8 @@ strum = { version = "0.27.1", features = [
     "std",
 ], default-features = false }
 thiserror = { version = "2.0.12", default-features = false }
-which = { version = "7.0.3", default-features = false }
-winnow = { version = "0.7.10", default-features = false, features = [
+which = { version = "8.0.0", default-features = false, features = ["real-sys"] }
+winnow = { version = "0.7.11", default-features = false, features = [
     "simd",
     "std",
 ] }
