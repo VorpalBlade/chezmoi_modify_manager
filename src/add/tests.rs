@@ -17,17 +17,17 @@
 //! | Existing (modify_)    | Smart   | Update data file               |
 
 use super::internal_filter;
+use crate::Style;
+use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 use crate::utils::Chezmoi;
 use crate::utils::ChezmoiVersion;
-use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
-use crate::Style;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
 use indoc::indoc;
 use pathdiff::diff_utf8_paths;
 use pretty_assertions::assert_eq;
-use tempfile::tempdir;
 use tempfile::TempDir;
+use tempfile::tempdir;
 
 #[derive(Debug)]
 struct FilterTest {
@@ -207,7 +207,9 @@ fn assert_unchanged_script(chezmoi: &DummyChezmoi, style: Style) {
 
     let file_data = std::fs::read(chezmoi.make_script_path("dummy_file", style)).unwrap();
     let file_data = String::from_utf8(file_data).unwrap();
-    assert!(file_data.starts_with("#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto"));
+    assert!(
+        file_data.starts_with("#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto")
+    );
 
     // No dummy basic file should exist
     assert!(!chezmoi.src_dir.join("dummy_file").try_exists().unwrap());
@@ -218,49 +220,61 @@ fn assert_default_basic(chezmoi: &DummyChezmoi) {
     assert_eq!(file_data, b"[a]\nb=c");
 
     // No modify script should exist
-    assert!(!chezmoi
-        .src_dir
-        .join("dummy_file.src.ini")
-        .try_exists()
-        .unwrap());
-    assert!(!chezmoi
-        .src_dir
-        .join("modify_dummy_file")
-        .try_exists()
-        .unwrap());
-    assert!(!chezmoi
-        .src_dir
-        .join("modify_dummy_file.tmpl")
-        .try_exists()
-        .unwrap());
+    assert!(
+        !chezmoi
+            .src_dir
+            .join("dummy_file.src.ini")
+            .try_exists()
+            .unwrap()
+    );
+    assert!(
+        !chezmoi
+            .src_dir
+            .join("modify_dummy_file")
+            .try_exists()
+            .unwrap()
+    );
+    assert!(
+        !chezmoi
+            .src_dir
+            .join("modify_dummy_file.tmpl")
+            .try_exists()
+            .unwrap()
+    );
 }
 
 fn assert_nothing_added(chezmoi: &DummyChezmoi) {
     // No files added
     assert!(!chezmoi.src_dir.join("dummy_file").try_exists().unwrap());
-    assert!(!chezmoi
-        .src_dir
-        .join("dummy_file.src.ini")
-        .try_exists()
-        .unwrap());
-    assert!(!chezmoi
-        .src_dir
-        .join("modify_dummy_file")
-        .try_exists()
-        .unwrap());
-    assert!(!chezmoi
-        .src_dir
-        .join("modify_dummy_file.tmpl")
-        .try_exists()
-        .unwrap());
+    assert!(
+        !chezmoi
+            .src_dir
+            .join("dummy_file.src.ini")
+            .try_exists()
+            .unwrap()
+    );
+    assert!(
+        !chezmoi
+            .src_dir
+            .join("modify_dummy_file")
+            .try_exists()
+            .unwrap()
+    );
+    assert!(
+        !chezmoi
+            .src_dir
+            .join("modify_dummy_file.tmpl")
+            .try_exists()
+            .unwrap()
+    );
 }
 
 mod versions {
-    use super::assert_nothing_added;
     use super::DummyChezmoi;
-    use crate::add::add;
-    use crate::add::Mode;
+    use super::assert_nothing_added;
     use crate::Style;
+    use crate::add::Mode;
+    use crate::add::add;
 
     #[test]
     fn check_error_on_old_chezmoi() {
@@ -285,13 +299,13 @@ mod versions {
 }
 
 mod path_tmpl {
+    use super::DummyChezmoi;
     use super::assert_default_basic;
     use super::assert_default_script;
     use super::assert_unchanged_script;
-    use super::DummyChezmoi;
-    use crate::add::add;
-    use crate::add::Mode;
     use crate::Style;
+    use crate::add::Mode;
+    use crate::add::add;
 
     #[test]
     fn check_add_normal_missing() {
@@ -415,13 +429,13 @@ mod path_tmpl {
 }
 
 mod path {
+    use super::DummyChezmoi;
     use super::assert_default_basic;
     use super::assert_default_script;
     use super::assert_unchanged_script;
-    use super::DummyChezmoi;
-    use crate::add::add;
-    use crate::add::Mode;
     use crate::Style;
+    use crate::add::Mode;
+    use crate::add::add;
 
     #[test]
     fn check_add_normal_missing() {
