@@ -101,7 +101,9 @@ const CHECKS: [Check; 9] = [
                     Itertools::intersperse(values.iter().map(|v| v.as_str()), "\n* ").collect();
                 Ok((
                     CheckResult::Error,
-                    format!("Legacy hook script(s) found:\n* {values}\nPlease read https://github.com/VorpalBlade/chezmoi_modify_manager/blob/main/doc/migration_3.md"),
+                    format!(
+                        "Legacy hook script(s) found:\n* {values}\nPlease read https://github.com/VorpalBlade/chezmoi_modify_manager/blob/main/doc/migration_3.md"
+                    ),
                 ))
             }
         }
