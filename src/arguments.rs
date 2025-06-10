@@ -4,10 +4,10 @@
 #![allow(clippy::doc_markdown)]
 
 use crate::add::Style;
-use bpaf::short;
 use bpaf::Bpaf;
 use bpaf::Parser;
 use bpaf::ShellComp;
+use bpaf::short;
 use camino::Utf8PathBuf;
 use itertools::Itertools;
 use strum::EnumMessage;

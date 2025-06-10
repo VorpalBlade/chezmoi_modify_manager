@@ -1,15 +1,15 @@
 //! Sanity checking of environment
 
+use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 use crate::utils::Chezmoi;
 use crate::utils::ChezmoiVersion;
 use crate::utils::RealChezmoi;
-use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 use anstream::println;
 use anstream::stdout;
 use anstyle::Effects;
 use anstyle::Reset;
-use anyhow::anyhow;
 use anyhow::Context;
+use anyhow::anyhow;
 use itertools::Itertools;
 use medic::Check;
 use medic::CheckResult;
@@ -186,8 +186,8 @@ enum ChezmoiVersionOverrideCheckError {
     ParseError(#[from] anyhow::Error),
 }
 
-fn chezmoi_version_override_check(
-) -> Result<(CheckResult, String), Box<dyn std::error::Error + Send + Sync>> {
+fn chezmoi_version_override_check()
+-> Result<(CheckResult, String), Box<dyn std::error::Error + Send + Sync>> {
     match std::env::var("CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION") {
         Ok(value) => match ChezmoiVersion::from_env_var(&value) {
             Ok(parsed) => Ok((

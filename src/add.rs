@@ -4,11 +4,11 @@
 #![allow(clippy::doc_markdown)]
 
 use crate::config;
+use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 use crate::utils::Chezmoi;
 use crate::utils::ChezmoiVersion;
-use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
-use anyhow::anyhow;
 use anyhow::Context;
+use anyhow::anyhow;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
 use indoc::formatdoc;

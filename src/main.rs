@@ -11,10 +11,10 @@ use chezmoi_modify_manager::parse_args;
 use env_logger::Builder;
 use env_logger::Env;
 use log::Level;
-use std::io::stdin;
-use std::io::stdout;
 use std::io::BufWriter;
 use std::io::Write;
+use std::io::stdin;
+use std::io::stdout;
 
 fn main() -> anyhow::Result<()> {
     // Set up logging

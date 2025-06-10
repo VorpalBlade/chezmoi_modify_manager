@@ -1,8 +1,8 @@
 //! Data & config driven tests.
 
 use camino::Utf8PathBuf;
-use chezmoi_modify_manager::inner_main;
 use chezmoi_modify_manager::ChmmArgs;
+use chezmoi_modify_manager::inner_main;
 use pretty_assertions::assert_eq;
 use std::fs::File;
 use std::io::BufReader;
