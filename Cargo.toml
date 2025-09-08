@@ -48,14 +48,14 @@ bpaf = { version = "0.9", features = [
     "autocomplete",
     "derive",
 ], default-features = false }
-camino = { version = "1.1.11", default-features = false }
+camino = { version = "1.1.12", default-features = false }
 duct = { version = "1.1.0", default-features = false }
 env_logger = { version = "0.11.8", default-features = false }
 glob = { version = "0.3.3", default-features = false }
 indoc = { version = "2.0.6", default-features = false }
 ini-merge = { version = "0.6.2", default-features = false }
 itertools = { version = "0.14.0", default-features = false }
-log = { version = "0.4.27", default-features = false }
+log = { version = "0.4.28", default-features = false }
 medic = { version = "0.3.3" }
 regex = "1.11.2"
 rpassword = "7.4.0"
