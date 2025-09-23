@@ -95,7 +95,7 @@ fn make_transformer(
     args: &HashMap<String, String>,
 ) -> anyhow::Result<transforms::TransformerDispatch> {
     Transform::from_str(transform)
-        .map_err(|err| anyhow!("Invalid transform specified: {}: {}", transform, err))?
+        .map_err(|err| anyhow!("Invalid transform specified: {transform}: {err}"))?
         .construct(args)
 }
 

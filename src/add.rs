@@ -331,7 +331,7 @@ fn sanity_check(
     chezmoi: &impl Chezmoi,
 ) -> Result<(), anyhow::Error> {
     if !path.is_file() {
-        return Err(anyhow!("{} is not a regular file", path));
+        return Err(anyhow!("{path} is not a regular file"));
     }
     if Style::InPath == style && chezmoi.version()? < CHEZMOI_AUTO_SOURCE_VERSION {
         return Err(anyhow!(
