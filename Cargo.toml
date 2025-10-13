@@ -57,7 +57,7 @@ ini-merge = { version = "0.6.2", default-features = false }
 itertools = { version = "0.14.0", default-features = false }
 log = { version = "0.4.28", default-features = false }
 medic = { version = "0.3.3" }
-regex = "1.11.3"
+regex = "1.12.1"
 rpassword = "7.4.0"
 strum = { version = "0.27.2", features = [
     "derive",
