@@ -52,7 +52,7 @@ camino = { version = "1.2.1", default-features = false }
 duct = { version = "1.1.0", default-features = false }
 env_logger = { version = "0.11.8", default-features = false }
 glob = { version = "0.3.3", default-features = false }
-indoc = { version = "2.0.6", default-features = false }
+indoc = { version = "2.0.7", default-features = false }
 ini-merge = { version = "0.6.2", default-features = false }
 itertools = { version = "0.14.0", default-features = false }
 log = { version = "0.4.28", default-features = false }
