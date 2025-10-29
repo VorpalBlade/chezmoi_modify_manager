@@ -73,7 +73,7 @@ jobs:
       - name: Install Rust
         run: rustup install --profile minimal ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
       - name: Install cross
-        uses: taiki-e/install-action@e43a5023a747770bfcb71ae048541a681714b951 # v2.62.33
+        uses: taiki-e/install-action@1d76762916ba18e4f0c3b2f71fee3da83a279745 # v2.62.41
         with:
           tool: cross@latest
       - name: Cache builds
@@ -95,7 +95,7 @@ jobs:
           fi
           tar cf chezmoi_modify_manager.tar chezmoi_modify_manager
           zstd -T0 -6 chezmoi_modify_manager.tar
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         if: matrix.rust == 'stable' && matrix.target != 'x86_64-pc-windows-gnu'
         with:
           name: chezmoi_modify_manager_${{ matrix.target }}.zst
@@ -218,7 +218,7 @@ jobs:
           cp -r target/${{ matrix.target }}/debug/chezmoi_modify_manager${{ matrix.debug-suffix }} chezmoi_modify_manager/
           tar cf chezmoi_modify_manager.tar chezmoi_modify_manager
           zstd -T0 -6 chezmoi_modify_manager.tar
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         if: matrix.rust == 'stable' && matrix.target != 'x86_64-pc-windows-gnu'
         with:
           name: chezmoi_modify_manager_${{ matrix.target }}.zst
