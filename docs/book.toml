@@ -1,7 +1,6 @@
 [book]
 authors = ["Arvid Norlander"]
 language = "en"
-multilingual = false
 src = "src"
 title = "Chezmoi Modify Manager"
 
