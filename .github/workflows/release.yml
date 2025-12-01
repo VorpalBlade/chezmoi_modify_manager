@@ -27,7 +27,7 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           persist-credentials: false
       - uses: taiki-e/create-gh-release-action@26b80501670402f1999aff4b934e1574ef2d3705 # v1.9.1
@@ -43,7 +43,7 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           persist-credentials: false
       - name: Setup Rust
@@ -104,7 +104,7 @@ jobs:
             rustflags:
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           persist-credentials: false
       - uses: taiki-e/upload-rust-binary-action@3962470d6e7f1993108411bc3f75a135ec67fc8c # v1.27.0
@@ -131,7 +131,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           persist-credentials: false
       - run: cargo publish --token ${CRATES_TOKEN}
@@ -145,7 +145,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           persist-credentials: false
       - name: Get AUR repo
