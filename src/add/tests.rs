@@ -288,6 +288,7 @@ mod versions {
         let error = add(
             &chezmoi,
             Mode::Normal,
+            false,
             Style::InPath,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -315,6 +316,7 @@ mod path_tmpl {
         add(
             &chezmoi,
             Mode::Normal,
+            false,
             Style::InPathTmpl,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -332,6 +334,7 @@ mod path_tmpl {
         add(
             &chezmoi,
             Mode::Smart,
+            false,
             Style::InPathTmpl,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -351,6 +354,7 @@ mod path_tmpl {
         add(
             &chezmoi,
             Mode::Normal,
+            false,
             Style::InPathTmpl,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -370,6 +374,7 @@ mod path_tmpl {
         add(
             &chezmoi,
             Mode::Smart,
+            false,
             Style::InPathTmpl,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -394,6 +399,7 @@ mod path_tmpl {
         add(
             &chezmoi,
             Mode::Normal,
+            false,
             Style::InPathTmpl,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -418,6 +424,7 @@ mod path_tmpl {
         add(
             &chezmoi,
             Mode::Smart,
+            false,
             Style::InPathTmpl,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -445,6 +452,7 @@ mod path {
         add(
             &chezmoi,
             Mode::Normal,
+            false,
             Style::InPath,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -462,6 +470,7 @@ mod path {
         add(
             &chezmoi,
             Mode::Smart,
+            false,
             Style::InPath,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -481,6 +490,7 @@ mod path {
         add(
             &chezmoi,
             Mode::Normal,
+            false,
             Style::InPath,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -500,6 +510,7 @@ mod path {
         add(
             &chezmoi,
             Mode::Smart,
+            false,
             Style::InPath,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -524,6 +535,7 @@ mod path {
         add(
             &chezmoi,
             Mode::Normal,
+            false,
             Style::InPath,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
@@ -548,6 +560,7 @@ mod path {
         add(
             &chezmoi,
             Mode::Smart,
+            false,
             Style::InPath,
             chezmoi.dummy_file.as_path(),
             &mut stdout,
