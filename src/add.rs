@@ -8,6 +8,7 @@ use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 use crate::utils::Chezmoi;
 use crate::utils::ChezmoiVersion;
 use anyhow::Context;
+use anyhow::Ok;
 use anyhow::anyhow;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
@@ -210,7 +211,7 @@ enum ChezmoiState {
 }
 
 // Source - https://stackoverflow.com/questions/26076005/how-can-i-list-files-of-a-directory-in-rust
-fn recurse_files(path: &Utf8Path) -> std::io::Result<Vec<Utf8PathBuf>> {
+fn recurse_files(path: &Utf8Path) -> anyhow::Result<Vec<Utf8PathBuf>> {
     let mut buf = vec![];
     let entries = Utf8Path::read_dir_utf8(path)?;
 
@@ -235,6 +236,7 @@ fn recurse_files(path: &Utf8Path) -> std::io::Result<Vec<Utf8PathBuf>> {
 pub(crate) fn add(
     chezmoi: &impl Chezmoi,
     mode: Mode,
+    recursive: bool,
     mut style: Style,
     path: &Utf8Path,
     status_out: &mut impl Write,
@@ -251,12 +253,21 @@ pub(crate) fn add(
     sanity_check(path, style, chezmoi)?;
 
     if path.is_dir() {
-        let files = recurse_files(path);
-        for file in files? {
+        if !recursive {
             _ = writeln!(
                 status_out,
-                "Adding {file:?}"
+                "Trying to add a directory, but -r (--recursive) flag is not set, ignoring"
             );
+            return Ok(());
+        }
+        let files = recurse_files(path);
+        let num_files = files.iter().count();
+        _ = writeln!(
+            status_out,
+            "Adding {num_files} files"
+        );
+        for file in files? {
+            _ = writeln!(status_out, "Adding {file:?}");
             add_file(chezmoi, mode, style, &file, status_out)?;
         }
         Ok(())
