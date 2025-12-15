@@ -251,7 +251,9 @@ pub(crate) fn add(
 
     if path.is_dir() {
         if !recursive {
-            return Err(anyhow!("Trying to add a directory, but -r (--recursive) flag is not set, ignoring"));
+            return Err(anyhow!(
+                "Trying to add a directory, but -r (--recursive) flag is not set, ignoring"
+            ));
         }
         let mut files = vec![];
         recurse_files(path, &mut files)?;
