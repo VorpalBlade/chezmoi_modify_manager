@@ -210,9 +210,7 @@ enum ChezmoiState {
     },
 }
 
-// Source - https://stackoverflow.com/questions/26076005/how-can-i-list-files-of-a-directory-in-rust
-fn recurse_files(path: &Utf8Path) -> anyhow::Result<Vec<Utf8PathBuf>> {
-    let mut buf = vec![];
+fn recurse_files(path: &Utf8Path, buf: &mut Vec<Utf8PathBuf>) -> anyhow::Result<()> {
     let entries = Utf8Path::read_dir_utf8(path)?;
 
     for entry in entries {
@@ -220,8 +218,7 @@ fn recurse_files(path: &Utf8Path) -> anyhow::Result<Vec<Utf8PathBuf>> {
         let meta = entry.metadata()?;
 
         if meta.is_dir() {
-            let mut subdir = recurse_files(entry.path())?;
-            buf.append(&mut subdir);
+            recurse_files(entry.path(), buf)?;
         }
 
         if meta.is_file() {
@@ -229,7 +226,7 @@ fn recurse_files(path: &Utf8Path) -> anyhow::Result<Vec<Utf8PathBuf>> {
         }
     }
 
-    Ok(buf)
+    Ok(())
 }
 
 /// Add a file
@@ -254,16 +251,13 @@ pub(crate) fn add(
 
     if path.is_dir() {
         if !recursive {
-            _ = writeln!(
-                status_out,
-                "Trying to add a directory, but -r (--recursive) flag is not set, ignoring"
-            );
-            return Ok(());
+            return Err(anyhow!("Trying to add a directory, but -r (--recursive) flag is not set, ignoring"));
         }
-        let files = recurse_files(path);
-        let num_files = files.iter().count();
+        let mut files = vec![];
+        recurse_files(path, &mut files)?;
+        let num_files = files.len();
         _ = writeln!(status_out, "Adding {num_files} files");
-        for file in files? {
+        for file in files {
             _ = writeln!(status_out, "Adding {file:?}");
             add_file(chezmoi, mode, style, &file, status_out)?;
         }
