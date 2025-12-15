@@ -8,6 +8,7 @@ use crate::utils::CHEZMOI_AUTO_SOURCE_VERSION;
 use crate::utils::Chezmoi;
 use crate::utils::ChezmoiVersion;
 use anyhow::Context;
+use anyhow::Ok;
 use anyhow::anyhow;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
@@ -209,10 +210,30 @@ enum ChezmoiState {
     },
 }
 
+fn recurse_files(path: &Utf8Path, buf: &mut Vec<Utf8PathBuf>) -> anyhow::Result<()> {
+    let entries = Utf8Path::read_dir_utf8(path)?;
+
+    for entry in entries {
+        let entry = entry?;
+        let meta = entry.metadata()?;
+
+        if meta.is_dir() {
+            recurse_files(entry.path(), buf)?;
+        }
+
+        if meta.is_file() {
+            buf.push(entry.into_path());
+        }
+    }
+
+    Ok(())
+}
+
 /// Add a file
 pub(crate) fn add(
     chezmoi: &impl Chezmoi,
     mode: Mode,
+    recursive: bool,
     mut style: Style,
     path: &Utf8Path,
     status_out: &mut impl Write,
@@ -228,6 +249,33 @@ pub(crate) fn add(
     // Start with a sanity check on the input file and environment
     sanity_check(path, style, chezmoi)?;
 
+    if path.is_dir() {
+        if !recursive {
+            return Err(anyhow!(
+                "Trying to add a directory, but -r (--recursive) flag is not set, ignoring"
+            ));
+        }
+        let mut files = vec![];
+        recurse_files(path, &mut files)?;
+        let num_files = files.len();
+        _ = writeln!(status_out, "Adding {num_files} files");
+        for file in files {
+            _ = writeln!(status_out, "Adding {file:?}");
+            add_file(chezmoi, mode, style, &file, status_out)?;
+        }
+        Ok(())
+    } else {
+        add_file(chezmoi, mode, style, path, status_out)
+    }
+}
+
+pub(crate) fn add_file(
+    chezmoi: &impl Chezmoi,
+    mode: Mode,
+    style: Style,
+    path: &Utf8Path,
+    status_out: &mut impl Write,
+) -> anyhow::Result<()> {
     // Let's check if the managed path exists
     let src_path = chezmoi.source_path(path)?;
 
@@ -330,8 +378,8 @@ fn sanity_check(
     style: Style,
     chezmoi: &impl Chezmoi,
 ) -> Result<(), anyhow::Error> {
-    if !path.is_file() {
-        return Err(anyhow!("{path} is not a regular file"));
+    if !path.exists() {
+        return Err(anyhow!("{path} does not exist"));
     }
     if Style::InPath == style && chezmoi.version()? < CHEZMOI_AUTO_SOURCE_VERSION {
         return Err(anyhow!(
