@@ -68,7 +68,7 @@ For detailed usage instructions see the [user manual].
 ### Feature: Adding all the files in a directory recursively
 
 By specifying the `-r/--recursive` flag, all the files in a given directory will be added 
-(with smart more if the smart mode flag is set)
+(with smart mode if the smart mode flag is set)
 
 ## Platform support and requirements
 

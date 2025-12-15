@@ -345,7 +345,11 @@ mod path_tmpl {
         )
         .unwrap();
 
-        assert_default_script(&chezmoi, Style::InPathTmpl, chezmoi.dummy_file0_name.as_str());
+        assert_default_script(
+            &chezmoi,
+            Style::InPathTmpl,
+            chezmoi.dummy_file0_name.as_str(),
+        );
     }
 
     #[test]
@@ -383,7 +387,11 @@ mod path_tmpl {
         )
         .unwrap();
 
-        assert_default_script(&chezmoi, Style::InPathTmpl, chezmoi.dummy_file0_name.as_str());
+        assert_default_script(
+            &chezmoi,
+            Style::InPathTmpl,
+            chezmoi.dummy_file0_name.as_str(),
+        );
     }
 
     #[test]
@@ -413,7 +421,11 @@ mod path_tmpl {
 
         let filename = chezmoi.dummy_file0_name.as_str();
 
-        std::fs::write(chezmoi.src_dir.join(format!("{filename}.src.ini")), "old_contents").unwrap();
+        std::fs::write(
+            chezmoi.src_dir.join(format!("{filename}.src.ini")),
+            "old_contents",
+        )
+        .unwrap();
         std::fs::write(
             chezmoi.src_dir.join(format!("modify_{filename}.tmpl")),
             "#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto",
@@ -440,7 +452,11 @@ mod path_tmpl {
 
         let filename = chezmoi.dummy_file0_name.as_str();
 
-        std::fs::write(chezmoi.src_dir.join(format!("{filename}.src.ini")), "old_contents").unwrap();
+        std::fs::write(
+            chezmoi.src_dir.join(format!("{filename}.src.ini")),
+            "old_contents",
+        )
+        .unwrap();
         std::fs::write(
             chezmoi.src_dir.join(format!("modify_{filename}.tmpl")),
             "#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto",
@@ -553,7 +569,11 @@ mod path {
 
         let filename = chezmoi.dummy_file0_name.as_str();
 
-        std::fs::write(chezmoi.src_dir.join(format!("{filename}.src.ini")), "old_contents").unwrap();
+        std::fs::write(
+            chezmoi.src_dir.join(format!("{filename}.src.ini")),
+            "old_contents",
+        )
+        .unwrap();
         std::fs::write(
             chezmoi.src_dir.join(format!("modify_{filename}")),
             "#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto",
@@ -580,7 +600,11 @@ mod path {
 
         let filename = chezmoi.dummy_file0_name.as_str();
 
-        std::fs::write(chezmoi.src_dir.join(format!("{filename}.src.ini")), "old_contents").unwrap();
+        std::fs::write(
+            chezmoi.src_dir.join(format!("{filename}.src.ini")),
+            "old_contents",
+        )
+        .unwrap();
         std::fs::write(
             chezmoi.src_dir.join(format!("modify_{filename}")),
             "#!/usr/bin/env chezmoi_modify_manager\n#UNTOUCHED\nsource auto",

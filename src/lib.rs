@@ -59,7 +59,12 @@ where
                 writeln!(stdout, "{line}")?;
             }
         }
-        ChmmArgs::Add { _a,recursive, files, style } => {
+        ChmmArgs::Add {
+            _a,
+            recursive,
+            files,
+            style,
+        } => {
             let mut stdout = status();
             for file in files {
                 add::add(
@@ -72,7 +77,11 @@ where
                 )?;
             }
         }
-        ChmmArgs::Smart { _a, recursive, files } => {
+        ChmmArgs::Smart {
+            _a,
+            recursive,
+            files,
+        } => {
             let mut stdout = status();
             for file in files {
                 add::add(

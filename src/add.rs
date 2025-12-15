@@ -262,10 +262,7 @@ pub(crate) fn add(
         }
         let files = recurse_files(path);
         let num_files = files.iter().count();
-        _ = writeln!(
-            status_out,
-            "Adding {num_files} files"
-        );
+        _ = writeln!(status_out, "Adding {num_files} files");
         for file in files? {
             _ = writeln!(status_out, "Adding {file:?}");
             add_file(chezmoi, mode, style, &file, status_out)?;
@@ -386,7 +383,7 @@ fn sanity_check(
     chezmoi: &impl Chezmoi,
 ) -> Result<(), anyhow::Error> {
     if !path.exists() {
-        return Err(anyhow!("{path} does not exist!"));
+        return Err(anyhow!("{path} does not exist"));
     }
     if Style::InPath == style && chezmoi.version()? < CHEZMOI_AUTO_SOURCE_VERSION {
         return Err(anyhow!(
