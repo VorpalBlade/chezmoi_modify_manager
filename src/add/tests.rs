@@ -99,6 +99,10 @@ const FILTER_TESTS: &[FilterTest] = &[
     },
 ];
 
+fn get_dummy_file_contents(dummy_file_name: &str) -> String {
+    format!("[a]\n{dummy_file_name}=c")
+}
+
 #[test]
 fn check_filtering() {
     for test_case in FILTER_TESTS {
@@ -143,8 +147,16 @@ impl DummyChezmoi {
         let dummy_file0_path: Utf8PathBuf = input_dir.join(dummy_file0_name.as_str());
         let dummy_file1_path: Utf8PathBuf = input_dir.join(dummy_file1_name.as_str());
 
-        std::fs::write(dummy_file0_path.as_path(), "[a]\nb=c").unwrap();
-        std::fs::write(dummy_file1_path.as_path(), "[a]\nb=c").unwrap();
+        std::fs::write(
+            dummy_file0_path.as_path(),
+            get_dummy_file_contents(dummy_file0_name.as_str()),
+        )
+        .unwrap();
+        std::fs::write(
+            dummy_file1_path.as_path(),
+            get_dummy_file_contents(dummy_file1_name.as_str()),
+        )
+        .unwrap();
 
         let dummy_file0_source_path: Utf8PathBuf = src_dir.join(dummy_file0_name.as_str());
 
@@ -212,7 +224,10 @@ impl Chezmoi for DummyChezmoi {
 fn assert_default_script(chezmoi: &DummyChezmoi, style: Style, dummy_file_name: &str) {
     let file_data =
         std::fs::read(chezmoi.src_dir.join(format!("{dummy_file_name}.src.ini"))).unwrap();
-    assert_eq!(file_data.strip_suffix(b"\n").unwrap(), b"[a]\nb=c");
+    assert_eq!(
+        file_data.strip_suffix(b"\n").unwrap(),
+        get_dummy_file_contents(dummy_file_name).as_bytes()
+    );
 
     let file_data = std::fs::read(chezmoi.make_script_path(dummy_file_name, style)).unwrap();
     let file_data = String::from_utf8(file_data).unwrap();
@@ -225,7 +240,10 @@ fn assert_default_script(chezmoi: &DummyChezmoi, style: Style, dummy_file_name: 
 fn assert_unchanged_script(chezmoi: &DummyChezmoi, style: Style, dummy_file_name: &str) {
     let file_data =
         std::fs::read(chezmoi.src_dir.join(format!("{dummy_file_name}.src.ini"))).unwrap();
-    assert_eq!(file_data.strip_suffix(b"\n").unwrap(), b"[a]\nb=c");
+    assert_eq!(
+        file_data.strip_suffix(b"\n").unwrap(),
+        get_dummy_file_contents(dummy_file_name).as_bytes()
+    );
 
     let file_data = std::fs::read(chezmoi.make_script_path(dummy_file_name, style)).unwrap();
     let file_data = String::from_utf8(file_data).unwrap();
@@ -239,7 +257,10 @@ fn assert_unchanged_script(chezmoi: &DummyChezmoi, style: Style, dummy_file_name
 
 fn assert_default_basic(chezmoi: &DummyChezmoi, dummy_file_name: &str) {
     let file_data = std::fs::read(chezmoi.src_dir.join(dummy_file_name)).unwrap();
-    assert_eq!(file_data, b"[a]\nb=c");
+    assert_eq!(
+        file_data,
+        get_dummy_file_contents(dummy_file_name).as_bytes()
+    );
 
     // No modify script should exist
     assert!(
@@ -687,7 +708,7 @@ mod recursive {
             chezmoi.input_dir.as_path(),
             &mut stdout,
         )
-        .unwrap();
+        .unwrap_err();
 
         assert_nothing_added(&chezmoi, chezmoi.dummy_file0_name.as_str());
         assert_nothing_added(&chezmoi, chezmoi.dummy_file1_name.as_str());
