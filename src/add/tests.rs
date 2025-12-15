@@ -647,3 +647,70 @@ mod path {
         assert_unchanged_script(&chezmoi, Style::InPath, filename);
     }
 }
+
+mod recursive {
+    use super::DummyChezmoi;
+    use super::assert_default_basic;
+    use super::assert_default_script;
+    use super::assert_nothing_added;
+    use crate::Style;
+    use crate::add::Mode;
+    use crate::add::add;
+
+    #[test]
+    fn check_add_recursive_missing() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
+
+        add(
+            &chezmoi,
+            Mode::Normal,
+            true,
+            Style::InPath,
+            chezmoi.input_dir.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
+
+        assert_default_script(&chezmoi, Style::InPath, chezmoi.dummy_file0_name.as_str());
+        assert_default_script(&chezmoi, Style::InPath, chezmoi.dummy_file1_name.as_str());
+    }
+
+    #[test]
+    fn check_smart_add_recursive_missing() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
+
+        add(
+            &chezmoi,
+            Mode::Smart,
+            true,
+            Style::InPath,
+            chezmoi.input_dir.as_path(),
+            &mut stdout,
+        )
+        .unwrap();
+
+        assert_default_basic(&chezmoi, chezmoi.dummy_file0_name.as_str());
+        assert_default_basic(&chezmoi, chezmoi.dummy_file1_name.as_str());
+    }
+
+    #[test]
+    fn check_add_recursive_missing_unset_flag() {
+        let chezmoi = DummyChezmoi::new();
+        let mut stdout: Vec<u8> = vec![];
+
+        add(
+            &chezmoi,
+            Mode::Normal,
+            false,
+            Style::InPath,
+            chezmoi.input_dir.as_path(),
+            &mut stdout,
+        )
+        .unwrap_err();
+
+        assert_nothing_added(&chezmoi, chezmoi.dummy_file0_name.as_str());
+        assert_nothing_added(&chezmoi, chezmoi.dummy_file1_name.as_str());
+    }
+}
