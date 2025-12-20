@@ -59,6 +59,9 @@ pub enum ChmmArgs {
         /// Add a file to be tracked by chezmoi_modify_manager
         #[bpaf(short('a'), long("add"))]
         _a: (),
+        /// Add all files in a directory recursively
+        #[bpaf(short('r'), long("recursive"))]
+        recursive: bool,
         #[bpaf(external)]
         style: Style,
         #[bpaf(positional("FILE"), complete_shell(ShellComp::File{mask: None}))]
@@ -69,6 +72,9 @@ pub enum ChmmArgs {
         /// chezmoi_modify_manager
         #[bpaf(short('s'), long("smart-add"))]
         _a: (),
+        /// Add all files in a directory recursively
+        #[bpaf(short('r'), long("recursive"))]
+        recursive: bool,
         #[bpaf(positional("FILE"), complete_shell(ShellComp::File{mask: None}))]
         files: Vec<Utf8PathBuf>,
     },

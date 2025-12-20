@@ -65,6 +65,11 @@ them after they changed:
 
 For detailed usage instructions see the [user manual].
 
+### Feature: Adding all the files in a directory recursively
+
+By specifying the `-r/--recursive` flag, all the files in a given directory will be added 
+(with smart mode if the smart mode flag is set)
+
 ## Platform support and requirements
 
 The binary is self-contained with no non-optional system dependencies apart

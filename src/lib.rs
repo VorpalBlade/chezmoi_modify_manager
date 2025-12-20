@@ -59,24 +59,35 @@ where
                 writeln!(stdout, "{line}")?;
             }
         }
-        ChmmArgs::Add { _a, files, style } => {
+        ChmmArgs::Add {
+            _a,
+            recursive,
+            files,
+            style,
+        } => {
             let mut stdout = status();
             for file in files {
                 add::add(
                     &RealChezmoi::default(),
                     add::Mode::Normal,
+                    recursive,
                     style,
                     &file,
                     &mut stdout,
                 )?;
             }
         }
-        ChmmArgs::Smart { _a, files } => {
+        ChmmArgs::Smart {
+            _a,
+            recursive,
+            files,
+        } => {
             let mut stdout = status();
             for file in files {
                 add::add(
                     &RealChezmoi::default(),
                     add::Mode::Smart,
+                    recursive,
                     Style::Auto, // Style unused for the smart case, so doesn't matter
                     &file,
                     &mut stdout,
