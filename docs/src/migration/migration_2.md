@@ -4,13 +4,15 @@ The new Rust code base has a superset of the features of the 1.x version, and it
 is also about 50x faster (in release builds, about 25x in debug builds).
 
 However, there is some work involved in migrating:
+
 * Different [installation](#installation) method.
-* The [syntax](#automatic-conversion-of-modify-scripts) has changed in the
+* The [syntax](#modify-scripts-automatic-conversion) has changed in the
   modify scripts.
 * Some changes to [transforms](#transforms) (in particular the
   [keyring](#keyring) transform has changed).
 
 In addition, the following differences are good to know about:
+
 * The separate shell script to help with adding files is gone, the functionality
   is now built into the main program (see `--help` output).
 * For binary installs from GitHub, you can now use a built-in self updater
@@ -49,11 +51,13 @@ The first line should now be used to invoke chezmoi_modify_manager. It should
 be one of:
 
 Use this if chezmoi_modify_manager is installed in PATH (recommended):
+
 ```bash
 #!/usr/bin/env chezmoi_modify_manager
 ```
 
 Use this if you keep chezmoi_modify_manager in your chezmoi source directory:
+
 ```bash
 #!{{ .chezmoi.sourceDir }}/.utils/chezmoi_modify_manager-{{ .chezmoi.os }}-{{ .chezmoi.arch }}
 ```

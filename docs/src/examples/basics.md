@@ -5,6 +5,7 @@ Here are some useful examples of flags for various settings files I have come ac
 ## KDE
 
 ### dolphinrc
+
 ```bash
 ignore section "MainWindow"
 ignore section "KPropertiesDialog"
@@ -13,6 +14,7 @@ ignore "Open-with settings" "History"
 ```
 
 ### kdeglobals
+
 ```bash
 ignore "General" "ColorSchemeHash"
 ignore "KFileDialog Settings" "Show hidden files"
@@ -21,6 +23,7 @@ ignore section "DirSelect Dialog"
 ```
 
 ### kglobalshortcutsrc
+
 There are two issues in this configuration.
 
 First, ActivityManager switch-to-activity entries. There are multiple entries,
@@ -49,6 +52,7 @@ transform regex ".*" ".*" kde-shortcut
 ```
 
 ### konversationrc
+
 Konversation has two relevant quirks:
 
 1. It saves the password in the settings file (instead of using kwallet)
@@ -70,6 +74,7 @@ $ chezmoi_modify_manager --keyring-set konversation konversation_id0
 ```
 
 ### kwinrc
+
 Similar to kglobalshortcutsrc there are computer specific UUIDs. In addition,
 the tiling configurations seem to be overwritten by KDE Plasma between computers.
 

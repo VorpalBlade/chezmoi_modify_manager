@@ -19,7 +19,6 @@ and understand the basics of how it works.
 3. Run `chezmoi_modify_manager --doctor` and make sure it reports no major issues
    with your installation.
 
-
 ## Tab completion
 
 Optionally you can install tab completion. The tab completion can be generated
@@ -35,6 +34,7 @@ for detailed instructions.
 ## Upgrading
 
 Depending on the installation method:
+
 * `chezmoi_modify_manager --upgrade`
 * With your package manager
 * For each OS and architecture, update the file `.utils/chezmoi_modify_manager-<os>-<arch>`.

@@ -70,6 +70,7 @@ version that you use. E.g:
 ```bash
 CHEZMOI_MODIFY_MANAGER_ASSUME_CHEZMOI_VERSION=2.46.0
 ```
+
 This could be set in your `.bashrc`/`.zshrc`/`.profile` or similar file (the
 details of how to best set environment variables for a particular platform and
 shell is out of scope of this documentation).

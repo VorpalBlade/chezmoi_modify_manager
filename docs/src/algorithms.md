@@ -14,12 +14,13 @@ interested in that, go read the code.
 The actual INI parser is in the [ini-roundtrip] crate. A custom INI parser is used
 to ensure that writing it back out doesn't change formatting.
 
-# Filtering
+## Filtering
 
 This is used when re-adding an existing file (`chezmoi_modify_manager -a` or `-s`).
 This is the simpler of the two algorithms.
 
 Relevant directives from your config for this algorithm:
+
 * `add:hide` (replaces the value with `HIDDEN` when re-adding)
 * `add:remove` (removes the line when re-adding)
 * `ignore` (removes the line when re-adding)
@@ -48,12 +49,13 @@ When a user passes `-s` or `-a` a bunch of things happen:
 Note evaluation order of actions documented in [Actions](actions.md#order-of-action-matching),
 section matches take priority, then literal matches, then regex matches (in order).
 
-# Merging
+## Merging
 
 This is used for normal `chezmoi apply` (and `chezmoi diff` etc). This is a more
 complicated case: there are now three files involved.
 
 Relevant directives from your config for this algorithm:
+
 * `ignore` (keeps the system state and ignores whatever is in the source state)
 * `set` (sets to a specific key and value)
 * `remove` (entirely removes the match)
@@ -74,8 +76,7 @@ Relevant directives from your config for this algorithm:
       * (There is also some additional logic to deal with entirely empty
         sections etc, so we don't actually emit the section on stdout until we
         are sure later on, there is a concept of "pending lines" to implement that.)
-   *  If it is a key, find the first [action that applies](actions.md#order-of-action-matching)
-      if any. Then:
+   * If it is a key, find the first [action that applies](actions.md#order-of-action-matching) if any. Then:
       * If no action applies, take the value from the `.src.ini` file.
       * If no action applies and the line is not in the `.src.ini` file, remove
         the line.

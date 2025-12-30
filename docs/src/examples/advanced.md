@@ -33,6 +33,7 @@ hide values respectively when re-adding files from the system to the chezmoi
 source state.
 
 Some use cases for this are:
+
 * Use `add:hide` to prevent a password from being added back to the source state
   when you re-add a file with other changes. See the
   [konversationrc example](basics.md#konversationrc) for an example of this. By using

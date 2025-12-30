@@ -22,7 +22,7 @@ There are two different "contexts" for evaluating actions:
 * Filtering: This is using when re-adding an existing file (`chezmoi_modify_manager -a`
   or `-s`).
 
-See [Algorithms](algorithms.md) for details of how these work, in this file we 
+See [Algorithms](algorithms.md) for details of how these work, in this file we
 are only concerned with how the directives and rules matching works.
 
 These have separate directive to action translators. Not all directives apply to

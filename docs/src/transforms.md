@@ -2,7 +2,7 @@
 
 This is a list of supported transforms. These are used to support some special
 hard-to-handle cases. The general syntax is [documented elsewhere](configuration_files.md#transform),
-but in short: 
+but in short:
 
 ```bash
 transform "section" "key" transform-name arg1="value" arg2="value" ...
