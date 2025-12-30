@@ -54,6 +54,8 @@ pub(super) enum Directive {
 pub(super) enum Matcher {
     /// Match a whole section (exact name)
     Section(String),
+    /// Match a whole section (regex)
+    SectionRegex(String),
     /// Match exact section and key names
     Literal(String, String),
     /// Match section and key names using regexes
@@ -197,6 +199,13 @@ fn transform_arg(i: &mut &str) -> ModalResult<(String, String)> {
 }
 
 /// Matcher for a section
+fn match_section_regex(i: &mut &str) -> ModalResult<Matcher> {
+    ("section", space1, "regex", space1, quoted_string)
+        .map(|(_, _, _, _, section)| Matcher::SectionRegex(section))
+        .parse_next(i)
+}
+
+/// Matcher for a section
 fn match_section(i: &mut &str) -> ModalResult<Matcher> {
     ("section", space1, quoted_string)
         .map(|(_, _, section)| Matcher::Section(section))
@@ -219,7 +228,13 @@ fn match_literal(i: &mut &str) -> ModalResult<Matcher> {
 
 /// All valid matchers
 fn matcher(i: &mut &str) -> ModalResult<Matcher> {
-    alt((match_section, match_regex, match_literal)).parse_next(i)
+    alt((
+        match_section_regex,
+        match_section,
+        match_regex,
+        match_literal,
+    ))
+    .parse_next(i)
 }
 
 /// The valid matchers for a transformer

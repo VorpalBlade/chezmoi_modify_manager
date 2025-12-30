@@ -133,7 +133,10 @@ pub(crate) fn parse_for_merge(src: &str) -> anyhow::Result<Config<Mutations>> {
                 source = Some(Source::AutoPath);
             }
             Directive::Ignore(Matcher::Section(section)) => {
-                builder.add_section_action(section, SectionAction::Ignore);
+                builder.add_section_literal_action(section, SectionAction::Ignore);
+            }
+            Directive::Ignore(Matcher::SectionRegex(section)) => {
+                builder.add_section_regex_action(section, SectionAction::Ignore);
             }
             Directive::Ignore(matcher) => {
                 add_merge_action(&mut builder, matcher, Action::Ignore);
@@ -154,12 +157,12 @@ pub(crate) fn parse_for_merge(src: &str) -> anyhow::Result<Config<Mutations>> {
                 builder.add_setter(
                     section,
                     key,
-                    value,
-                    separator.unwrap_or_else(|| " = ".to_string()),
+                    &value,
+                    &separator.unwrap_or_else(|| " = ".to_string()),
                 );
             }
             Directive::Remove(Matcher::Section(section)) => {
-                builder.add_section_action(section, SectionAction::Delete);
+                builder.add_section_literal_action(section, SectionAction::Delete);
             }
             Directive::Remove(matcher) => {
                 add_merge_action(&mut builder, matcher, Action::Delete);
@@ -233,11 +236,12 @@ pub(crate) fn parse_for_add(src: &str) -> Result<Config<FilterActions>, anyhow::
 fn add_merge_action(builder: &mut MutationsBuilder, matcher: Matcher, action: Action) {
     match matcher {
         Matcher::Section(_) => panic!("Section match not valid in add_merge_action()"),
+        Matcher::SectionRegex(_) => panic!("SectionRegex match not valid in add_merge_action()"),
         Matcher::Literal(section, key) => {
-            builder.add_literal_action(section, key, action);
+            builder.add_literal_action(section, &key, action);
         }
         Matcher::Regex(section, key) => {
-            builder.add_regex_action(section, key, action);
+            builder.add_regex_action(&section, &key, action);
         }
     }
 }
@@ -245,13 +249,16 @@ fn add_merge_action(builder: &mut MutationsBuilder, matcher: Matcher, action: Ac
 fn add_filter_action(builder: &mut FilterActionsBuilder, matcher: Matcher, action: FilterAction) {
     match matcher {
         Matcher::Section(section) => {
-            builder.add_section_action(section, action);
+            builder.add_section_literal_action(section, action);
+        }
+        Matcher::SectionRegex(section) => {
+            builder.add_section_regex_action(section, action);
         }
         Matcher::Literal(section, key) => {
-            builder.add_literal_action(section, key, action);
+            builder.add_literal_action(section, &key, action);
         }
         Matcher::Regex(section, key) => {
-            builder.add_regex_action(section, key, action);
+            builder.add_regex_action(&section, &key, action);
         }
     }
 }
