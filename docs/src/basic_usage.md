@@ -83,9 +83,11 @@ ignore "SomeSection" "SomeKey"
 ignore section "An entire section that is ignored"
 
 ignore regex "Some Sections .*" "A key regex .*"
+
+ignore section regex "^AllSectionsStartingWithThisString.*"
 ```
 
-This illustrates some basics: 
+This illustrates some basics:
 
 * The first line needs to be a `#!` that tells the OS that `chezmoi_modify_manager`
   should be the interpreter for this file. (This still works on Windows because

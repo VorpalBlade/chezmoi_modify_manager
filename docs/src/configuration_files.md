@@ -48,13 +48,15 @@ are supported:
 
 ```bash
 ignore section "my-section"
+ignore section regex "^MySection.*"
 ignore "my-section" "my-key"
 ignore regex "section.*regex" "key regex.*"
 ```
 
 * The first form ignores a whole section (exact literal match).
-* The second form ignores a specific key (exact literal match).
-* The third form uses a regex to ignore a specific key.
+* The second form ignores a whole section (regex match).
+* The third form ignores a specific key (exact literal match).
+* The fourth form uses a regex to ignore a specific key.
 
 Prefer the exact literal match variants where possible, they will be
 marginally faster.
