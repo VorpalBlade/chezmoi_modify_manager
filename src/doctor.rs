@@ -13,6 +13,7 @@ use anyhow::anyhow;
 use itertools::Itertools;
 use medic::Check;
 use medic::CheckResult;
+use regex::Regex;
 use std::env::VarError;
 use std::fs::File;
 use std::io::BufRead;
@@ -215,11 +216,12 @@ fn check_has_ignore() -> Result<(CheckResult, String), Box<dyn std::error::Error
         let mut reader = BufReader::new(file);
 
         let mut buffer = String::new();
+        let re = Regex::new(r"^\*\*/\*\.src\.ini(\s+#.*)?\s*$").unwrap();
         while let Ok(len) = reader.read_line(&mut buffer) {
             if len == 0 {
                 break;
             }
-            if buffer.trim_end() == "**/*.src.ini" {
+            if re.is_match(buffer.as_str()) {
                 return Ok((CheckResult::Ok, "Ignore of **/*.src.ini found".to_owned()));
             }
             buffer.clear();
