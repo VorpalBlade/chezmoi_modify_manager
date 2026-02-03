@@ -216,7 +216,7 @@ fn check_has_ignore() -> Result<(CheckResult, String), Box<dyn std::error::Error
         let mut reader = BufReader::new(file);
 
         let mut buffer = String::new();
-        let re = Regex::new(r"^\*\*/\*\.src\.ini(\s+#.*)?\s*$").unwrap();
+        let re = Regex::new(r"^\*\*/\*\.src\.ini(\s+#.*)?\s*$").expect("Invalid regex");
         while let Ok(len) = reader.read_line(&mut buffer) {
             if len == 0 {
                 break;
