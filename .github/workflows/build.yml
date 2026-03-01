@@ -117,7 +117,7 @@ jobs:
           - --no-default-features --features=updater-tls-rusttls
           - --no-default-features --features=keyring
         rust:
-          - 1.86.0
+          - 1.90.0
           - stable
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
