@@ -39,7 +39,7 @@ anstream = { version = "1.0.0", default-features = false, features = [
     "auto",
     "wincon",
 ] }
-anstyle = { version = "1.0.13", default-features = false }
+anstyle = { version = "1.0.14", default-features = false }
 anyhow = { version = "1.0.102", features = [
     "backtrace",
     "std",
@@ -50,7 +50,7 @@ bpaf = { version = "0.9", features = [
 ], default-features = false }
 camino = { version = "1.2.2", default-features = false }
 duct = { version = "1.1.1", default-features = false }
-env_logger = { version = "0.11.9", default-features = false }
+env_logger = { version = "0.11.10", default-features = false }
 glob = { version = "0.3.3", default-features = false }
 indoc = { version = "2.0.7", default-features = false }
 ini-merge = { version = "0.7.0", default-features = false }
@@ -64,7 +64,7 @@ strum = { version = "0.27.2", features = [
     "std",
 ], default-features = false }
 thiserror = { version = "2.0.18", default-features = false }
-which = { version = "8.0.0", default-features = false, features = ["real-sys"] }
+which = { version = "8.0.2", default-features = false, features = ["real-sys"] }
 winnow = { version = "0.7.14", default-features = false, features = [
     "simd",
     "std",
@@ -77,7 +77,7 @@ pathdiff = { version = "0.2.3", features = [
 pretty_assertions = { version = "1.4.1", default-features = false, features = [
     "std",
 ] }
-tempfile = { version = "3.26.0", default-features = false }
+tempfile = { version = "3.27.0", default-features = false }
 
 [lints.rust]
 elided_lifetimes_in_paths = "warn"
