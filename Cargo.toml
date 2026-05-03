@@ -56,16 +56,16 @@ indoc = { version = "2.0.7", default-features = false }
 ini-merge = { version = "0.7.0", default-features = false }
 itertools = { version = "0.14.0", default-features = false }
 log = { version = "0.4.29", default-features = false }
-medic = { version = "0.3.4" }
+medic = { version = "0.3.5" }
 regex = "1.12.3"
-rpassword = "7.4.0"
+rpassword = "7.5.2"
 strum = { version = "0.27.2", features = [
     "derive",
     "std",
 ], default-features = false }
 thiserror = { version = "2.0.18", default-features = false }
 which = { version = "8.0.2", default-features = false, features = ["real-sys"] }
-winnow = { version = "0.7.14", default-features = false, features = [
+winnow = { version = "0.7.15", default-features = false, features = [
     "simd",
     "std",
 ] }
