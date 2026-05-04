@@ -13,6 +13,7 @@ accepted = [
     "OpenSSL",
     "Unicode-3.0",
     "Unicode-DFS-2016",
+    "Zlib",
 ]
 ignore-dev-dependencies = true
 private.ignore = true
