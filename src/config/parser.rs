@@ -65,18 +65,22 @@ pub(super) enum Matcher {
 /// Top level parser for the config file
 pub(super) fn parse_config(i: &mut &str) -> ModalResult<Vec<Directive>> {
     let alternatives = (
-        comment.context(StrContext::Label("comment")),
-        chezmoi_template.context(StrContext::Label("chezmoi template")),
-        source.context(StrContext::Label("source")),
-        no_warn_multiple_key_matches.context(StrContext::Label("no-warn-multiple-key-matches")),
-        ignore.context(StrContext::Label("ignore")),
-        transform.context(StrContext::Label("transform")),
-        set.context(StrContext::Label("set")),
-        remove.context(StrContext::Label("remove")),
-        add_remove.context(StrContext::Label("add:remove")),
-        add_hide.context(StrContext::Label("add:hide")),
-        "".map(|_| Directive::WS)
-            .context(StrContext::Label("whitespace")), // Blank lines
+        alt((
+            comment.context(StrContext::Label("comment")),
+            chezmoi_template.context(StrContext::Label("chezmoi template")),
+            source.context(StrContext::Label("source")),
+            no_warn_multiple_key_matches.context(StrContext::Label("no-warn-multiple-key-matches")),
+            ignore.context(StrContext::Label("ignore")),
+            transform.context(StrContext::Label("transform")),
+        )),
+        alt((
+            set.context(StrContext::Label("set")),
+            remove.context(StrContext::Label("remove")),
+            add_remove.context(StrContext::Label("add:remove")),
+            add_hide.context(StrContext::Label("add:hide")),
+            "".map(|_| Directive::WS)
+                .context(StrContext::Label("whitespace")), // Blank lines
+        )),
     );
     (separated(0.., alt(alternatives), newline), opt(newline))
         .map(|(val, _)| val)

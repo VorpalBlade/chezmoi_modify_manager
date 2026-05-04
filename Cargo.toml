@@ -65,8 +65,10 @@ strum = { version = "0.27.2", features = [
 ], default-features = false }
 thiserror = { version = "2.0.18", default-features = false }
 which = { version = "8.0.2", default-features = false, features = ["real-sys"] }
-winnow = { version = "0.7.15", default-features = false, features = [
+winnow = { version = "1.0.2", default-features = false, features = [
     "simd",
+    "ascii",
+    "parser",
     "std",
 ] }
 
