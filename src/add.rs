@@ -49,10 +49,10 @@ impl std::str::FromStr for Style {
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value {
-            "auto" => Ok(Style::Auto),
-            "path" => Ok(Style::InPath),
-            "path-tmpl" => Ok(Style::InPathTmpl),
-            "src" => Ok(Style::InSrc),
+            "auto" => Ok(Self::Auto),
+            "path" => Ok(Self::InPath),
+            "path-tmpl" => Ok(Self::InPathTmpl),
+            "src" => Ok(Self::InSrc),
             _ => Err(anyhow!("Invalid style: {value}")),
         }
     }
