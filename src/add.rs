@@ -19,16 +19,13 @@ use std::io::Write;
 use strum::Display;
 use strum::EnumIter;
 use strum::EnumMessage;
-use strum::EnumString;
 use strum::IntoStaticStr;
 
 #[cfg(test)]
 mod tests;
 
 /// The style of calls to the executable
-#[derive(
-    Debug, Eq, PartialEq, EnumString, Clone, Copy, EnumIter, EnumMessage, Display, IntoStaticStr,
-)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumIter, EnumMessage, Display, IntoStaticStr)]
 pub enum Style {
     /// Selects between path and path-tmpl based on detected chezmoi version
     #[strum(serialize = "auto")]
@@ -45,6 +42,20 @@ pub enum Style {
     ///    (modify_ script is always templated)
     #[strum(serialize = "src")]
     InSrc,
+}
+
+impl std::str::FromStr for Style {
+    type Err = anyhow::Error;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "auto" => Ok(Style::Auto),
+            "path" => Ok(Style::InPath),
+            "path-tmpl" => Ok(Style::InPathTmpl),
+            "src" => Ok(Style::InSrc),
+            _ => Err(anyhow!("Invalid style: {value}")),
+        }
+    }
 }
 
 /// The mode for adding
