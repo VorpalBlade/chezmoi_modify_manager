@@ -73,11 +73,11 @@ jobs:
       - name: Install Rust
         run: rustup install --profile minimal ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
       - name: Install cross
-        uses: taiki-e/install-action@3d7d7cd5ac7f994c1892ae0c06165095b9139094 # v2.85.1
+        uses: taiki-e/install-action@b6ff580856c41316412a0b9b60540fbc6f8c82cc # v2.86.7
         with:
           tool: cross@latest
       - name: Cache builds
-        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           key: ${{ matrix.target }}-${{ matrix.rust }}
       - name: Cross compile
@@ -129,7 +129,7 @@ jobs:
         if: matrix.features == '--no-default-features --features=keyring'
         run: sudo apt-get install -y libdbus-1-dev pkg-config
       - name: Cache builds
-        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           save-if: ${{ matrix.features == '--no-default-features --features=updater-tls-native-vendored' }}
       - name: Compile
@@ -203,7 +203,7 @@ jobs:
       - name: Install Rust
         run: rustup install --no-self-update --profile minimal ${{ matrix.rust }} && rustup default ${{ matrix.rust }} && rustup target add ${{ matrix.target }}
       - name: Cache builds
-        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.rust }}
       - name: Compile
