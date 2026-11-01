@@ -38,14 +38,14 @@ jobs:
         run: cargo binstall --no-confirm --no-symlinks clippy-sarif sarif-fmt
 
       - name: Cache builds
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
 
       - name: Run rust-clippy
         run: cargo clippy --all-features --all-targets --message-format=json -- -D warnings | clippy-sarif | tee rust-clippy-results.sarif | sarif-fmt
         continue-on-error: true
 
       - name: Upload analysis results to GitHub
-        uses: github/codeql-action/upload-sarif@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v3.29.5
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v3.29.5
         with:
           sarif_file: rust-clippy-results.sarif
           wait-for-processing: true
