@@ -73,11 +73,11 @@ jobs:
       - name: Install Rust
         run: rustup install --profile minimal ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
       - name: Install cross
-        uses: taiki-e/install-action@b6ff580856c41316412a0b9b60540fbc6f8c82cc # v2.86.7
+        uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2.87.31
         with:
           tool: cross@latest
       - name: Cache builds
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           key: ${{ matrix.target }}-${{ matrix.rust }}
       - name: Cross compile
@@ -95,7 +95,7 @@ jobs:
           fi
           tar cf chezmoi_modify_manager.tar chezmoi_modify_manager
           zstd -T0 -6 chezmoi_modify_manager.tar
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: matrix.rust == 'stable' && matrix.target != 'x86_64-pc-windows-gnu'
         with:
           name: chezmoi_modify_manager_${{ matrix.target }}.zst
@@ -129,7 +129,7 @@ jobs:
         if: matrix.features == '--no-default-features --features=keyring'
         run: sudo apt-get install -y libdbus-1-dev pkg-config
       - name: Cache builds
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           save-if: ${{ matrix.features == '--no-default-features --features=updater-tls-native-vendored' }}
       - name: Compile
@@ -203,7 +203,7 @@ jobs:
       - name: Install Rust
         run: rustup install --no-self-update --profile minimal ${{ matrix.rust }} && rustup default ${{ matrix.rust }} && rustup target add ${{ matrix.target }}
       - name: Cache builds
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.rust }}
       - name: Compile
@@ -218,7 +218,7 @@ jobs:
           cp -r target/${{ matrix.target }}/debug/chezmoi_modify_manager${{ matrix.debug-suffix }} chezmoi_modify_manager/
           tar cf chezmoi_modify_manager.tar chezmoi_modify_manager
           zstd -T0 -6 chezmoi_modify_manager.tar
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: matrix.rust == 'stable' && matrix.target != 'x86_64-pc-windows-gnu'
         with:
           name: chezmoi_modify_manager_${{ matrix.target }}.zst
